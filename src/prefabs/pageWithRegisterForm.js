@@ -27,7 +27,7 @@
         <Header onClose={close} title="Configure register form" />
         <Content>
           <Field
-            label="Select the webuser model"
+            label="Select model"
             error={
               showValidation && (
                 <Text color="#e82600">Selecting a model is required</Text>
