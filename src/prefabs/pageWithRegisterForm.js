@@ -7141,7 +7141,7 @@
                   type: 'TOGGLE',
                 },
                 {
-                  value: 'Primary',
+                  value: 'Transparent',
                   label: 'Background color',
                   key: 'backgroundColor',
                   type: 'COLOR',
@@ -7169,7 +7169,9 @@
                   },
                 },
                 {
-                  value: [''],
+                  value: [
+                    'https://assets.bettyblocks.com/7730f33d3a624ec6b5383b5dc26c79d6_assets/files/login-background.jpeg',
+                  ],
                   label: 'Background url',
                   key: 'backgroundUrl',
                   type: 'VARIABLE',
