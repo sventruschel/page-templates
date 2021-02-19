@@ -6644,22 +6644,6 @@
         },
       },
     },
-    {
-      ref: {
-        id: '#usernameVariableId',
-        actionId: '#registerActionId',
-      },
-      kind: 'string',
-      name: 'username',
-    },
-    {
-      ref: {
-        id: '#passwordVariableId',
-        actionId: '#registerActionId',
-      },
-      kind: 'string',
-      name: 'password',
-    },
   ],
   actions: [
     {
