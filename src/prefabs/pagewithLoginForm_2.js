@@ -114,7 +114,7 @@
                 },
               );
               const descendantsArray = properties
-                .sort((a, b) => (a.kind === 'PASSWORD' ? 1 : -1))
+                .sort(a => (a.kind === 'PASSWORD' ? 1 : -1))
                 .map(property => {
                   switch (property.kind) {
                     case 'EMAIL_ADDRESS': {
