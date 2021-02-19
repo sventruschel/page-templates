@@ -27,7 +27,7 @@
         <Header onClose={close} title="Configure register form" />
         <Content>
           <Field
-            label="Select the webuser model"
+            label="Select model"
             error={
               showValidation && (
                 <Text color="#e82600">Selecting a model is required</Text>
@@ -6644,22 +6644,6 @@
         },
       },
     },
-    {
-      ref: {
-        id: '#usernameVariableId',
-        actionId: '#registerActionId',
-      },
-      kind: 'string',
-      name: 'username',
-    },
-    {
-      ref: {
-        id: '#passwordVariableId',
-        actionId: '#registerActionId',
-      },
-      kind: 'string',
-      name: 'password',
-    },
   ],
   actions: [
     {
@@ -7141,7 +7125,7 @@
                   type: 'TOGGLE',
                 },
                 {
-                  value: 'Primary',
+                  value: 'Transparent',
                   label: 'Background color',
                   key: 'backgroundColor',
                   type: 'COLOR',
@@ -7169,7 +7153,9 @@
                   },
                 },
                 {
-                  value: [''],
+                  value: [
+                    'https://assets.bettyblocks.com/7730f33d3a624ec6b5383b5dc26c79d6_assets/files/login-background.jpeg',
+                  ],
                   label: 'Background url',
                   key: 'backgroundUrl',
                   type: 'VARIABLE',
