@@ -1,6 +1,7 @@
 (() => ({
-  name: 'loginTemplate',
+  name: 'Page With Login Form 2',
   icon: 'LoginFormIcon',
+  description: 'Page with login form',
   category: 'FORM',
   beforeCreate: ({
     prefab,
@@ -51,12 +52,23 @@
               value={authProfileId}
             />
           </Field>
-          <EndpointSelector
-            onChange={redirectTo => {
-              setRedirectTo(redirectTo);
-            }}
-            value={redirectTo}
-          />
+          <Field
+            label="Select a page to go to after login"
+            error={
+              showValidation && (
+                <Text color="#e82600">
+                  Selecting an authentication profile is required
+                </Text>
+              )
+            }
+          >
+            <EndpointSelector
+              onChange={redirectTo => {
+                setRedirectTo(redirectTo);
+              }}
+              value={redirectTo}
+            />
+          </Field>
         </Content>
         <Footer
           onClose={close}
