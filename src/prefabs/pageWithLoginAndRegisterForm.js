@@ -44,7 +44,7 @@
               )
             }
           >
-            <Text size="small" color="grey700">
+            <Text size="small" color="grey700" as="div" margin={{ "bottom": "0.5rem" }}>
               The input fields used in the login form are automatically generated based on
               the username and password property of the selected authentication profile.
             </Text>
@@ -59,7 +59,7 @@
           </Field>
           {authProfileId && (
             <Field label="Input fields in the register form">
-              <Text size="small" color="grey700">
+              <Text size="small" color="grey700" as="div" margin={{ "bottom": "0.5rem" }}>
                 The selected properties will show up as input fields in the register
                 form.
               </Text>
