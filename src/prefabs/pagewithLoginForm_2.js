@@ -67,6 +67,7 @@
                 setRedirectTo(redirectTo);
               }}
               value={redirectTo}
+              size="large"
             />
           </Field>
         </Content>
@@ -5399,15 +5400,15 @@
       },
       type: 'Custom',
     },
-    {
-      name: 'login',
-      sourceEvent: 'onActionSuccess',
-      ref: {
-        sourceComponentId: '#formId',
-      },
-      parameters: [],
-      type: 'Global',
-    },
+    // {
+    //   name: 'login',
+    //   sourceEvent: 'onActionSuccess',
+    //   ref: {
+    //     sourceComponentId: '#formId',
+    //   },
+    //   parameters: [],
+    //   type: 'Global',
+    // },
   ],
   structure: [
     {
