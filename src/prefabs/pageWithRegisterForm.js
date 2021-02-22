@@ -43,13 +43,46 @@
             />
           </Field>
           {modelId && (
-            <Field label="Input fields in the register form">
+            <Field
+              label="Input fields in the register form"
+              info={
+                <Text size="small" color="grey700">
+                  The selected properties will show up as input fields in the register
+                  form.
+                </Text>
+              }
+            >
               <PropertiesSelector
                 modelId={modelId}
                 value={properties}
                 onChange={value => {
                   setProperties(value);
                 }}
+                scopedModels={false}
+                disabledNames={['created_at', 'updated_at', 'id']}
+                disabledKinds={[
+                  'BELONGS_TO',
+                  'HAS_AND_BELONGS_TO_MANY',
+                  'HAS_MANY',
+                  'MULTI_FILE',
+                  'AUTO_INCREMENT',
+                  'COUNT',
+                  'EMAIL',
+                  'MULTI_IMAGE',
+                  'PDF',
+                  'RICH_TEXT',
+                  'SIGNED_PDF',
+                  'SUM',
+                  'BOOLEAN_EXPRESSION',
+                  'DATE_EXPRESSION',
+                  'DATE_TIME_EXPRESSION',
+                  'DECIMAL_EXPRESSION',
+                  'INTEGER_EXPRESSION',
+                  'MINUTES_EXPRESSION',
+                  'PRICE_EXPRESSION',
+                  'STRING_EXPRESSION',
+                  'TEXT_EXPRESSION',
+                ]}
               />
             </Field>
           )}
