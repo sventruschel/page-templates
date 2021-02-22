@@ -43,15 +43,11 @@
             />
           </Field>
           {modelId && (
-            <Field
-              label="Input fields in the register form"
-              info={
-                <Text size="small" color="grey700">
-                  The selected properties will show up as input fields in the register
-                  form.
-                </Text>
-              }
-            >
+            <Field label="Input fields in the register form">
+              <Text size="small" color="grey700">
+                The selected properties will show up as input fields in the register
+                form.
+              </Text>
               <PropertiesSelector
                 modelId={modelId}
                 value={properties}
