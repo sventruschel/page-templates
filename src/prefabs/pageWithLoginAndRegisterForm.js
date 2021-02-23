@@ -16,19 +16,34 @@
       Footer,
       Text,
       PropertiesSelector,
+      EndpointSelector,
     },
   }) => {
     const [authProfileId, setAuthProfileId] = React.useState('');
+    const [redirectTo, setRedirectTo] = React.useState({});
     const [authProfile, setAuthProfile] = React.useState(null);
-    const [showValidation, setShowValidation] = React.useState(false);
+    const [showAuthValidation, setShowAuthValidation] = React.useState(false);
+    const [showEndpointValidation, setShowEndpointValidation] = React.useState(
+      false,
+    );
     const [registerProperties, setRegisterProperties] = React.useState([]);
     const [headerTitle, setHeaderTitle] = React.useState('Configure login form');
 
+    function serializeParameters(obj) {
+      return Object.entries(obj).map(([name, entry]) => ({
+        name,
+        value: entry.map(v => JSON.stringify(v)),
+      }));
+    }
+
+    const isEmptyRedirect = value =>
+      !value || Object.keys(value).length === 0 || value.id === '';
+
     React.useEffect(() => {
-      authProfileId
+      authProfileId && redirectTo
         ? setHeaderTitle('Configure register form')
         : setHeaderTitle('Configure login form');
-    }, [authProfileId]);
+    }, [authProfileId, redirectTo]);
 
     return (
       <>
@@ -37,7 +52,7 @@
           <Field
             label="Select an authentication profile"
             error={
-              showValidation && (
+              showAuthValidation && (
                 <Text color="#e82600">
                   Selecting an authentication profile is required
                 </Text>
@@ -50,14 +65,31 @@
             </Text>
             <AuthenticationProfileSelector
               onChange={(id, authProfileObject) => {
-                setShowValidation(false);
+                setShowAuthValidation(false);
                 setAuthProfileId(id);
                 setAuthProfile(authProfileObject);
               }}
               value={authProfileId}
             />
           </Field>
-          {authProfileId && (
+          <Field
+            label="Redirect after successful login"
+            error={
+              showEndpointValidation && (
+                <Text color="#e82600">Selecting an endpoint is required</Text>
+              )
+            }
+          >
+            <EndpointSelector
+              value={redirectTo}
+              size="large"
+              onChange={value => {
+                setShowEndpointValidation(isEmptyRedirect(value));
+                setRedirectTo(value);
+              }}
+            />
+          </Field>
+          {authProfileId && redirectTo && (
             <Field label="Input fields in the register form">
               <Text size="small" color="grey700" as="div" margin={{ "bottom": "0.5rem" }}>
                 The selected properties will show up as input fields in the register
@@ -102,12 +134,26 @@
           onClose={close}
           onSave={() => {
             if (!authProfileId) {
-              setShowValidation(true);
+              setShowAuthValidation(true);
               return;
             }
+
+            if (isEmptyRedirect(redirectTo)) {
+              setShowEndpointValidation(true);
+              return;
+            }
+
             const newPrefab = { ...prefab };
             if (authProfileId) {
               const { loginModel, properties, id } = authProfile;
+              newPrefab.interactions[0].parameters = [
+                {
+                  parameter: 'redirectTo',
+                  pageId: redirectTo.pageId,
+                  endpointId: redirectTo.id,
+                  parameters: serializeParameters(redirectTo.params),
+                },
+              ];
               const loginFormPrefab =
                 newPrefab.structure[0].descendants[0].descendants[0]
                   .descendants[0].descendants[0].descendants[1].descendants[0]
@@ -133,3775 +179,3777 @@
               //   },
               // );
 
-              const loginDescendantsArray = properties
-                .sort(a => (a.kind === 'PASSWORD' ? 1 : -1))
-                .map(property => {
-                  switch (property.kind) {
-                    case 'EMAIL_ADDRESS': {
-                      return {
-                        name: 'TextField',
-                        options: [
-                          {
-                            value: {
-                              label: [property.label],
-                              value: [
-                                {
-                                  id: [property.id],
-                                  type: 'PROPERTY',
-                                },
-                              ],
-                              propertyIds: [property.id],
-                              ref: {
-                                id: `#login_attribute_${property.id}`,
-                              },
-                            },
-                            label: 'Label',
-                            key: 'customModelAttribute',
-                            type: 'CUSTOM_MODEL_ATTRIBUTE',
-                            configuration: {
-                              allowedTypes: ['string'],
-                            },
-                          },
-                          {
-                            value: false,
-                            label: 'Validation options',
-                            key: 'validationOptions',
-                            type: 'TOGGLE',
-                          },
-                          {
-                            label: 'Validation pattern',
-                            key: 'pattern',
-                            value: '',
-                            type: 'TEXT',
-                            configuration: {
-                              placeholder:
-                                '[a-z0-9._%+-]+@[a-z0-9.-]+.[a-z]{2,4}$',
-                              condition: {
-                                type: 'SHOW',
-                                option: 'validationOptions',
-                                comparator: 'EQ',
-                                value: true,
-                              },
-                            },
-                          },
-                          {
-                            label: 'Min length',
-                            key: 'minlength',
-                            value: '',
-                            type: 'NUMBER',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'validationOptions',
-                                comparator: 'EQ',
-                                value: true,
-                              },
-                            },
-                          },
-                          {
-                            label: 'Max length',
-                            key: 'maxlength',
-                            value: '',
-                            type: 'NUMBER',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'validationOptions',
-                                comparator: 'EQ',
-                                value: true,
-                              },
-                            },
-                          },
-                          {
-                            value: ['This field is required'],
-                            label: 'Value required message',
-                            key: 'validationValueMissing',
-                            type: 'VARIABLE',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'validationOptions',
-                                comparator: 'EQ',
-                                value: true,
-                              },
-                            },
-                          },
-                          {
-                            value: ['Invalid value'],
-                            label: 'Pattern mismatch message',
-                            key: 'validationPatternMismatch',
-                            type: 'VARIABLE',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'validationOptions',
-                                comparator: 'EQ',
-                                value: true,
-                              },
-                            },
-                          },
-                          {
-                            value: ['This value is too short'],
-                            label: 'Value too short message',
-                            key: 'validationTooShort',
-                            type: 'VARIABLE',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'validationOptions',
-                                comparator: 'EQ',
-                                value: true,
-                              },
-                            },
-                          },
-                          {
-                            value: ['This value is too long'],
-                            label: 'Value too long message',
-                            key: 'validationTooLong',
-                            type: 'VARIABLE',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'validationOptions',
-                                comparator: 'EQ',
-                                value: true,
-                              },
-                            },
-                          },
-                          {
-                            value: ['No valid value provided'],
-                            label: 'Email mismatch message',
-                            key: 'validationTypeMismatch',
-                            type: 'VARIABLE',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'validationOptions',
-                                comparator: 'EQ',
-                                value: true,
-                              },
-                            },
-                          },
-                          {
-                            type: 'TOGGLE',
-                            label: 'Disabled',
-                            key: 'disabled',
-                            value: false,
-                          },
-                          {
-                            value: [],
-                            label: 'Placeholder',
-                            key: 'placeholder',
-                            type: 'VARIABLE',
-                          },
-                          {
-                            value: [],
-                            label: 'Helper text',
-                            key: 'helperText',
-                            type: 'VARIABLE',
-                          },
-                          {
-                            label: 'Variant',
-                            key: 'variant',
-                            value: 'outlined',
-                            type: 'CUSTOM',
-                            configuration: {
-                              as: 'BUTTONGROUP',
-                              dataType: 'string',
-                              allowedInput: [
-                                {
-                                  name: 'Standard',
-                                  value: 'standard',
-                                },
-                                {
-                                  name: 'Outlined',
-                                  value: 'outlined',
-                                },
-                                { name: 'Filled', value: 'filled' },
-                              ],
-                            },
-                          },
-                          {
-                            type: 'TOGGLE',
-                            label: 'Full width',
-                            key: 'fullWidth',
-                            value: true,
-                          },
-                          {
-                            label: 'Size',
-                            key: 'size',
-                            value: 'Medium',
-                            type: 'CUSTOM',
-                            configuration: {
-                              as: 'BUTTONGROUP',
-                              dataType: 'string',
-                              allowedInput: [
-                                { name: 'Medium', value: 'medium' },
-                                { name: 'Small', value: 'small' },
-                              ],
-                            },
-                          },
-                          {
-                            label: 'Margin',
-                            key: 'margin',
-                            value: 'normal',
-                            type: 'CUSTOM',
-                            configuration: {
-                              as: 'BUTTONGROUP',
-                              dataType: 'string',
-                              allowedInput: [
-                                { name: 'None', value: 'none' },
-                                { name: 'Dense', value: 'dense' },
-                                { name: 'Normal', value: 'normal' },
-                              ],
-                            },
-                          },
-                          {
-                            label: 'Adornment',
-                            key: 'adornmentIcon',
-                            value: 'Email',
-                            type: 'CUSTOM',
-                            configuration: {
-                              as: 'DROPDOWN',
-                              dataType: 'string',
-                              allowedInput: [
-                                { name: 'None', value: 'none' },
-                                {
-                                  name: 'AcUnit',
-                                  value: 'AcUnit',
-                                },
-                                {
-                                  name: 'AccessTime',
-                                  value: 'AccessTime',
-                                },
-                                {
-                                  name: 'AccessibilityNew',
-                                  value: 'AccessibilityNew',
-                                },
-                                {
-                                  name: 'Accessible',
-                                  value: 'Accessible',
-                                },
-                                {
-                                  name: 'AccountBalance',
-                                  value: 'AccountBalance',
-                                },
-                                {
-                                  name: 'AccountBalanceWallet',
-                                  value: 'AccountBalanceWallet',
-                                },
-                                {
-                                  name: 'AccountCircle',
-                                  value: 'AccountCircle',
-                                },
-                                {
-                                  name: 'AccountTree',
-                                  value: 'AccountTree',
-                                },
-                                {
-                                  name: 'Add',
-                                  value: 'Add',
-                                },
-                                {
-                                  name: 'AddAPhoto',
-                                  value: 'AddAPhoto',
-                                },
-                                {
-                                  name: 'AddBox',
-                                  value: 'AddBox',
-                                },
-                                {
-                                  name: 'AddCircle',
-                                  value: 'AddCircle',
-                                },
-                                {
-                                  name: 'AddCircleOutline',
-                                  value: 'AddCircleOutline',
-                                },
-                                {
-                                  name: 'AddComment',
-                                  value: 'AddComment',
-                                },
-                                {
-                                  name: 'Adjust',
-                                  value: 'Adjust',
-                                },
-                                {
-                                  name: 'AirplanemodeActive',
-                                  value: 'AirplanemodeActive',
-                                },
-                                {
-                                  name: 'AirplanemodeInactive',
-                                  value: 'AirplanemodeInactive',
-                                },
-                                {
-                                  name: 'Airplay',
-                                  value: 'Airplay',
-                                },
-                                {
-                                  name: 'AirportShuttle',
-                                  value: 'AirportShuttle',
-                                },
-                                {
-                                  name: 'Alarm',
-                                  value: 'Alarm',
-                                },
-                                {
-                                  name: 'Album',
-                                  value: 'Album',
-                                },
-                                {
-                                  name: 'AllInbox',
-                                  value: 'AllInbox',
-                                },
-                                {
-                                  name: 'AllInclusive',
-                                  value: 'AllInclusive',
-                                },
-                                {
-                                  name: 'AlternateEmail',
-                                  value: 'AlternateEmail',
-                                },
-                                {
-                                  name: 'Announcement',
-                                  value: 'Announcement',
-                                },
-                                {
-                                  name: 'Apartment',
-                                  value: 'Apartment',
-                                },
-                                {
-                                  name: 'Apps',
-                                  value: 'Apps',
-                                },
-                                {
-                                  name: 'Archive',
-                                  value: 'Archive',
-                                },
-                                {
-                                  name: 'ArrowBack',
-                                  value: 'ArrowBack',
-                                },
-                                {
-                                  name: 'ArrowBackIos',
-                                  value: 'ArrowBackIos',
-                                },
-                                {
-                                  name: 'ArrowDownward',
-                                  value: 'ArrowDownward',
-                                },
-                                {
-                                  name: 'ArrowDropDown',
-                                  value: 'ArrowDropDown',
-                                },
-                                {
-                                  name: 'ArrowDropDownCircle',
-                                  value: 'ArrowDropDownCircle',
-                                },
-                                {
-                                  name: 'ArrowDropUp',
-                                  value: 'ArrowDropUp',
-                                },
-                                {
-                                  name: 'ArrowForward',
-                                  value: 'ArrowForward',
-                                },
-                                {
-                                  name: 'ArrowForwardIos',
-                                  value: 'ArrowForwardIos',
-                                },
-                                {
-                                  name: 'ArrowLeft',
-                                  value: 'ArrowLeft',
-                                },
-                                {
-                                  name: 'ArrowRight',
-                                  value: 'ArrowRight',
-                                },
-                                {
-                                  name: 'ArrowRightAlt',
-                                  value: 'ArrowRightAlt',
-                                },
-                                {
-                                  name: 'ArrowUpward',
-                                  value: 'ArrowUpward',
-                                },
-                                {
-                                  name: 'Assessment',
-                                  value: 'Assessment',
-                                },
-                                {
-                                  name: 'Assignment',
-                                  value: 'Assignment',
-                                },
-                                {
-                                  name: 'AssignmentInd',
-                                  value: 'AssignmentInd',
-                                },
-                                {
-                                  name: 'AssignmentLate',
-                                  value: 'AssignmentLate',
-                                },
-                                {
-                                  name: 'AssignmentReturn',
-                                  value: 'AssignmentReturn',
-                                },
-                                {
-                                  name: 'AssignmentReturned',
-                                  value: 'AssignmentReturned',
-                                },
-                                {
-                                  name: 'AssignmentTurnedIn',
-                                  value: 'AssignmentTurnedIn',
-                                },
-                                {
-                                  name: 'Assistant',
-                                  value: 'Assistant',
-                                },
-                                {
-                                  name: 'AssistantPhoto',
-                                  value: 'AssistantPhoto',
-                                },
-                                {
-                                  name: 'AttachFile',
-                                  value: 'AttachFile',
-                                },
-                                {
-                                  name: 'AttachMoney',
-                                  value: 'AttachMoney',
-                                },
-                                {
-                                  name: 'Attachment',
-                                  value: 'Attachment',
-                                },
-                                {
-                                  name: 'Audiotrack',
-                                  value: 'Audiotrack',
-                                },
-                                {
-                                  name: 'Autorenew',
-                                  value: 'Autorenew',
-                                },
-                                {
-                                  name: 'AvTimer',
-                                  value: 'AvTimer',
-                                },
-                                {
-                                  name: 'Backspace',
-                                  value: 'Backspace',
-                                },
-                                {
-                                  name: 'Backup',
-                                  value: 'Backup',
-                                },
-                                {
-                                  name: 'BarChart',
-                                  value: 'BarChart',
-                                },
-                                {
-                                  name: 'Battery20',
-                                  value: 'Battery20',
-                                },
-                                {
-                                  name: 'Beenhere',
-                                  value: 'Beenhere',
-                                },
-                                {
-                                  name: 'Block',
-                                  value: 'Block',
-                                },
-                                {
-                                  name: 'Bluetooth',
-                                  value: 'Bluetooth',
-                                },
-                                {
-                                  name: 'Book',
-                                  value: 'Book',
-                                },
-                                {
-                                  name: 'Bookmark',
-                                  value: 'Bookmark',
-                                },
-                                {
-                                  name: 'BookmarkBorder',
-                                  value: 'BookmarkBorder',
-                                },
-                                {
-                                  name: 'Bookmarks',
-                                  value: 'Bookmarks',
-                                },
-                                {
-                                  name: 'Brush',
-                                  value: 'Brush',
-                                },
-                                {
-                                  name: 'BubbleChart',
-                                  value: 'BubbleChart',
-                                },
-                                {
-                                  name: 'BugReport',
-                                  value: 'BugReport',
-                                },
-                                {
-                                  name: 'Build',
-                                  value: 'Build',
-                                },
-                                {
-                                  name: 'Cached',
-                                  value: 'Cached',
-                                },
-                                {
-                                  name: 'Cake',
-                                  value: 'Cake',
-                                },
-                                {
-                                  name: 'CalendarToday',
-                                  value: 'CalendarToday',
-                                },
-                                {
-                                  name: 'Call',
-                                  value: 'Call',
-                                },
-                                {
-                                  name: 'CameraAlt',
-                                  value: 'CameraAlt',
-                                },
-                                {
-                                  name: 'CameraRoll',
-                                  value: 'CameraRoll',
-                                },
-                                {
-                                  name: 'Cancel',
-                                  value: 'Cancel',
-                                },
-                                {
-                                  name: 'CardTravel',
-                                  value: 'CardTravel',
-                                },
-                                {
-                                  name: 'Cast',
-                                  value: 'Cast',
-                                },
-                                {
-                                  name: 'Category',
-                                  value: 'Category',
-                                },
-                                {
-                                  name: 'Chat',
-                                  value: 'Chat',
-                                },
-                                {
-                                  name: 'Check',
-                                  value: 'Check',
-                                },
-                                {
-                                  name: 'CheckBox',
-                                  value: 'CheckBox',
-                                },
-                                {
-                                  name: 'CheckCircle',
-                                  value: 'CheckCircle',
-                                },
-                                {
-                                  name: 'CheckCircleOutline',
-                                  value: 'CheckCircleOutline',
-                                },
-                                {
-                                  name: 'ChevronLeft',
-                                  value: 'ChevronLeft',
-                                },
-                                {
-                                  name: 'ChevronRight',
-                                  value: 'ChevronRight',
-                                },
-                                {
-                                  name: 'ChildCare',
-                                  value: 'ChildCare',
-                                },
-                                {
-                                  name: 'Clear',
-                                  value: 'Clear',
-                                },
-                                {
-                                  name: 'Close',
-                                  value: 'Close',
-                                },
-                                {
-                                  name: 'Cloud',
-                                  value: 'Cloud',
-                                },
-                                {
-                                  name: 'CloudDownload',
-                                  value: 'CloudDownload',
-                                },
-                                {
-                                  name: 'CloudUpload',
-                                  value: 'CloudUpload',
-                                },
-                                {
-                                  name: 'Code',
-                                  value: 'Code',
-                                },
-                                {
-                                  name: 'Collections',
-                                  value: 'Collections',
-                                },
-                                {
-                                  name: 'ColorLens',
-                                  value: 'ColorLens',
-                                },
-                                {
-                                  name: 'Colorize',
-                                  value: 'Colorize',
-                                },
-                                {
-                                  name: 'Commute',
-                                  value: 'Commute',
-                                },
-                                {
-                                  name: 'Computer',
-                                  value: 'Computer',
-                                },
-                                {
-                                  name: 'CreditCard',
-                                  value: 'CreditCard',
-                                },
-                                {
-                                  name: 'Dashboard',
-                                  value: 'Dashboard',
-                                },
-                                {
-                                  name: 'DataUsage',
-                                  value: 'DataUsage',
-                                },
-                                {
-                                  name: 'Deck',
-                                  value: 'Deck',
-                                },
-                                {
-                                  name: 'Dehaze',
-                                  value: 'Dehaze',
-                                },
-                                {
-                                  name: 'Delete',
-                                  value: 'Delete',
-                                },
-                                {
-                                  name: 'DeleteForever',
-                                  value: 'DeleteForever',
-                                },
-                                {
-                                  name: 'DesktopMac',
-                                  value: 'DesktopMac',
-                                },
-                                {
-                                  name: 'DeveloperMode',
-                                  value: 'DeveloperMode',
-                                },
-                                {
-                                  name: 'Devices',
-                                  value: 'Devices',
-                                },
-                                {
-                                  name: 'Dialpad',
-                                  value: 'Dialpad',
-                                },
-                                {
-                                  name: 'Directions',
-                                  value: 'Directions',
-                                },
-                                {
-                                  name: 'DirectionsBike',
-                                  value: 'DirectionsBike',
-                                },
-                                {
-                                  name: 'DirectionsBoat',
-                                  value: 'DirectionsBoat',
-                                },
-                                {
-                                  name: 'DirectionsBus',
-                                  value: 'DirectionsBus',
-                                },
-                                {
-                                  name: 'DirectionsCar',
-                                  value: 'DirectionsCar',
-                                },
-                                {
-                                  name: 'DirectionsRailway',
-                                  value: 'DirectionsRailway',
-                                },
-                                {
-                                  name: 'DirectionsRun',
-                                  value: 'DirectionsRun',
-                                },
-                                {
-                                  name: 'DirectionsSubway',
-                                  value: 'DirectionsSubway',
-                                },
-                                {
-                                  name: 'DirectionsTransit',
-                                  value: 'DirectionsTransit',
-                                },
-                                {
-                                  name: 'DirectionsWalk',
-                                  value: 'DirectionsWalk',
-                                },
-                                {
-                                  name: 'DiscFull',
-                                  value: 'DiscFull',
-                                },
-                                {
-                                  name: 'Dns',
-                                  value: 'Dns',
-                                },
-                                {
-                                  name: 'Done',
-                                  value: 'Done',
-                                },
-                                {
-                                  name: 'DoneAll',
-                                  value: 'DoneAll',
-                                },
-                                {
-                                  name: 'DoubleArrow',
-                                  value: 'DoubleArrow',
-                                },
-                                {
-                                  name: 'Drafts',
-                                  value: 'Drafts',
-                                },
-                                {
-                                  name: 'Eco',
-                                  value: 'Eco',
-                                },
-                                {
-                                  name: 'Edit',
-                                  value: 'Edit',
-                                },
-                                {
-                                  name: 'Email',
-                                  value: 'Email',
-                                },
-                                {
-                                  name: 'Equalizer',
-                                  value: 'Equalizer',
-                                },
-                                {
-                                  name: 'Error',
-                                  value: 'Error',
-                                },
-                                {
-                                  name: 'Euro',
-                                  value: 'Euro',
-                                },
-                                {
-                                  name: 'Event',
-                                  value: 'Event',
-                                },
-                                {
-                                  name: 'ExpandLess',
-                                  value: 'ExpandLess',
-                                },
-                                {
-                                  name: 'ExpandMore',
-                                  value: 'ExpandMore',
-                                },
-                                {
-                                  name: 'Explore',
-                                  value: 'Explore',
-                                },
-                                {
-                                  name: 'Extension',
-                                  value: 'Extension',
-                                },
-                                {
-                                  name: 'Face',
-                                  value: 'Face',
-                                },
-                                {
-                                  name: 'Facebook',
-                                  value: 'Facebook',
-                                },
-                                {
-                                  name: 'FastForward',
-                                  value: 'FastForward',
-                                },
-                                {
-                                  name: 'FastRewind',
-                                  value: 'FastRewind',
-                                },
-                                {
-                                  name: 'Favorite',
-                                  value: 'Favorite',
-                                },
-                                {
-                                  name: 'FavoriteBorder',
-                                  value: 'FavoriteBorder',
-                                },
-                                {
-                                  name: 'FilterList',
-                                  value: 'FilterList',
-                                },
-                                {
-                                  name: 'Flag',
-                                  value: 'Flag',
-                                },
-                                {
-                                  name: 'Flare',
-                                  value: 'Flare',
-                                },
-                                {
-                                  name: 'Flight',
-                                  value: 'Flight',
-                                },
-                                {
-                                  name: 'Folder',
-                                  value: 'Folder',
-                                },
-                                {
-                                  name: 'Forum',
-                                  value: 'Forum',
-                                },
-                                {
-                                  name: 'Forward',
-                                  value: 'Forward',
-                                },
-                                {
-                                  name: 'FreeBreakfast',
-                                  value: 'FreeBreakfast',
-                                },
-                                {
-                                  name: 'Fullscreen',
-                                  value: 'Fullscreen',
-                                },
-                                {
-                                  name: 'Functions',
-                                  value: 'Functions',
-                                },
-                                {
-                                  name: 'Games',
-                                  value: 'Games',
-                                },
-                                {
-                                  name: 'Gavel',
-                                  value: 'Gavel',
-                                },
-                                {
-                                  name: 'Gesture',
-                                  value: 'Gesture',
-                                },
-                                {
-                                  name: 'GetApp',
-                                  value: 'GetApp',
-                                },
-                                {
-                                  name: 'Gif',
-                                  value: 'Gif',
-                                },
-                                {
-                                  name: 'GpsFixed',
-                                  value: 'GpsFixed',
-                                },
-                                {
-                                  name: 'Grade',
-                                  value: 'Grade',
-                                },
-                                {
-                                  name: 'Group',
-                                  value: 'Group',
-                                },
-                                {
-                                  name: 'Headset',
-                                  value: 'Headset',
-                                },
-                                {
-                                  name: 'Hearing',
-                                  value: 'Hearing',
-                                },
-                                {
-                                  name: 'Height',
-                                  value: 'Height',
-                                },
-                                {
-                                  name: 'Help',
-                                  value: 'Help',
-                                },
-                                {
-                                  name: 'HelpOutline',
-                                  value: 'HelpOutline',
-                                },
-                                {
-                                  name: 'Highlight',
-                                  value: 'Highlight',
-                                },
-                                {
-                                  name: 'History',
-                                  value: 'History',
-                                },
-                                {
-                                  name: 'Home',
-                                  value: 'Home',
-                                },
-                                {
-                                  name: 'Hotel',
-                                  value: 'Hotel',
-                                },
-                                {
-                                  name: 'HourglassEmpty',
-                                  value: 'HourglassEmpty',
-                                },
-                                {
-                                  name: 'Http',
-                                  value: 'Http',
-                                },
-                                {
-                                  name: 'Https',
-                                  value: 'Https',
-                                },
-                                {
-                                  name: 'Image',
-                                  value: 'Image',
-                                },
-                                {
-                                  name: 'ImportExport',
-                                  value: 'ImportExport',
-                                },
-                                {
-                                  name: 'Inbox',
-                                  value: 'Inbox',
-                                },
-                                {
-                                  name: 'Info',
-                                  value: 'Info',
-                                },
-                                {
-                                  name: 'Input',
-                                  value: 'Input',
-                                },
-                                {
-                                  name: 'Keyboard',
-                                  value: 'Keyboard',
-                                },
-                                {
-                                  name: 'KeyboardArrowDown',
-                                  value: 'KeyboardArrowDown',
-                                },
-                                {
-                                  name: 'KeyboardArrowLeft',
-                                  value: 'KeyboardArrowLeft',
-                                },
-                                {
-                                  name: 'KeyboardArrowRight',
-                                  value: 'KeyboardArrowRight',
-                                },
-                                {
-                                  name: 'KeyboardArrowUp',
-                                  value: 'KeyboardArrowUp',
-                                },
-                                {
-                                  name: 'KeyboardVoice',
-                                  value: 'KeyboardVoice',
-                                },
-                                {
-                                  name: 'Label',
-                                  value: 'Label',
-                                },
-                                {
-                                  name: 'Landscape',
-                                  value: 'Landscape',
-                                },
-                                {
-                                  name: 'Language',
-                                  value: 'Language',
-                                },
-                                {
-                                  name: 'Laptop',
-                                  value: 'Laptop',
-                                },
-                                {
-                                  name: 'LastPage',
-                                  value: 'LastPage',
-                                },
-                                {
-                                  name: 'Launch',
-                                  value: 'Launch',
-                                },
-                                {
-                                  name: 'Layers',
-                                  value: 'Layers',
-                                },
-                                {
-                                  name: 'Link',
-                                  value: 'Link',
-                                },
-                                {
-                                  name: 'List',
-                                  value: 'List',
-                                },
-                                {
-                                  name: 'LocalBar',
-                                  value: 'LocalBar',
-                                },
-                                {
-                                  name: 'Lock',
-                                  value: 'Lock',
-                                },
-                                {
-                                  name: 'LockOpen',
-                                  value: 'LockOpen',
-                                },
-                                {
-                                  name: 'Loop',
-                                  value: 'Loop',
-                                },
-                                {
-                                  name: 'Mail',
-                                  value: 'Mail',
-                                },
-                                {
-                                  name: 'Map',
-                                  value: 'Map',
-                                },
-                                {
-                                  name: 'Menu',
-                                  value: 'Menu',
-                                },
-                                {
-                                  name: 'Message',
-                                  value: 'Message',
-                                },
-                                {
-                                  name: 'Mic',
-                                  value: 'Mic',
-                                },
-                                {
-                                  name: 'Mms',
-                                  value: 'Mms',
-                                },
-                                {
-                                  name: 'Money',
-                                  value: 'Money',
-                                },
-                                {
-                                  name: 'Mood',
-                                  value: 'Mood',
-                                },
-                                {
-                                  name: 'MoodBad',
-                                  value: 'MoodBad',
-                                },
-                                {
-                                  name: 'More',
-                                  value: 'More',
-                                },
-                                {
-                                  name: 'MoreHoriz',
-                                  value: 'MoreHoriz',
-                                },
-                                {
-                                  name: 'MoreVert',
-                                  value: 'MoreVert',
-                                },
-                                {
-                                  name: 'Motorcycle',
-                                  value: 'Motorcycle',
-                                },
-                                {
-                                  name: 'Movie',
-                                  value: 'Movie',
-                                },
-                                {
-                                  name: 'MusicNote',
-                                  value: 'MusicNote',
-                                },
-                                {
-                                  name: 'MyLocation',
-                                  value: 'MyLocation',
-                                },
-                                {
-                                  name: 'Nature',
-                                  value: 'Nature',
-                                },
-                                {
-                                  name: 'Navigation',
-                                  value: 'Navigation',
-                                },
-                                {
-                                  name: 'NewReleases',
-                                  value: 'NewReleases',
-                                },
-                                {
-                                  name: 'NotInterested',
-                                  value: 'NotInterested',
-                                },
-                                {
-                                  name: 'Note',
-                                  value: 'Note',
-                                },
-                                {
-                                  name: 'NotificationImportant',
-                                  value: 'NotificationImportant',
-                                },
-                                {
-                                  name: 'Notifications',
-                                  value: 'Notifications',
-                                },
-                                {
-                                  name: 'NotificationsActive',
-                                  value: 'NotificationsActive',
-                                },
-                                {
-                                  name: 'Opacity',
-                                  value: 'Opacity',
-                                },
-                                {
-                                  name: 'Palette',
-                                  value: 'Palette',
-                                },
-                                {
-                                  name: 'Pause',
-                                  value: 'Pause',
-                                },
-                                {
-                                  name: 'Payment',
-                                  value: 'Payment',
-                                },
-                                {
-                                  name: 'People',
-                                  value: 'People',
-                                },
-                                {
-                                  name: 'Person',
-                                  value: 'Person',
-                                },
-                                {
-                                  name: 'PersonAdd',
-                                  value: 'PersonAdd',
-                                },
-                                {
-                                  name: 'Pets',
-                                  value: 'Pets',
-                                },
-                                {
-                                  name: 'Phone',
-                                  value: 'Phone',
-                                },
-                                {
-                                  name: 'Photo',
-                                  value: 'Photo',
-                                },
-                                {
-                                  name: 'PhotoCamera',
-                                  value: 'PhotoCamera',
-                                },
-                                {
-                                  name: 'PieChart',
-                                  value: 'PieChart',
-                                },
-                                {
-                                  name: 'Place',
-                                  value: 'Place',
-                                },
-                                {
-                                  name: 'PlayArrow',
-                                  value: 'PlayArrow',
-                                },
-                                {
-                                  name: 'PlayCircleFilled',
-                                  value: 'PlayCircleFilled',
-                                },
-                                {
-                                  name: 'PlayCircleFilledWhite',
-                                  value: 'PlayCircleFilledWhite',
-                                },
-                                {
-                                  name: 'PlayCircleOutline',
-                                  value: 'PlayCircleOutline',
-                                },
-                                {
-                                  name: 'Power',
-                                  value: 'Power',
-                                },
-                                {
-                                  name: 'Public',
-                                  value: 'Public',
-                                },
-                                {
-                                  name: 'Radio',
-                                  value: 'Radio',
-                                },
-                                {
-                                  name: 'Redo',
-                                  value: 'Redo',
-                                },
-                                {
-                                  name: 'Refresh',
-                                  value: 'Refresh',
-                                },
-                                {
-                                  name: 'Remove',
-                                  value: 'Remove',
-                                },
-                                {
-                                  name: 'RemoveCircle',
-                                  value: 'RemoveCircle',
-                                },
-                                {
-                                  name: 'RemoveCircleOutline',
-                                  value: 'RemoveCircleOutline',
-                                },
-                                {
-                                  name: 'Replay',
-                                  value: 'Replay',
-                                },
-                                {
-                                  name: 'Reply',
-                                  value: 'Reply',
-                                },
-                                {
-                                  name: 'Report',
-                                  value: 'Report',
-                                },
-                                {
-                                  name: 'ReportProblem',
-                                  value: 'ReportProblem',
-                                },
-                                {
-                                  name: 'Restaurant',
-                                  value: 'Restaurant',
-                                },
-                                {
-                                  name: 'RssFeed',
-                                  value: 'RssFeed',
-                                },
-                                {
-                                  name: 'Save',
-                                  value: 'Save',
-                                },
-                                {
-                                  name: 'SaveAlt',
-                                  value: 'SaveAlt',
-                                },
-                                {
-                                  name: 'School',
-                                  value: 'School',
-                                },
-                                {
-                                  name: 'Search',
-                                  value: 'Search',
-                                },
-                                {
-                                  name: 'Security',
-                                  value: 'Security',
-                                },
-                                {
-                                  name: 'Send',
-                                  value: 'Send',
-                                },
-                                {
-                                  name: 'Settings',
-                                  value: 'Settings',
-                                },
-                                {
-                                  name: 'ShoppingCart',
-                                  value: 'ShoppingCart',
-                                },
-                                {
-                                  name: 'ShowChart',
-                                  value: 'ShowChart',
-                                },
-                                {
-                                  name: 'Smartphone',
-                                  value: 'Smartphone',
-                                },
-                                {
-                                  name: 'SmokeFree',
-                                  value: 'SmokeFree',
-                                },
-                                {
-                                  name: 'SmokingRooms',
-                                  value: 'SmokingRooms',
-                                },
-                                {
-                                  name: 'Speaker',
-                                  value: 'Speaker',
-                                },
-                                {
-                                  name: 'Speed',
-                                  value: 'Speed',
-                                },
-                                {
-                                  name: 'Spellcheck',
-                                  value: 'Spellcheck',
-                                },
-                                {
-                                  name: 'SquareFoot',
-                                  value: 'SquareFoot',
-                                },
-                                {
-                                  name: 'Star',
-                                  value: 'Star',
-                                },
-                                {
-                                  name: 'StarBorder',
-                                  value: 'StarBorder',
-                                },
-                                {
-                                  name: 'StarHalf',
-                                  value: 'StarHalf',
-                                },
-                                {
-                                  name: 'StarOutline',
-                                  value: 'StarOutline',
-                                },
-                                {
-                                  name: 'StarRate',
-                                  value: 'StarRate',
-                                },
-                                {
-                                  name: 'Stars',
-                                  value: 'Stars',
-                                },
-                                {
-                                  name: 'Stop',
-                                  value: 'Stop',
-                                },
-                                {
-                                  name: 'Storefront',
-                                  value: 'Storefront',
-                                },
-                                {
-                                  name: 'Sync',
-                                  value: 'Sync',
-                                },
-                                {
-                                  name: 'Tab',
-                                  value: 'Tab',
-                                },
-                                {
-                                  name: 'TextFields',
-                                  value: 'TextFields',
-                                },
-                                {
-                                  name: 'ThumbDown',
-                                  value: 'ThumbDown',
-                                },
-                                {
-                                  name: 'ThumbDownAlt',
-                                  value: 'ThumbDownAlt',
-                                },
-                                {
-                                  name: 'ThumbUp',
-                                  value: 'ThumbUp',
-                                },
-                                {
-                                  name: 'ThumbUpAlt',
-                                  value: 'ThumbUpAlt',
-                                },
-                                {
-                                  name: 'ThumbsUpDown',
-                                  value: 'ThumbsUpDown',
-                                },
-                                {
-                                  name: 'Title',
-                                  value: 'Title',
-                                },
-                                {
-                                  name: 'TouchApp',
-                                  value: 'TouchApp',
-                                },
-                                {
-                                  name: 'Traffic',
-                                  value: 'Traffic',
-                                },
-                                {
-                                  name: 'Train',
-                                  value: 'Train',
-                                },
-                                {
-                                  name: 'Tram',
-                                  value: 'Tram',
-                                },
-                                {
-                                  name: 'Translate',
-                                  value: 'Translate',
-                                },
-                                {
-                                  name: 'TrendingDown',
-                                  value: 'TrendingDown',
-                                },
-                                {
-                                  name: 'TrendingFlat',
-                                  value: 'TrendingFlat',
-                                },
-                                {
-                                  name: 'TrendingUp',
-                                  value: 'TrendingUp',
-                                },
-                                {
-                                  name: 'Undo',
-                                  value: 'Undo',
-                                },
-                                {
-                                  name: 'Update',
-                                  value: 'Update',
-                                },
-                                {
-                                  name: 'Usb',
-                                  value: 'Usb',
-                                },
-                                {
-                                  name: 'VerifiedUser',
-                                  value: 'VerifiedUser',
-                                },
-                                {
-                                  name: 'VideoCall',
-                                  value: 'VideoCall',
-                                },
-                                {
-                                  name: 'Visibility',
-                                  value: 'Visibility',
-                                },
-                                {
-                                  name: 'VisibilityOff',
-                                  value: 'VisibilityOff',
-                                },
-                                {
-                                  name: 'Voicemail',
-                                  value: 'Voicemail',
-                                },
-                                {
-                                  name: 'VolumeDown',
-                                  value: 'VolumeDown',
-                                },
-                                {
-                                  name: 'VolumeMute',
-                                  value: 'VolumeMute',
-                                },
-                                {
-                                  name: 'VolumeOff',
-                                  value: 'VolumeOff',
-                                },
-                                {
-                                  name: 'VolumeUp',
-                                  value: 'VolumeUp',
-                                },
-                                {
-                                  name: 'Warning',
-                                  value: 'Warning',
-                                },
-                                {
-                                  name: 'Watch',
-                                  value: 'Watch',
-                                },
-                                {
-                                  name: 'WatchLater',
-                                  value: 'WatchLater',
-                                },
-                                {
-                                  name: 'Wc',
-                                  value: 'Wc',
-                                },
-                                {
-                                  name: 'Widgets',
-                                  value: 'Widgets',
-                                },
-                                {
-                                  name: 'Wifi',
-                                  value: 'Wifi',
-                                },
-                                {
-                                  name: 'Work',
-                                  value: 'Work',
-                                },
-                              ],
-                            },
-                          },
-                          {
-                            type: 'CUSTOM',
-                            label: 'Position',
-                            key: 'adornmentPosition',
-                            value: 'end',
-                            configuration: {
-                              condition: {
-                                type: 'HIDE',
-                                option: 'adornmentIcon',
-                                comparator: 'EQ',
-                                value: 'none',
-                              },
-                              as: 'BUTTONGROUP',
-                              dataType: 'string',
-                              allowedInput: [
-                                { name: 'Start', value: 'start' },
-                                { name: 'End', value: 'end' },
-                              ],
-                            },
-                          },
-                          {
-                            label: 'Type',
-                            key: 'type',
-                            value: 'email',
-                            type: 'TEXT',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'adornmentIcon',
-                                comparator: 'EQ',
-                                value: 0,
-                              },
-                            },
-                          },
-                          {
-                            value: false,
-                            label: 'Styles',
-                            key: 'styles',
-                            type: 'TOGGLE',
-                          },
-                          {
-                            type: 'COLOR',
-                            label: 'Background color',
-                            key: 'backgroundColor',
-                            value: 'White',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'styles',
-                                comparator: 'EQ',
-                                value: true,
-                              },
-                            },
-                          },
-                          {
-                            type: 'COLOR',
-                            label: 'Border color',
-                            key: 'borderColor',
-                            value: 'Accent1',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'styles',
-                                comparator: 'EQ',
-                                value: true,
-                              },
-                            },
-                          },
-                          {
-                            type: 'COLOR',
-                            label: 'Border color (hover)',
-                            key: 'borderHoverColor',
-                            value: 'Black',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'styles',
-                                comparator: 'EQ',
-                                value: true,
-                              },
-                            },
-                          },
-                          {
-                            type: 'COLOR',
-                            label: 'Border color (focus)',
-                            key: 'borderFocusColor',
-                            value: 'Primary',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'styles',
-                                comparator: 'EQ',
-                                value: true,
-                              },
-                            },
-                          },
-                          {
-                            value: false,
-                            label: 'Hide label',
-                            key: 'hideLabel',
-                            type: 'TOGGLE',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'styles',
-                                comparator: 'EQ',
-                                value: true,
-                              },
-                            },
-                          },
-                          {
-                            type: 'COLOR',
-                            label: 'Label color',
-                            key: 'labelColor',
-                            value: 'Accent3',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'styles',
-                                comparator: 'EQ',
-                                value: true,
-                              },
-                            },
-                          },
-                          {
-                            type: 'COLOR',
-                            label: 'Text color',
-                            key: 'textColor',
-                            value: 'Black',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'styles',
-                                comparator: 'EQ',
-                                value: true,
-                              },
-                            },
-                          },
-                          {
-                            type: 'COLOR',
-                            label: 'Placeholder color',
-                            key: 'placeholderColor',
-                            value: 'Light',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'styles',
-                                comparator: 'EQ',
-                                value: true,
-                              },
-                            },
-                          },
-                          {
-                            type: 'COLOR',
-                            label: 'Helper color',
-                            key: 'helperColor',
-                            value: 'Accent2',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'styles',
-                                comparator: 'EQ',
-                                value: true,
-                              },
-                            },
-                          },
-                          {
-                            type: 'COLOR',
-                            label: 'Error color',
-                            key: 'errorColor',
-                            value: 'Danger',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'styles',
-                                comparator: 'EQ',
-                                value: true,
-                              },
-                            },
-                          },
-                          {
-                            value: false,
-                            label: 'Advanced settings',
-                            key: 'advancedSettings',
-                            type: 'TOGGLE',
-                          },
-                          {
-                            type: 'VARIABLE',
-                            label: 'name attribute',
-                            key: 'nameAttribute',
-                            value: [],
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'advancedSettings',
-                                comparator: 'EQ',
-                                value: true,
-                              },
-                            },
-                          },
-                        ],
-                        descendants: [],
-                      };
-                    }
-                    case 'PASSWORD': {
-                      return {
-                        name: 'TextField',
-                        options: [
-                          {
-                            value: {
-                              label: [property.label],
-                              value: [
-                                {
-                                  id: [property.id],
-                                  type: 'PROPERTY',
-                                },
-                              ],
-                              propertyIds: [property.id],
-                              ref: {
-                                id: `#login_attribute_${property.id}`,
-                              },
-                            },
-                            label: 'Label',
-                            key: 'customModelAttribute',
-                            type: 'CUSTOM_MODEL_ATTRIBUTE',
-                            configuration: {
-                              allowedTypes: ['string'],
-                            },
-                          },
-                          {
-                            value: false,
-                            label: 'Validation options',
-                            key: 'validationOptions',
-                            type: 'TOGGLE',
-                          },
-                          {
-                            label: 'Validation pattern',
-                            key: 'pattern',
-                            value: '',
-                            type: 'TEXT',
-                            configuration: {
-                              placeholder: '(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,}',
-                              condition: {
-                                type: 'SHOW',
-                                option: 'validationOptions',
-                                comparator: 'EQ',
-                                value: true,
-                              },
-                            },
-                          },
-                          {
-                            label: 'Min length',
-                            key: 'minlength',
-                            value: '',
-                            type: 'NUMBER',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'validationOptions',
-                                comparator: 'EQ',
-                                value: true,
-                              },
-                            },
-                          },
-                          {
-                            label: 'Max length',
-                            key: 'maxlength',
-                            value: '',
-                            type: 'NUMBER',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'validationOptions',
-                                comparator: 'EQ',
-                                value: true,
-                              },
-                            },
-                          },
-                          {
-                            value: ['This field is required'],
-                            label: 'Value required message',
-                            key: 'validationValueMissing',
-                            type: 'VARIABLE',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'validationOptions',
-                                comparator: 'EQ',
-                                value: true,
-                              },
-                            },
-                          },
-                          {
+              const descendants = properties.sort((a, b) =>
+                a.kind.localeCompare(b.kind),
+              );
+
+              const loginDescendantsArray = descendants.map(property => {
+                switch (property.kind) {
+                  case 'EMAIL_ADDRESS': {
+                    return {
+                      name: 'TextField',
+                      options: [
+                        {
+                          value: {
+                            label: [property.label],
                             value: [
-                              'Password must contain 8 characters, 1 lowercase character, 1 upper case character and 1 digit',
+                              {
+                                id: [property.id],
+                                type: 'PROPERTY',
+                              },
                             ],
-                            label: 'Pattern mismatch message',
-                            key: 'validationPatternMismatch',
-                            type: 'VARIABLE',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'validationOptions',
-                                comparator: 'EQ',
-                                value: true,
+                            propertyIds: [property.id],
+                            ref: {
+                              id: `#login_attribute_${property.id}`,
+                            },
+                          },
+                          label: 'Label',
+                          key: 'customModelAttribute',
+                          type: 'CUSTOM_MODEL_ATTRIBUTE',
+                          configuration: {
+                            allowedTypes: ['string'],
+                          },
+                        },
+                        {
+                          value: false,
+                          label: 'Validation options',
+                          key: 'validationOptions',
+                          type: 'TOGGLE',
+                        },
+                        {
+                          label: 'Validation pattern',
+                          key: 'pattern',
+                          value: '',
+                          type: 'TEXT',
+                          configuration: {
+                            placeholder:
+                              '[a-z0-9._%+-]+@[a-z0-9.-]+.[a-z]{2,4}$',
+                            condition: {
+                              type: 'SHOW',
+                              option: 'validationOptions',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          label: 'Min length',
+                          key: 'minlength',
+                          value: '',
+                          type: 'NUMBER',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'validationOptions',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          label: 'Max length',
+                          key: 'maxlength',
+                          value: '',
+                          type: 'NUMBER',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'validationOptions',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          value: ['This field is required'],
+                          label: 'Value required message',
+                          key: 'validationValueMissing',
+                          type: 'VARIABLE',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'validationOptions',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          value: ['Invalid value'],
+                          label: 'Pattern mismatch message',
+                          key: 'validationPatternMismatch',
+                          type: 'VARIABLE',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'validationOptions',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          value: ['This value is too short'],
+                          label: 'Value too short message',
+                          key: 'validationTooShort',
+                          type: 'VARIABLE',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'validationOptions',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          value: ['This value is too long'],
+                          label: 'Value too long message',
+                          key: 'validationTooLong',
+                          type: 'VARIABLE',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'validationOptions',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          value: ['No valid value provided'],
+                          label: 'Email mismatch message',
+                          key: 'validationTypeMismatch',
+                          type: 'VARIABLE',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'validationOptions',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          type: 'TOGGLE',
+                          label: 'Disabled',
+                          key: 'disabled',
+                          value: false,
+                        },
+                        {
+                          value: [],
+                          label: 'Placeholder',
+                          key: 'placeholder',
+                          type: 'VARIABLE',
+                        },
+                        {
+                          value: [],
+                          label: 'Helper text',
+                          key: 'helperText',
+                          type: 'VARIABLE',
+                        },
+                        {
+                          label: 'Variant',
+                          key: 'variant',
+                          value: 'outlined',
+                          type: 'CUSTOM',
+                          configuration: {
+                            as: 'BUTTONGROUP',
+                            dataType: 'string',
+                            allowedInput: [
+                              {
+                                name: 'Standard',
+                                value: 'standard',
                               },
-                            },
-                          },
-                          {
-                            value: ['This value is too short'],
-                            label: 'Value too short message',
-                            key: 'validationTooShort',
-                            type: 'VARIABLE',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'validationOptions',
-                                comparator: 'EQ',
-                                value: true,
+                              {
+                                name: 'Outlined',
+                                value: 'outlined',
                               },
-                            },
+                              { name: 'Filled', value: 'filled' },
+                            ],
                           },
-                          {
-                            value: ['This value is too long'],
-                            label: 'Value too long message',
-                            key: 'validationTooLong',
-                            type: 'VARIABLE',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'validationOptions',
-                                comparator: 'EQ',
-                                value: true,
+                        },
+                        {
+                          type: 'TOGGLE',
+                          label: 'Full width',
+                          key: 'fullWidth',
+                          value: true,
+                        },
+                        {
+                          label: 'Size',
+                          key: 'size',
+                          value: 'Medium',
+                          type: 'CUSTOM',
+                          configuration: {
+                            as: 'BUTTONGROUP',
+                            dataType: 'string',
+                            allowedInput: [
+                              { name: 'Medium', value: 'medium' },
+                              { name: 'Small', value: 'small' },
+                            ],
+                          },
+                        },
+                        {
+                          label: 'Margin',
+                          key: 'margin',
+                          value: 'normal',
+                          type: 'CUSTOM',
+                          configuration: {
+                            as: 'BUTTONGROUP',
+                            dataType: 'string',
+                            allowedInput: [
+                              { name: 'None', value: 'none' },
+                              { name: 'Dense', value: 'dense' },
+                              { name: 'Normal', value: 'normal' },
+                            ],
+                          },
+                        },
+                        {
+                          label: 'Adornment',
+                          key: 'adornmentIcon',
+                          value: 'Email',
+                          type: 'CUSTOM',
+                          configuration: {
+                            as: 'DROPDOWN',
+                            dataType: 'string',
+                            allowedInput: [
+                              { name: 'None', value: 'none' },
+                              {
+                                name: 'AcUnit',
+                                value: 'AcUnit',
                               },
-                            },
-                          },
-                          {
-                            type: 'TOGGLE',
-                            label: 'Disabled',
-                            key: 'disabled',
-                            value: false,
-                          },
-                          {
-                            value: [],
-                            label: 'Placeholder',
-                            key: 'placeholder',
-                            type: 'VARIABLE',
-                          },
-                          {
-                            value: [],
-                            label: 'Helper text',
-                            key: 'helperText',
-                            type: 'VARIABLE',
-                          },
-                          {
-                            label: 'Variant',
-                            key: 'variant',
-                            value: 'outlined',
-                            type: 'CUSTOM',
-                            configuration: {
-                              as: 'BUTTONGROUP',
-                              dataType: 'string',
-                              allowedInput: [
-                                {
-                                  name: 'Standard',
-                                  value: 'standard',
-                                },
-                                {
-                                  name: 'Outlined',
-                                  value: 'outlined',
-                                },
-                                { name: 'Filled', value: 'filled' },
-                              ],
-                            },
-                          },
-                          {
-                            type: 'TOGGLE',
-                            label: 'Full width',
-                            key: 'fullWidth',
-                            value: true,
-                          },
-                          {
-                            label: 'Size',
-                            key: 'size',
-                            value: 'medium',
-                            type: 'CUSTOM',
-                            configuration: {
-                              as: 'BUTTONGROUP',
-                              dataType: 'string',
-                              allowedInput: [
-                                { name: 'Medium', value: 'medium' },
-                                { name: 'Small', value: 'small' },
-                              ],
-                            },
-                          },
-                          {
-                            label: 'Margin',
-                            key: 'margin',
-                            value: 'normal',
-                            type: 'CUSTOM',
-                            configuration: {
-                              as: 'BUTTONGROUP',
-                              dataType: 'string',
-                              allowedInput: [
-                                { name: 'None', value: 'none' },
-                                { name: 'Dense', value: 'dense' },
-                                { name: 'Normal', value: 'normal' },
-                              ],
-                            },
-                          },
-                          {
-                            label: 'Show password toggle',
-                            key: 'adornment',
-                            value: true,
-                            type: 'TOGGLE',
-                          },
-                          {
-                            type: 'CUSTOM',
-                            label: 'Position',
-                            key: 'adornmentPosition',
-                            value: 'end',
-                            configuration: {
-                              condition: {
-                                type: 'HIDE',
-                                option: 'adornment',
-                                comparator: 'EQ',
-                                value: false,
+                              {
+                                name: 'AccessTime',
+                                value: 'AccessTime',
                               },
-                              as: 'BUTTONGROUP',
-                              dataType: 'string',
-                              allowedInput: [
-                                { name: 'Start', value: 'start' },
-                                { name: 'End', value: 'end' },
-                              ],
-                            },
-                          },
-                          {
-                            label: 'Type',
-                            key: 'type',
-                            value: 'password',
-                            type: 'TEXT',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'adornmentPosition',
-                                comparator: 'EQ',
-                                value: 0,
+                              {
+                                name: 'AccessibilityNew',
+                                value: 'AccessibilityNew',
                               },
-                            },
-                          },
-                          {
-                            value: false,
-                            label: 'Styles',
-                            key: 'styles',
-                            type: 'TOGGLE',
-                          },
-                          {
-                            type: 'COLOR',
-                            label: 'Background color',
-                            key: 'backgroundColor',
-                            value: 'White',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'styles',
-                                comparator: 'EQ',
-                                value: true,
+                              {
+                                name: 'Accessible',
+                                value: 'Accessible',
                               },
-                            },
-                          },
-                          {
-                            type: 'COLOR',
-                            label: 'Border color',
-                            key: 'borderColor',
-                            value: 'Accent1',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'styles',
-                                comparator: 'EQ',
-                                value: true,
+                              {
+                                name: 'AccountBalance',
+                                value: 'AccountBalance',
                               },
-                            },
-                          },
-                          {
-                            type: 'COLOR',
-                            label: 'Border color (hover)',
-                            key: 'borderHoverColor',
-                            value: 'Black',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'styles',
-                                comparator: 'EQ',
-                                value: true,
+                              {
+                                name: 'AccountBalanceWallet',
+                                value: 'AccountBalanceWallet',
                               },
-                            },
-                          },
-                          {
-                            type: 'COLOR',
-                            label: 'Border color (focus)',
-                            key: 'borderFocusColor',
-                            value: 'Primary',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'styles',
-                                comparator: 'EQ',
-                                value: true,
+                              {
+                                name: 'AccountCircle',
+                                value: 'AccountCircle',
                               },
-                            },
-                          },
-                          {
-                            value: false,
-                            label: 'Hide label',
-                            key: 'hideLabel',
-                            type: 'TOGGLE',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'styles',
-                                comparator: 'EQ',
-                                value: true,
+                              {
+                                name: 'AccountTree',
+                                value: 'AccountTree',
                               },
-                            },
-                          },
-                          {
-                            type: 'COLOR',
-                            label: 'Label color',
-                            key: 'labelColor',
-                            value: 'Accent3',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'styles',
-                                comparator: 'EQ',
-                                value: true,
+                              {
+                                name: 'Add',
+                                value: 'Add',
                               },
-                            },
-                          },
-                          {
-                            type: 'COLOR',
-                            label: 'Text color',
-                            key: 'textColor',
-                            value: 'Black',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'styles',
-                                comparator: 'EQ',
-                                value: true,
+                              {
+                                name: 'AddAPhoto',
+                                value: 'AddAPhoto',
                               },
-                            },
-                          },
-                          {
-                            type: 'COLOR',
-                            label: 'Placeholder color',
-                            key: 'placeholderColor',
-                            value: 'Light',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'styles',
-                                comparator: 'EQ',
-                                value: true,
+                              {
+                                name: 'AddBox',
+                                value: 'AddBox',
                               },
-                            },
-                          },
-                          {
-                            type: 'COLOR',
-                            label: 'Helper color',
-                            key: 'helperColor',
-                            value: 'Accent2',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'styles',
-                                comparator: 'EQ',
-                                value: true,
+                              {
+                                name: 'AddCircle',
+                                value: 'AddCircle',
                               },
-                            },
-                          },
-                          {
-                            type: 'COLOR',
-                            label: 'Error color',
-                            key: 'errorColor',
-                            value: 'Danger',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'styles',
-                                comparator: 'EQ',
-                                value: true,
+                              {
+                                name: 'AddCircleOutline',
+                                value: 'AddCircleOutline',
                               },
-                            },
-                          },
-                          {
-                            value: false,
-                            label: 'Advanced settings',
-                            key: 'advancedSettings',
-                            type: 'TOGGLE',
-                          },
-                          {
-                            type: 'VARIABLE',
-                            label: 'name attribute',
-                            key: 'nameAttribute',
-                            value: [],
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'advancedSettings',
-                                comparator: 'EQ',
-                                value: true,
+                              {
+                                name: 'AddComment',
+                                value: 'AddComment',
                               },
-                            },
-                          },
-                        ],
-                        descendants: [],
-                      };
-                    }
-                    default:
-                      return {
-                        name: 'TextField',
-                        options: [
-                          {
-                            value: {
-                              label: [property.label],
-                              value: [
-                                {
-                                  id: [property.id],
-                                  type: 'PROPERTY',
-                                },
-                              ],
-                              propertyIds: [property.id],
-                              ref: {
-                                id: `#login_attribute_${property.id}`,
+                              {
+                                name: 'Adjust',
+                                value: 'Adjust',
                               },
-                            },
-                            label: 'Label',
-                            key: 'customModelAttribute',
-                            type: 'CUSTOM_MODEL_ATTRIBUTE',
-                            configuration: {
-                              allowedTypes: ['string'],
-                            },
-                          },
-                          {
-                            value: false,
-                            label: 'Validation options',
-                            key: 'validationOptions',
-                            type: 'TOGGLE',
-                          },
-                          {
-                            label: 'Validation pattern',
-                            key: 'pattern',
-                            value: '',
-                            type: 'TEXT',
-                            configuration: {
-                              placeholder: '(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,}',
-                              condition: {
-                                type: 'SHOW',
-                                option: 'validationOptions',
-                                comparator: 'EQ',
-                                value: true,
+                              {
+                                name: 'AirplanemodeActive',
+                                value: 'AirplanemodeActive',
                               },
-                            },
-                          },
-                          {
-                            label: 'Min length',
-                            key: 'minlength',
-                            value: '',
-                            type: 'NUMBER',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'validationOptions',
-                                comparator: 'EQ',
-                                value: true,
+                              {
+                                name: 'AirplanemodeInactive',
+                                value: 'AirplanemodeInactive',
                               },
-                            },
-                          },
-                          {
-                            label: 'Max length',
-                            key: 'maxlength',
-                            value: '',
-                            type: 'NUMBER',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'validationOptions',
-                                comparator: 'EQ',
-                                value: true,
+                              {
+                                name: 'Airplay',
+                                value: 'Airplay',
                               },
-                            },
-                          },
-                          {
-                            value: ['This field is required'],
-                            label: 'Value required message',
-                            key: 'validationValueMissing',
-                            type: 'VARIABLE',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'validationOptions',
-                                comparator: 'EQ',
-                                value: true,
+                              {
+                                name: 'AirportShuttle',
+                                value: 'AirportShuttle',
                               },
-                            },
-                          },
-                          {
-                            value: ['Invalid value'],
-                            label: 'Pattern mismatch message',
-                            key: 'validationPatternMismatch',
-                            type: 'VARIABLE',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'validationOptions',
-                                comparator: 'EQ',
-                                value: true,
+                              {
+                                name: 'Alarm',
+                                value: 'Alarm',
                               },
-                            },
-                          },
-                          {
-                            value: ['This value is too short'],
-                            label: 'Value too short message',
-                            key: 'validationTooShort',
-                            type: 'VARIABLE',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'validationOptions',
-                                comparator: 'EQ',
-                                value: true,
+                              {
+                                name: 'Album',
+                                value: 'Album',
                               },
-                            },
-                          },
-                          {
-                            value: ['This value is too long'],
-                            label: 'Value too long message',
-                            key: 'validationTooLong',
-                            type: 'VARIABLE',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'validationOptions',
-                                comparator: 'EQ',
-                                value: true,
+                              {
+                                name: 'AllInbox',
+                                value: 'AllInbox',
                               },
-                            },
-                          },
-                          {
-                            type: 'TOGGLE',
-                            label: 'Disabled',
-                            key: 'disabled',
-                            value: false,
-                          },
-                          {
-                            value: [],
-                            label: 'Placeholder',
-                            key: 'placeholder',
-                            type: 'VARIABLE',
-                          },
-                          {
-                            value: [],
-                            label: 'Helper text',
-                            key: 'helperText',
-                            type: 'VARIABLE',
-                          },
-                          {
-                            label: 'Variant',
-                            key: 'variant',
-                            value: 'outlined',
-                            type: 'CUSTOM',
-                            configuration: {
-                              as: 'BUTTONGROUP',
-                              dataType: 'string',
-                              allowedInput: [
-                                {
-                                  name: 'Standard',
-                                  value: 'standard',
-                                },
-                                {
-                                  name: 'Outlined',
-                                  value: 'outlined',
-                                },
-                                {
-                                  name: 'Filled',
-                                  value: 'filled',
-                                },
-                              ],
-                            },
-                          },
-                          {
-                            type: 'TOGGLE',
-                            label: 'Full width',
-                            key: 'fullWidth',
-                            value: true,
-                          },
-                          {
-                            label: 'Size',
-                            key: 'size',
-                            value: 'medium',
-                            type: 'CUSTOM',
-                            configuration: {
-                              as: 'BUTTONGROUP',
-                              dataType: 'string',
-                              allowedInput: [
-                                {
-                                  name: 'Medium',
-                                  value: 'medium',
-                                },
-                                { name: 'Small', value: 'small' },
-                              ],
-                            },
-                          },
-                          {
-                            label: 'Margin',
-                            key: 'margin',
-                            value: 'normal',
-                            type: 'CUSTOM',
-                            configuration: {
-                              as: 'BUTTONGROUP',
-                              dataType: 'string',
-                              allowedInput: [
-                                { name: 'None', value: 'none' },
-                                { name: 'Dense', value: 'dense' },
-                                {
-                                  name: 'Normal',
-                                  value: 'normal',
-                                },
-                              ],
-                            },
-                          },
-                          {
-                            label: 'Adornment',
-                            key: 'adornmentIcon',
-                            value: 'none',
-                            type: 'CUSTOM',
-                            configuration: {
-                              as: 'DROPDOWN',
-                              dataType: 'string',
-                              allowedInput: [
-                                { name: 'None', value: 'none' },
-                                {
-                                  name: 'AcUnit',
-                                  value: 'AcUnit',
-                                },
-                                {
-                                  name: 'AccessTime',
-                                  value: 'AccessTime',
-                                },
-                                {
-                                  name: 'AccessibilityNew',
-                                  value: 'AccessibilityNew',
-                                },
-                                {
-                                  name: 'Accessible',
-                                  value: 'Accessible',
-                                },
-                                {
-                                  name: 'AccountBalance',
-                                  value: 'AccountBalance',
-                                },
-                                {
-                                  name: 'AccountBalanceWallet',
-                                  value: 'AccountBalanceWallet',
-                                },
-                                {
-                                  name: 'AccountCircle',
-                                  value: 'AccountCircle',
-                                },
-                                {
-                                  name: 'AccountTree',
-                                  value: 'AccountTree',
-                                },
-                                {
-                                  name: 'Add',
-                                  value: 'Add',
-                                },
-                                {
-                                  name: 'AddAPhoto',
-                                  value: 'AddAPhoto',
-                                },
-                                {
-                                  name: 'AddBox',
-                                  value: 'AddBox',
-                                },
-                                {
-                                  name: 'AddCircle',
-                                  value: 'AddCircle',
-                                },
-                                {
-                                  name: 'AddCircleOutline',
-                                  value: 'AddCircleOutline',
-                                },
-                                {
-                                  name: 'AddComment',
-                                  value: 'AddComment',
-                                },
-                                {
-                                  name: 'Adjust',
-                                  value: 'Adjust',
-                                },
-                                {
-                                  name: 'AirplanemodeActive',
-                                  value: 'AirplanemodeActive',
-                                },
-                                {
-                                  name: 'AirplanemodeInactive',
-                                  value: 'AirplanemodeInactive',
-                                },
-                                {
-                                  name: 'Airplay',
-                                  value: 'Airplay',
-                                },
-                                {
-                                  name: 'AirportShuttle',
-                                  value: 'AirportShuttle',
-                                },
-                                {
-                                  name: 'Alarm',
-                                  value: 'Alarm',
-                                },
-                                {
-                                  name: 'Album',
-                                  value: 'Album',
-                                },
-                                {
-                                  name: 'AllInbox',
-                                  value: 'AllInbox',
-                                },
-                                {
-                                  name: 'AllInclusive',
-                                  value: 'AllInclusive',
-                                },
-                                {
-                                  name: 'AlternateEmail',
-                                  value: 'AlternateEmail',
-                                },
-                                {
-                                  name: 'Announcement',
-                                  value: 'Announcement',
-                                },
-                                {
-                                  name: 'Apartment',
-                                  value: 'Apartment',
-                                },
-                                {
-                                  name: 'Apps',
-                                  value: 'Apps',
-                                },
-                                {
-                                  name: 'Archive',
-                                  value: 'Archive',
-                                },
-                                {
-                                  name: 'ArrowBack',
-                                  value: 'ArrowBack',
-                                },
-                                {
-                                  name: 'ArrowBackIos',
-                                  value: 'ArrowBackIos',
-                                },
-                                {
-                                  name: 'ArrowDownward',
-                                  value: 'ArrowDownward',
-                                },
-                                {
-                                  name: 'ArrowDropDown',
-                                  value: 'ArrowDropDown',
-                                },
-                                {
-                                  name: 'ArrowDropDownCircle',
-                                  value: 'ArrowDropDownCircle',
-                                },
-                                {
-                                  name: 'ArrowDropUp',
-                                  value: 'ArrowDropUp',
-                                },
-                                {
-                                  name: 'ArrowForward',
-                                  value: 'ArrowForward',
-                                },
-                                {
-                                  name: 'ArrowForwardIos',
-                                  value: 'ArrowForwardIos',
-                                },
-                                {
-                                  name: 'ArrowLeft',
-                                  value: 'ArrowLeft',
-                                },
-                                {
-                                  name: 'ArrowRight',
-                                  value: 'ArrowRight',
-                                },
-                                {
-                                  name: 'ArrowRightAlt',
-                                  value: 'ArrowRightAlt',
-                                },
-                                {
-                                  name: 'ArrowUpward',
-                                  value: 'ArrowUpward',
-                                },
-                                {
-                                  name: 'Assessment',
-                                  value: 'Assessment',
-                                },
-                                {
-                                  name: 'Assignment',
-                                  value: 'Assignment',
-                                },
-                                {
-                                  name: 'AssignmentInd',
-                                  value: 'AssignmentInd',
-                                },
-                                {
-                                  name: 'AssignmentLate',
-                                  value: 'AssignmentLate',
-                                },
-                                {
-                                  name: 'AssignmentReturn',
-                                  value: 'AssignmentReturn',
-                                },
-                                {
-                                  name: 'AssignmentReturned',
-                                  value: 'AssignmentReturned',
-                                },
-                                {
-                                  name: 'AssignmentTurnedIn',
-                                  value: 'AssignmentTurnedIn',
-                                },
-                                {
-                                  name: 'Assistant',
-                                  value: 'Assistant',
-                                },
-                                {
-                                  name: 'AssistantPhoto',
-                                  value: 'AssistantPhoto',
-                                },
-                                {
-                                  name: 'AttachFile',
-                                  value: 'AttachFile',
-                                },
-                                {
-                                  name: 'AttachMoney',
-                                  value: 'AttachMoney',
-                                },
-                                {
-                                  name: 'Attachment',
-                                  value: 'Attachment',
-                                },
-                                {
-                                  name: 'Audiotrack',
-                                  value: 'Audiotrack',
-                                },
-                                {
-                                  name: 'Autorenew',
-                                  value: 'Autorenew',
-                                },
-                                {
-                                  name: 'AvTimer',
-                                  value: 'AvTimer',
-                                },
-                                {
-                                  name: 'Backspace',
-                                  value: 'Backspace',
-                                },
-                                {
-                                  name: 'Backup',
-                                  value: 'Backup',
-                                },
-                                {
-                                  name: 'BarChart',
-                                  value: 'BarChart',
-                                },
-                                {
-                                  name: 'Battery20',
-                                  value: 'Battery20',
-                                },
-                                {
-                                  name: 'Beenhere',
-                                  value: 'Beenhere',
-                                },
-                                {
-                                  name: 'Block',
-                                  value: 'Block',
-                                },
-                                {
-                                  name: 'Bluetooth',
-                                  value: 'Bluetooth',
-                                },
-                                {
-                                  name: 'Book',
-                                  value: 'Book',
-                                },
-                                {
-                                  name: 'Bookmark',
-                                  value: 'Bookmark',
-                                },
-                                {
-                                  name: 'BookmarkBorder',
-                                  value: 'BookmarkBorder',
-                                },
-                                {
-                                  name: 'Bookmarks',
-                                  value: 'Bookmarks',
-                                },
-                                {
-                                  name: 'Brush',
-                                  value: 'Brush',
-                                },
-                                {
-                                  name: 'BubbleChart',
-                                  value: 'BubbleChart',
-                                },
-                                {
-                                  name: 'BugReport',
-                                  value: 'BugReport',
-                                },
-                                {
-                                  name: 'Build',
-                                  value: 'Build',
-                                },
-                                {
-                                  name: 'Cached',
-                                  value: 'Cached',
-                                },
-                                {
-                                  name: 'Cake',
-                                  value: 'Cake',
-                                },
-                                {
-                                  name: 'CalendarToday',
-                                  value: 'CalendarToday',
-                                },
-                                {
-                                  name: 'Call',
-                                  value: 'Call',
-                                },
-                                {
-                                  name: 'CameraAlt',
-                                  value: 'CameraAlt',
-                                },
-                                {
-                                  name: 'CameraRoll',
-                                  value: 'CameraRoll',
-                                },
-                                {
-                                  name: 'Cancel',
-                                  value: 'Cancel',
-                                },
-                                {
-                                  name: 'CardTravel',
-                                  value: 'CardTravel',
-                                },
-                                {
-                                  name: 'Cast',
-                                  value: 'Cast',
-                                },
-                                {
-                                  name: 'Category',
-                                  value: 'Category',
-                                },
-                                {
-                                  name: 'Chat',
-                                  value: 'Chat',
-                                },
-                                {
-                                  name: 'Check',
-                                  value: 'Check',
-                                },
-                                {
-                                  name: 'CheckBox',
-                                  value: 'CheckBox',
-                                },
-                                {
-                                  name: 'CheckCircle',
-                                  value: 'CheckCircle',
-                                },
-                                {
-                                  name: 'CheckCircleOutline',
-                                  value: 'CheckCircleOutline',
-                                },
-                                {
-                                  name: 'ChevronLeft',
-                                  value: 'ChevronLeft',
-                                },
-                                {
-                                  name: 'ChevronRight',
-                                  value: 'ChevronRight',
-                                },
-                                {
-                                  name: 'ChildCare',
-                                  value: 'ChildCare',
-                                },
-                                {
-                                  name: 'Clear',
-                                  value: 'Clear',
-                                },
-                                {
-                                  name: 'Close',
-                                  value: 'Close',
-                                },
-                                {
-                                  name: 'Cloud',
-                                  value: 'Cloud',
-                                },
-                                {
-                                  name: 'CloudDownload',
-                                  value: 'CloudDownload',
-                                },
-                                {
-                                  name: 'CloudUpload',
-                                  value: 'CloudUpload',
-                                },
-                                {
-                                  name: 'Code',
-                                  value: 'Code',
-                                },
-                                {
-                                  name: 'Collections',
-                                  value: 'Collections',
-                                },
-                                {
-                                  name: 'ColorLens',
-                                  value: 'ColorLens',
-                                },
-                                {
-                                  name: 'Colorize',
-                                  value: 'Colorize',
-                                },
-                                {
-                                  name: 'Commute',
-                                  value: 'Commute',
-                                },
-                                {
-                                  name: 'Computer',
-                                  value: 'Computer',
-                                },
-                                {
-                                  name: 'CreditCard',
-                                  value: 'CreditCard',
-                                },
-                                {
-                                  name: 'Dashboard',
-                                  value: 'Dashboard',
-                                },
-                                {
-                                  name: 'DataUsage',
-                                  value: 'DataUsage',
-                                },
-                                {
-                                  name: 'Deck',
-                                  value: 'Deck',
-                                },
-                                {
-                                  name: 'Dehaze',
-                                  value: 'Dehaze',
-                                },
-                                {
-                                  name: 'Delete',
-                                  value: 'Delete',
-                                },
-                                {
-                                  name: 'DeleteForever',
-                                  value: 'DeleteForever',
-                                },
-                                {
-                                  name: 'DesktopMac',
-                                  value: 'DesktopMac',
-                                },
-                                {
-                                  name: 'DeveloperMode',
-                                  value: 'DeveloperMode',
-                                },
-                                {
-                                  name: 'Devices',
-                                  value: 'Devices',
-                                },
-                                {
-                                  name: 'Dialpad',
-                                  value: 'Dialpad',
-                                },
-                                {
-                                  name: 'Directions',
-                                  value: 'Directions',
-                                },
-                                {
-                                  name: 'DirectionsBike',
-                                  value: 'DirectionsBike',
-                                },
-                                {
-                                  name: 'DirectionsBoat',
-                                  value: 'DirectionsBoat',
-                                },
-                                {
-                                  name: 'DirectionsBus',
-                                  value: 'DirectionsBus',
-                                },
-                                {
-                                  name: 'DirectionsCar',
-                                  value: 'DirectionsCar',
-                                },
-                                {
-                                  name: 'DirectionsRailway',
-                                  value: 'DirectionsRailway',
-                                },
-                                {
-                                  name: 'DirectionsRun',
-                                  value: 'DirectionsRun',
-                                },
-                                {
-                                  name: 'DirectionsSubway',
-                                  value: 'DirectionsSubway',
-                                },
-                                {
-                                  name: 'DirectionsTransit',
-                                  value: 'DirectionsTransit',
-                                },
-                                {
-                                  name: 'DirectionsWalk',
-                                  value: 'DirectionsWalk',
-                                },
-                                {
-                                  name: 'DiscFull',
-                                  value: 'DiscFull',
-                                },
-                                {
-                                  name: 'Dns',
-                                  value: 'Dns',
-                                },
-                                {
-                                  name: 'Done',
-                                  value: 'Done',
-                                },
-                                {
-                                  name: 'DoneAll',
-                                  value: 'DoneAll',
-                                },
-                                {
-                                  name: 'DoubleArrow',
-                                  value: 'DoubleArrow',
-                                },
-                                {
-                                  name: 'Drafts',
-                                  value: 'Drafts',
-                                },
-                                {
-                                  name: 'Eco',
-                                  value: 'Eco',
-                                },
-                                {
-                                  name: 'Edit',
-                                  value: 'Edit',
-                                },
-                                {
-                                  name: 'Email',
-                                  value: 'Email',
-                                },
-                                {
-                                  name: 'Equalizer',
-                                  value: 'Equalizer',
-                                },
-                                {
-                                  name: 'Error',
-                                  value: 'Error',
-                                },
-                                {
-                                  name: 'Euro',
-                                  value: 'Euro',
-                                },
-                                {
-                                  name: 'Event',
-                                  value: 'Event',
-                                },
-                                {
-                                  name: 'ExpandLess',
-                                  value: 'ExpandLess',
-                                },
-                                {
-                                  name: 'ExpandMore',
-                                  value: 'ExpandMore',
-                                },
-                                {
-                                  name: 'Explore',
-                                  value: 'Explore',
-                                },
-                                {
-                                  name: 'Extension',
-                                  value: 'Extension',
-                                },
-                                {
-                                  name: 'Face',
-                                  value: 'Face',
-                                },
-                                {
-                                  name: 'Facebook',
-                                  value: 'Facebook',
-                                },
-                                {
-                                  name: 'FastForward',
-                                  value: 'FastForward',
-                                },
-                                {
-                                  name: 'FastRewind',
-                                  value: 'FastRewind',
-                                },
-                                {
-                                  name: 'Favorite',
-                                  value: 'Favorite',
-                                },
-                                {
-                                  name: 'FavoriteBorder',
-                                  value: 'FavoriteBorder',
-                                },
-                                {
-                                  name: 'FilterList',
-                                  value: 'FilterList',
-                                },
-                                {
-                                  name: 'Flag',
-                                  value: 'Flag',
-                                },
-                                {
-                                  name: 'Flare',
-                                  value: 'Flare',
-                                },
-                                {
-                                  name: 'Flight',
-                                  value: 'Flight',
-                                },
-                                {
-                                  name: 'Folder',
-                                  value: 'Folder',
-                                },
-                                {
-                                  name: 'Forum',
-                                  value: 'Forum',
-                                },
-                                {
-                                  name: 'Forward',
-                                  value: 'Forward',
-                                },
-                                {
-                                  name: 'FreeBreakfast',
-                                  value: 'FreeBreakfast',
-                                },
-                                {
-                                  name: 'Fullscreen',
-                                  value: 'Fullscreen',
-                                },
-                                {
-                                  name: 'Functions',
-                                  value: 'Functions',
-                                },
-                                {
-                                  name: 'Games',
-                                  value: 'Games',
-                                },
-                                {
-                                  name: 'Gavel',
-                                  value: 'Gavel',
-                                },
-                                {
-                                  name: 'Gesture',
-                                  value: 'Gesture',
-                                },
-                                {
-                                  name: 'GetApp',
-                                  value: 'GetApp',
-                                },
-                                {
-                                  name: 'Gif',
-                                  value: 'Gif',
-                                },
-                                {
-                                  name: 'GpsFixed',
-                                  value: 'GpsFixed',
-                                },
-                                {
-                                  name: 'Grade',
-                                  value: 'Grade',
-                                },
-                                {
-                                  name: 'Group',
-                                  value: 'Group',
-                                },
-                                {
-                                  name: 'Headset',
-                                  value: 'Headset',
-                                },
-                                {
-                                  name: 'Hearing',
-                                  value: 'Hearing',
-                                },
-                                {
-                                  name: 'Height',
-                                  value: 'Height',
-                                },
-                                {
-                                  name: 'Help',
-                                  value: 'Help',
-                                },
-                                {
-                                  name: 'HelpOutline',
-                                  value: 'HelpOutline',
-                                },
-                                {
-                                  name: 'Highlight',
-                                  value: 'Highlight',
-                                },
-                                {
-                                  name: 'History',
-                                  value: 'History',
-                                },
-                                {
-                                  name: 'Home',
-                                  value: 'Home',
-                                },
-                                {
-                                  name: 'Hotel',
-                                  value: 'Hotel',
-                                },
-                                {
-                                  name: 'HourglassEmpty',
-                                  value: 'HourglassEmpty',
-                                },
-                                {
-                                  name: 'Http',
-                                  value: 'Http',
-                                },
-                                {
-                                  name: 'Https',
-                                  value: 'Https',
-                                },
-                                {
-                                  name: 'Image',
-                                  value: 'Image',
-                                },
-                                {
-                                  name: 'ImportExport',
-                                  value: 'ImportExport',
-                                },
-                                {
-                                  name: 'Inbox',
-                                  value: 'Inbox',
-                                },
-                                {
-                                  name: 'Info',
-                                  value: 'Info',
-                                },
-                                {
-                                  name: 'Input',
-                                  value: 'Input',
-                                },
-                                {
-                                  name: 'Keyboard',
-                                  value: 'Keyboard',
-                                },
-                                {
-                                  name: 'KeyboardArrowDown',
-                                  value: 'KeyboardArrowDown',
-                                },
-                                {
-                                  name: 'KeyboardArrowLeft',
-                                  value: 'KeyboardArrowLeft',
-                                },
-                                {
-                                  name: 'KeyboardArrowRight',
-                                  value: 'KeyboardArrowRight',
-                                },
-                                {
-                                  name: 'KeyboardArrowUp',
-                                  value: 'KeyboardArrowUp',
-                                },
-                                {
-                                  name: 'KeyboardVoice',
-                                  value: 'KeyboardVoice',
-                                },
-                                {
-                                  name: 'Label',
-                                  value: 'Label',
-                                },
-                                {
-                                  name: 'Landscape',
-                                  value: 'Landscape',
-                                },
-                                {
-                                  name: 'Language',
-                                  value: 'Language',
-                                },
-                                {
-                                  name: 'Laptop',
-                                  value: 'Laptop',
-                                },
-                                {
-                                  name: 'LastPage',
-                                  value: 'LastPage',
-                                },
-                                {
-                                  name: 'Launch',
-                                  value: 'Launch',
-                                },
-                                {
-                                  name: 'Layers',
-                                  value: 'Layers',
-                                },
-                                {
-                                  name: 'Link',
-                                  value: 'Link',
-                                },
-                                {
-                                  name: 'List',
-                                  value: 'List',
-                                },
-                                {
-                                  name: 'LocalBar',
-                                  value: 'LocalBar',
-                                },
-                                {
-                                  name: 'Lock',
-                                  value: 'Lock',
-                                },
-                                {
-                                  name: 'LockOpen',
-                                  value: 'LockOpen',
-                                },
-                                {
-                                  name: 'Loop',
-                                  value: 'Loop',
-                                },
-                                {
-                                  name: 'Mail',
-                                  value: 'Mail',
-                                },
-                                {
-                                  name: 'Map',
-                                  value: 'Map',
-                                },
-                                {
-                                  name: 'Menu',
-                                  value: 'Menu',
-                                },
-                                {
-                                  name: 'Message',
-                                  value: 'Message',
-                                },
-                                {
-                                  name: 'Mic',
-                                  value: 'Mic',
-                                },
-                                {
-                                  name: 'Mms',
-                                  value: 'Mms',
-                                },
-                                {
-                                  name: 'Money',
-                                  value: 'Money',
-                                },
-                                {
-                                  name: 'Mood',
-                                  value: 'Mood',
-                                },
-                                {
-                                  name: 'MoodBad',
-                                  value: 'MoodBad',
-                                },
-                                {
-                                  name: 'More',
-                                  value: 'More',
-                                },
-                                {
-                                  name: 'MoreHoriz',
-                                  value: 'MoreHoriz',
-                                },
-                                {
-                                  name: 'MoreVert',
-                                  value: 'MoreVert',
-                                },
-                                {
-                                  name: 'Motorcycle',
-                                  value: 'Motorcycle',
-                                },
-                                {
-                                  name: 'Movie',
-                                  value: 'Movie',
-                                },
-                                {
-                                  name: 'MusicNote',
-                                  value: 'MusicNote',
-                                },
-                                {
-                                  name: 'MyLocation',
-                                  value: 'MyLocation',
-                                },
-                                {
-                                  name: 'Nature',
-                                  value: 'Nature',
-                                },
-                                {
-                                  name: 'Navigation',
-                                  value: 'Navigation',
-                                },
-                                {
-                                  name: 'NewReleases',
-                                  value: 'NewReleases',
-                                },
-                                {
-                                  name: 'NotInterested',
-                                  value: 'NotInterested',
-                                },
-                                {
-                                  name: 'Note',
-                                  value: 'Note',
-                                },
-                                {
-                                  name: 'NotificationImportant',
-                                  value: 'NotificationImportant',
-                                },
-                                {
-                                  name: 'Notifications',
-                                  value: 'Notifications',
-                                },
-                                {
-                                  name: 'NotificationsActive',
-                                  value: 'NotificationsActive',
-                                },
-                                {
-                                  name: 'Opacity',
-                                  value: 'Opacity',
-                                },
-                                {
-                                  name: 'Palette',
-                                  value: 'Palette',
-                                },
-                                {
-                                  name: 'Pause',
-                                  value: 'Pause',
-                                },
-                                {
-                                  name: 'Payment',
-                                  value: 'Payment',
-                                },
-                                {
-                                  name: 'People',
-                                  value: 'People',
-                                },
-                                {
-                                  name: 'Person',
-                                  value: 'Person',
-                                },
-                                {
-                                  name: 'PersonAdd',
-                                  value: 'PersonAdd',
-                                },
-                                {
-                                  name: 'Pets',
-                                  value: 'Pets',
-                                },
-                                {
-                                  name: 'Phone',
-                                  value: 'Phone',
-                                },
-                                {
-                                  name: 'Photo',
-                                  value: 'Photo',
-                                },
-                                {
-                                  name: 'PhotoCamera',
-                                  value: 'PhotoCamera',
-                                },
-                                {
-                                  name: 'PieChart',
-                                  value: 'PieChart',
-                                },
-                                {
-                                  name: 'Place',
-                                  value: 'Place',
-                                },
-                                {
-                                  name: 'PlayArrow',
-                                  value: 'PlayArrow',
-                                },
-                                {
-                                  name: 'PlayCircleFilled',
-                                  value: 'PlayCircleFilled',
-                                },
-                                {
-                                  name: 'PlayCircleFilledWhite',
-                                  value: 'PlayCircleFilledWhite',
-                                },
-                                {
-                                  name: 'PlayCircleOutline',
-                                  value: 'PlayCircleOutline',
-                                },
-                                {
-                                  name: 'Power',
-                                  value: 'Power',
-                                },
-                                {
-                                  name: 'Public',
-                                  value: 'Public',
-                                },
-                                {
-                                  name: 'Radio',
-                                  value: 'Radio',
-                                },
-                                {
-                                  name: 'Redo',
-                                  value: 'Redo',
-                                },
-                                {
-                                  name: 'Refresh',
-                                  value: 'Refresh',
-                                },
-                                {
-                                  name: 'Remove',
-                                  value: 'Remove',
-                                },
-                                {
-                                  name: 'RemoveCircle',
-                                  value: 'RemoveCircle',
-                                },
-                                {
-                                  name: 'RemoveCircleOutline',
-                                  value: 'RemoveCircleOutline',
-                                },
-                                {
-                                  name: 'Replay',
-                                  value: 'Replay',
-                                },
-                                {
-                                  name: 'Reply',
-                                  value: 'Reply',
-                                },
-                                {
-                                  name: 'Report',
-                                  value: 'Report',
-                                },
-                                {
-                                  name: 'ReportProblem',
-                                  value: 'ReportProblem',
-                                },
-                                {
-                                  name: 'Restaurant',
-                                  value: 'Restaurant',
-                                },
-                                {
-                                  name: 'RssFeed',
-                                  value: 'RssFeed',
-                                },
-                                {
-                                  name: 'Save',
-                                  value: 'Save',
-                                },
-                                {
-                                  name: 'SaveAlt',
-                                  value: 'SaveAlt',
-                                },
-                                {
-                                  name: 'School',
-                                  value: 'School',
-                                },
-                                {
-                                  name: 'Search',
-                                  value: 'Search',
-                                },
-                                {
-                                  name: 'Security',
-                                  value: 'Security',
-                                },
-                                {
-                                  name: 'Send',
-                                  value: 'Send',
-                                },
-                                {
-                                  name: 'Settings',
-                                  value: 'Settings',
-                                },
-                                {
-                                  name: 'ShoppingCart',
-                                  value: 'ShoppingCart',
-                                },
-                                {
-                                  name: 'ShowChart',
-                                  value: 'ShowChart',
-                                },
-                                {
-                                  name: 'Smartphone',
-                                  value: 'Smartphone',
-                                },
-                                {
-                                  name: 'SmokeFree',
-                                  value: 'SmokeFree',
-                                },
-                                {
-                                  name: 'SmokingRooms',
-                                  value: 'SmokingRooms',
-                                },
-                                {
-                                  name: 'Speaker',
-                                  value: 'Speaker',
-                                },
-                                {
-                                  name: 'Speed',
-                                  value: 'Speed',
-                                },
-                                {
-                                  name: 'Spellcheck',
-                                  value: 'Spellcheck',
-                                },
-                                {
-                                  name: 'SquareFoot',
-                                  value: 'SquareFoot',
-                                },
-                                {
-                                  name: 'Star',
-                                  value: 'Star',
-                                },
-                                {
-                                  name: 'StarBorder',
-                                  value: 'StarBorder',
-                                },
-                                {
-                                  name: 'StarHalf',
-                                  value: 'StarHalf',
-                                },
-                                {
-                                  name: 'StarOutline',
-                                  value: 'StarOutline',
-                                },
-                                {
-                                  name: 'StarRate',
-                                  value: 'StarRate',
-                                },
-                                {
-                                  name: 'Stars',
-                                  value: 'Stars',
-                                },
-                                {
-                                  name: 'Stop',
-                                  value: 'Stop',
-                                },
-                                {
-                                  name: 'Storefront',
-                                  value: 'Storefront',
-                                },
-                                {
-                                  name: 'Sync',
-                                  value: 'Sync',
-                                },
-                                {
-                                  name: 'Tab',
-                                  value: 'Tab',
-                                },
-                                {
-                                  name: 'TextFields',
-                                  value: 'TextFields',
-                                },
-                                {
-                                  name: 'ThumbDown',
-                                  value: 'ThumbDown',
-                                },
-                                {
-                                  name: 'ThumbDownAlt',
-                                  value: 'ThumbDownAlt',
-                                },
-                                {
-                                  name: 'ThumbUp',
-                                  value: 'ThumbUp',
-                                },
-                                {
-                                  name: 'ThumbUpAlt',
-                                  value: 'ThumbUpAlt',
-                                },
-                                {
-                                  name: 'ThumbsUpDown',
-                                  value: 'ThumbsUpDown',
-                                },
-                                {
-                                  name: 'Title',
-                                  value: 'Title',
-                                },
-                                {
-                                  name: 'TouchApp',
-                                  value: 'TouchApp',
-                                },
-                                {
-                                  name: 'Traffic',
-                                  value: 'Traffic',
-                                },
-                                {
-                                  name: 'Train',
-                                  value: 'Train',
-                                },
-                                {
-                                  name: 'Tram',
-                                  value: 'Tram',
-                                },
-                                {
-                                  name: 'Translate',
-                                  value: 'Translate',
-                                },
-                                {
-                                  name: 'TrendingDown',
-                                  value: 'TrendingDown',
-                                },
-                                {
-                                  name: 'TrendingFlat',
-                                  value: 'TrendingFlat',
-                                },
-                                {
-                                  name: 'TrendingUp',
-                                  value: 'TrendingUp',
-                                },
-                                {
-                                  name: 'Undo',
-                                  value: 'Undo',
-                                },
-                                {
-                                  name: 'Update',
-                                  value: 'Update',
-                                },
-                                {
-                                  name: 'Usb',
-                                  value: 'Usb',
-                                },
-                                {
-                                  name: 'VerifiedUser',
-                                  value: 'VerifiedUser',
-                                },
-                                {
-                                  name: 'VideoCall',
-                                  value: 'VideoCall',
-                                },
-                                {
-                                  name: 'Visibility',
-                                  value: 'Visibility',
-                                },
-                                {
-                                  name: 'VisibilityOff',
-                                  value: 'VisibilityOff',
-                                },
-                                {
-                                  name: 'Voicemail',
-                                  value: 'Voicemail',
-                                },
-                                {
-                                  name: 'VolumeDown',
-                                  value: 'VolumeDown',
-                                },
-                                {
-                                  name: 'VolumeMute',
-                                  value: 'VolumeMute',
-                                },
-                                {
-                                  name: 'VolumeOff',
-                                  value: 'VolumeOff',
-                                },
-                                {
-                                  name: 'VolumeUp',
-                                  value: 'VolumeUp',
-                                },
-                                {
-                                  name: 'Warning',
-                                  value: 'Warning',
-                                },
-                                {
-                                  name: 'Watch',
-                                  value: 'Watch',
-                                },
-                                {
-                                  name: 'WatchLater',
-                                  value: 'WatchLater',
-                                },
-                                {
-                                  name: 'Wc',
-                                  value: 'Wc',
-                                },
-                                {
-                                  name: 'Widgets',
-                                  value: 'Widgets',
-                                },
-                                {
-                                  name: 'Wifi',
-                                  value: 'Wifi',
-                                },
-                                {
-                                  name: 'Work',
-                                  value: 'Work',
-                                },
-                              ],
-                            },
-                          },
-                          {
-                            type: 'CUSTOM',
-                            label: 'Position',
-                            key: 'adornmentPosition',
-                            value: 'start',
-                            configuration: {
-                              condition: {
-                                type: 'HIDE',
-                                option: 'adornmentIcon',
-                                comparator: 'EQ',
-                                value: '',
+                              {
+                                name: 'AllInclusive',
+                                value: 'AllInclusive',
                               },
-                              as: 'BUTTONGROUP',
-                              dataType: 'string',
-                              allowedInput: [
-                                { name: 'Start', value: 'start' },
-                                { name: 'End', value: 'end' },
-                              ],
-                            },
-                          },
-                          {
-                            value: false,
-                            label: 'Styles',
-                            key: 'styles',
-                            type: 'TOGGLE',
-                          },
-                          {
-                            type: 'COLOR',
-                            label: 'Background color',
-                            key: 'backgroundColor',
-                            value: 'White',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'styles',
-                                comparator: 'EQ',
-                                value: true,
+                              {
+                                name: 'AlternateEmail',
+                                value: 'AlternateEmail',
                               },
-                            },
-                          },
-                          {
-                            type: 'COLOR',
-                            label: 'Border color',
-                            key: 'borderColor',
-                            value: 'Accent1',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'styles',
-                                comparator: 'EQ',
-                                value: true,
+                              {
+                                name: 'Announcement',
+                                value: 'Announcement',
                               },
-                            },
-                          },
-                          {
-                            type: 'COLOR',
-                            label: 'Border color (hover)',
-                            key: 'borderHoverColor',
-                            value: 'Black',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'styles',
-                                comparator: 'EQ',
-                                value: true,
+                              {
+                                name: 'Apartment',
+                                value: 'Apartment',
                               },
-                            },
-                          },
-                          {
-                            type: 'COLOR',
-                            label: 'Border color (focus)',
-                            key: 'borderFocusColor',
-                            value: 'Primary',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'styles',
-                                comparator: 'EQ',
-                                value: true,
+                              {
+                                name: 'Apps',
+                                value: 'Apps',
                               },
-                            },
-                          },
-                          {
-                            value: false,
-                            label: 'Hide label',
-                            key: 'hideLabel',
-                            type: 'TOGGLE',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'styles',
-                                comparator: 'EQ',
-                                value: true,
+                              {
+                                name: 'Archive',
+                                value: 'Archive',
                               },
-                            },
-                          },
-                          {
-                            type: 'COLOR',
-                            label: 'Label color',
-                            key: 'labelColor',
-                            value: 'Accent3',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'styles',
-                                comparator: 'EQ',
-                                value: true,
+                              {
+                                name: 'ArrowBack',
+                                value: 'ArrowBack',
                               },
-                            },
-                          },
-                          {
-                            type: 'COLOR',
-                            label: 'Text color',
-                            key: 'textColor',
-                            value: 'Black',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'styles',
-                                comparator: 'EQ',
-                                value: true,
+                              {
+                                name: 'ArrowBackIos',
+                                value: 'ArrowBackIos',
                               },
-                            },
-                          },
-                          {
-                            type: 'COLOR',
-                            label: 'Placeholder color',
-                            key: 'placeholderColor',
-                            value: 'Light',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'styles',
-                                comparator: 'EQ',
-                                value: true,
+                              {
+                                name: 'ArrowDownward',
+                                value: 'ArrowDownward',
                               },
-                            },
-                          },
-                          {
-                            type: 'COLOR',
-                            label: 'Helper color',
-                            key: 'helperColor',
-                            value: 'Accent2',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'styles',
-                                comparator: 'EQ',
-                                value: true,
+                              {
+                                name: 'ArrowDropDown',
+                                value: 'ArrowDropDown',
                               },
-                            },
-                          },
-                          {
-                            type: 'COLOR',
-                            label: 'Error color',
-                            key: 'errorColor',
-                            value: 'Danger',
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'styles',
-                                comparator: 'EQ',
-                                value: true,
+                              {
+                                name: 'ArrowDropDownCircle',
+                                value: 'ArrowDropDownCircle',
                               },
-                            },
-                          },
-                          {
-                            value: false,
-                            label: 'Advanced settings',
-                            key: 'advancedSettings',
-                            type: 'TOGGLE',
-                          },
-                          {
-                            type: 'VARIABLE',
-                            label: 'name attribute',
-                            key: 'nameAttribute',
-                            value: [],
-                            configuration: {
-                              condition: {
-                                type: 'SHOW',
-                                option: 'advancedSettings',
-                                comparator: 'EQ',
-                                value: true,
+                              {
+                                name: 'ArrowDropUp',
+                                value: 'ArrowDropUp',
                               },
+                              {
+                                name: 'ArrowForward',
+                                value: 'ArrowForward',
+                              },
+                              {
+                                name: 'ArrowForwardIos',
+                                value: 'ArrowForwardIos',
+                              },
+                              {
+                                name: 'ArrowLeft',
+                                value: 'ArrowLeft',
+                              },
+                              {
+                                name: 'ArrowRight',
+                                value: 'ArrowRight',
+                              },
+                              {
+                                name: 'ArrowRightAlt',
+                                value: 'ArrowRightAlt',
+                              },
+                              {
+                                name: 'ArrowUpward',
+                                value: 'ArrowUpward',
+                              },
+                              {
+                                name: 'Assessment',
+                                value: 'Assessment',
+                              },
+                              {
+                                name: 'Assignment',
+                                value: 'Assignment',
+                              },
+                              {
+                                name: 'AssignmentInd',
+                                value: 'AssignmentInd',
+                              },
+                              {
+                                name: 'AssignmentLate',
+                                value: 'AssignmentLate',
+                              },
+                              {
+                                name: 'AssignmentReturn',
+                                value: 'AssignmentReturn',
+                              },
+                              {
+                                name: 'AssignmentReturned',
+                                value: 'AssignmentReturned',
+                              },
+                              {
+                                name: 'AssignmentTurnedIn',
+                                value: 'AssignmentTurnedIn',
+                              },
+                              {
+                                name: 'Assistant',
+                                value: 'Assistant',
+                              },
+                              {
+                                name: 'AssistantPhoto',
+                                value: 'AssistantPhoto',
+                              },
+                              {
+                                name: 'AttachFile',
+                                value: 'AttachFile',
+                              },
+                              {
+                                name: 'AttachMoney',
+                                value: 'AttachMoney',
+                              },
+                              {
+                                name: 'Attachment',
+                                value: 'Attachment',
+                              },
+                              {
+                                name: 'Audiotrack',
+                                value: 'Audiotrack',
+                              },
+                              {
+                                name: 'Autorenew',
+                                value: 'Autorenew',
+                              },
+                              {
+                                name: 'AvTimer',
+                                value: 'AvTimer',
+                              },
+                              {
+                                name: 'Backspace',
+                                value: 'Backspace',
+                              },
+                              {
+                                name: 'Backup',
+                                value: 'Backup',
+                              },
+                              {
+                                name: 'BarChart',
+                                value: 'BarChart',
+                              },
+                              {
+                                name: 'Battery20',
+                                value: 'Battery20',
+                              },
+                              {
+                                name: 'Beenhere',
+                                value: 'Beenhere',
+                              },
+                              {
+                                name: 'Block',
+                                value: 'Block',
+                              },
+                              {
+                                name: 'Bluetooth',
+                                value: 'Bluetooth',
+                              },
+                              {
+                                name: 'Book',
+                                value: 'Book',
+                              },
+                              {
+                                name: 'Bookmark',
+                                value: 'Bookmark',
+                              },
+                              {
+                                name: 'BookmarkBorder',
+                                value: 'BookmarkBorder',
+                              },
+                              {
+                                name: 'Bookmarks',
+                                value: 'Bookmarks',
+                              },
+                              {
+                                name: 'Brush',
+                                value: 'Brush',
+                              },
+                              {
+                                name: 'BubbleChart',
+                                value: 'BubbleChart',
+                              },
+                              {
+                                name: 'BugReport',
+                                value: 'BugReport',
+                              },
+                              {
+                                name: 'Build',
+                                value: 'Build',
+                              },
+                              {
+                                name: 'Cached',
+                                value: 'Cached',
+                              },
+                              {
+                                name: 'Cake',
+                                value: 'Cake',
+                              },
+                              {
+                                name: 'CalendarToday',
+                                value: 'CalendarToday',
+                              },
+                              {
+                                name: 'Call',
+                                value: 'Call',
+                              },
+                              {
+                                name: 'CameraAlt',
+                                value: 'CameraAlt',
+                              },
+                              {
+                                name: 'CameraRoll',
+                                value: 'CameraRoll',
+                              },
+                              {
+                                name: 'Cancel',
+                                value: 'Cancel',
+                              },
+                              {
+                                name: 'CardTravel',
+                                value: 'CardTravel',
+                              },
+                              {
+                                name: 'Cast',
+                                value: 'Cast',
+                              },
+                              {
+                                name: 'Category',
+                                value: 'Category',
+                              },
+                              {
+                                name: 'Chat',
+                                value: 'Chat',
+                              },
+                              {
+                                name: 'Check',
+                                value: 'Check',
+                              },
+                              {
+                                name: 'CheckBox',
+                                value: 'CheckBox',
+                              },
+                              {
+                                name: 'CheckCircle',
+                                value: 'CheckCircle',
+                              },
+                              {
+                                name: 'CheckCircleOutline',
+                                value: 'CheckCircleOutline',
+                              },
+                              {
+                                name: 'ChevronLeft',
+                                value: 'ChevronLeft',
+                              },
+                              {
+                                name: 'ChevronRight',
+                                value: 'ChevronRight',
+                              },
+                              {
+                                name: 'ChildCare',
+                                value: 'ChildCare',
+                              },
+                              {
+                                name: 'Clear',
+                                value: 'Clear',
+                              },
+                              {
+                                name: 'Close',
+                                value: 'Close',
+                              },
+                              {
+                                name: 'Cloud',
+                                value: 'Cloud',
+                              },
+                              {
+                                name: 'CloudDownload',
+                                value: 'CloudDownload',
+                              },
+                              {
+                                name: 'CloudUpload',
+                                value: 'CloudUpload',
+                              },
+                              {
+                                name: 'Code',
+                                value: 'Code',
+                              },
+                              {
+                                name: 'Collections',
+                                value: 'Collections',
+                              },
+                              {
+                                name: 'ColorLens',
+                                value: 'ColorLens',
+                              },
+                              {
+                                name: 'Colorize',
+                                value: 'Colorize',
+                              },
+                              {
+                                name: 'Commute',
+                                value: 'Commute',
+                              },
+                              {
+                                name: 'Computer',
+                                value: 'Computer',
+                              },
+                              {
+                                name: 'CreditCard',
+                                value: 'CreditCard',
+                              },
+                              {
+                                name: 'Dashboard',
+                                value: 'Dashboard',
+                              },
+                              {
+                                name: 'DataUsage',
+                                value: 'DataUsage',
+                              },
+                              {
+                                name: 'Deck',
+                                value: 'Deck',
+                              },
+                              {
+                                name: 'Dehaze',
+                                value: 'Dehaze',
+                              },
+                              {
+                                name: 'Delete',
+                                value: 'Delete',
+                              },
+                              {
+                                name: 'DeleteForever',
+                                value: 'DeleteForever',
+                              },
+                              {
+                                name: 'DesktopMac',
+                                value: 'DesktopMac',
+                              },
+                              {
+                                name: 'DeveloperMode',
+                                value: 'DeveloperMode',
+                              },
+                              {
+                                name: 'Devices',
+                                value: 'Devices',
+                              },
+                              {
+                                name: 'Dialpad',
+                                value: 'Dialpad',
+                              },
+                              {
+                                name: 'Directions',
+                                value: 'Directions',
+                              },
+                              {
+                                name: 'DirectionsBike',
+                                value: 'DirectionsBike',
+                              },
+                              {
+                                name: 'DirectionsBoat',
+                                value: 'DirectionsBoat',
+                              },
+                              {
+                                name: 'DirectionsBus',
+                                value: 'DirectionsBus',
+                              },
+                              {
+                                name: 'DirectionsCar',
+                                value: 'DirectionsCar',
+                              },
+                              {
+                                name: 'DirectionsRailway',
+                                value: 'DirectionsRailway',
+                              },
+                              {
+                                name: 'DirectionsRun',
+                                value: 'DirectionsRun',
+                              },
+                              {
+                                name: 'DirectionsSubway',
+                                value: 'DirectionsSubway',
+                              },
+                              {
+                                name: 'DirectionsTransit',
+                                value: 'DirectionsTransit',
+                              },
+                              {
+                                name: 'DirectionsWalk',
+                                value: 'DirectionsWalk',
+                              },
+                              {
+                                name: 'DiscFull',
+                                value: 'DiscFull',
+                              },
+                              {
+                                name: 'Dns',
+                                value: 'Dns',
+                              },
+                              {
+                                name: 'Done',
+                                value: 'Done',
+                              },
+                              {
+                                name: 'DoneAll',
+                                value: 'DoneAll',
+                              },
+                              {
+                                name: 'DoubleArrow',
+                                value: 'DoubleArrow',
+                              },
+                              {
+                                name: 'Drafts',
+                                value: 'Drafts',
+                              },
+                              {
+                                name: 'Eco',
+                                value: 'Eco',
+                              },
+                              {
+                                name: 'Edit',
+                                value: 'Edit',
+                              },
+                              {
+                                name: 'Email',
+                                value: 'Email',
+                              },
+                              {
+                                name: 'Equalizer',
+                                value: 'Equalizer',
+                              },
+                              {
+                                name: 'Error',
+                                value: 'Error',
+                              },
+                              {
+                                name: 'Euro',
+                                value: 'Euro',
+                              },
+                              {
+                                name: 'Event',
+                                value: 'Event',
+                              },
+                              {
+                                name: 'ExpandLess',
+                                value: 'ExpandLess',
+                              },
+                              {
+                                name: 'ExpandMore',
+                                value: 'ExpandMore',
+                              },
+                              {
+                                name: 'Explore',
+                                value: 'Explore',
+                              },
+                              {
+                                name: 'Extension',
+                                value: 'Extension',
+                              },
+                              {
+                                name: 'Face',
+                                value: 'Face',
+                              },
+                              {
+                                name: 'Facebook',
+                                value: 'Facebook',
+                              },
+                              {
+                                name: 'FastForward',
+                                value: 'FastForward',
+                              },
+                              {
+                                name: 'FastRewind',
+                                value: 'FastRewind',
+                              },
+                              {
+                                name: 'Favorite',
+                                value: 'Favorite',
+                              },
+                              {
+                                name: 'FavoriteBorder',
+                                value: 'FavoriteBorder',
+                              },
+                              {
+                                name: 'FilterList',
+                                value: 'FilterList',
+                              },
+                              {
+                                name: 'Flag',
+                                value: 'Flag',
+                              },
+                              {
+                                name: 'Flare',
+                                value: 'Flare',
+                              },
+                              {
+                                name: 'Flight',
+                                value: 'Flight',
+                              },
+                              {
+                                name: 'Folder',
+                                value: 'Folder',
+                              },
+                              {
+                                name: 'Forum',
+                                value: 'Forum',
+                              },
+                              {
+                                name: 'Forward',
+                                value: 'Forward',
+                              },
+                              {
+                                name: 'FreeBreakfast',
+                                value: 'FreeBreakfast',
+                              },
+                              {
+                                name: 'Fullscreen',
+                                value: 'Fullscreen',
+                              },
+                              {
+                                name: 'Functions',
+                                value: 'Functions',
+                              },
+                              {
+                                name: 'Games',
+                                value: 'Games',
+                              },
+                              {
+                                name: 'Gavel',
+                                value: 'Gavel',
+                              },
+                              {
+                                name: 'Gesture',
+                                value: 'Gesture',
+                              },
+                              {
+                                name: 'GetApp',
+                                value: 'GetApp',
+                              },
+                              {
+                                name: 'Gif',
+                                value: 'Gif',
+                              },
+                              {
+                                name: 'GpsFixed',
+                                value: 'GpsFixed',
+                              },
+                              {
+                                name: 'Grade',
+                                value: 'Grade',
+                              },
+                              {
+                                name: 'Group',
+                                value: 'Group',
+                              },
+                              {
+                                name: 'Headset',
+                                value: 'Headset',
+                              },
+                              {
+                                name: 'Hearing',
+                                value: 'Hearing',
+                              },
+                              {
+                                name: 'Height',
+                                value: 'Height',
+                              },
+                              {
+                                name: 'Help',
+                                value: 'Help',
+                              },
+                              {
+                                name: 'HelpOutline',
+                                value: 'HelpOutline',
+                              },
+                              {
+                                name: 'Highlight',
+                                value: 'Highlight',
+                              },
+                              {
+                                name: 'History',
+                                value: 'History',
+                              },
+                              {
+                                name: 'Home',
+                                value: 'Home',
+                              },
+                              {
+                                name: 'Hotel',
+                                value: 'Hotel',
+                              },
+                              {
+                                name: 'HourglassEmpty',
+                                value: 'HourglassEmpty',
+                              },
+                              {
+                                name: 'Http',
+                                value: 'Http',
+                              },
+                              {
+                                name: 'Https',
+                                value: 'Https',
+                              },
+                              {
+                                name: 'Image',
+                                value: 'Image',
+                              },
+                              {
+                                name: 'ImportExport',
+                                value: 'ImportExport',
+                              },
+                              {
+                                name: 'Inbox',
+                                value: 'Inbox',
+                              },
+                              {
+                                name: 'Info',
+                                value: 'Info',
+                              },
+                              {
+                                name: 'Input',
+                                value: 'Input',
+                              },
+                              {
+                                name: 'Keyboard',
+                                value: 'Keyboard',
+                              },
+                              {
+                                name: 'KeyboardArrowDown',
+                                value: 'KeyboardArrowDown',
+                              },
+                              {
+                                name: 'KeyboardArrowLeft',
+                                value: 'KeyboardArrowLeft',
+                              },
+                              {
+                                name: 'KeyboardArrowRight',
+                                value: 'KeyboardArrowRight',
+                              },
+                              {
+                                name: 'KeyboardArrowUp',
+                                value: 'KeyboardArrowUp',
+                              },
+                              {
+                                name: 'KeyboardVoice',
+                                value: 'KeyboardVoice',
+                              },
+                              {
+                                name: 'Label',
+                                value: 'Label',
+                              },
+                              {
+                                name: 'Landscape',
+                                value: 'Landscape',
+                              },
+                              {
+                                name: 'Language',
+                                value: 'Language',
+                              },
+                              {
+                                name: 'Laptop',
+                                value: 'Laptop',
+                              },
+                              {
+                                name: 'LastPage',
+                                value: 'LastPage',
+                              },
+                              {
+                                name: 'Launch',
+                                value: 'Launch',
+                              },
+                              {
+                                name: 'Layers',
+                                value: 'Layers',
+                              },
+                              {
+                                name: 'Link',
+                                value: 'Link',
+                              },
+                              {
+                                name: 'List',
+                                value: 'List',
+                              },
+                              {
+                                name: 'LocalBar',
+                                value: 'LocalBar',
+                              },
+                              {
+                                name: 'Lock',
+                                value: 'Lock',
+                              },
+                              {
+                                name: 'LockOpen',
+                                value: 'LockOpen',
+                              },
+                              {
+                                name: 'Loop',
+                                value: 'Loop',
+                              },
+                              {
+                                name: 'Mail',
+                                value: 'Mail',
+                              },
+                              {
+                                name: 'Map',
+                                value: 'Map',
+                              },
+                              {
+                                name: 'Menu',
+                                value: 'Menu',
+                              },
+                              {
+                                name: 'Message',
+                                value: 'Message',
+                              },
+                              {
+                                name: 'Mic',
+                                value: 'Mic',
+                              },
+                              {
+                                name: 'Mms',
+                                value: 'Mms',
+                              },
+                              {
+                                name: 'Money',
+                                value: 'Money',
+                              },
+                              {
+                                name: 'Mood',
+                                value: 'Mood',
+                              },
+                              {
+                                name: 'MoodBad',
+                                value: 'MoodBad',
+                              },
+                              {
+                                name: 'More',
+                                value: 'More',
+                              },
+                              {
+                                name: 'MoreHoriz',
+                                value: 'MoreHoriz',
+                              },
+                              {
+                                name: 'MoreVert',
+                                value: 'MoreVert',
+                              },
+                              {
+                                name: 'Motorcycle',
+                                value: 'Motorcycle',
+                              },
+                              {
+                                name: 'Movie',
+                                value: 'Movie',
+                              },
+                              {
+                                name: 'MusicNote',
+                                value: 'MusicNote',
+                              },
+                              {
+                                name: 'MyLocation',
+                                value: 'MyLocation',
+                              },
+                              {
+                                name: 'Nature',
+                                value: 'Nature',
+                              },
+                              {
+                                name: 'Navigation',
+                                value: 'Navigation',
+                              },
+                              {
+                                name: 'NewReleases',
+                                value: 'NewReleases',
+                              },
+                              {
+                                name: 'NotInterested',
+                                value: 'NotInterested',
+                              },
+                              {
+                                name: 'Note',
+                                value: 'Note',
+                              },
+                              {
+                                name: 'NotificationImportant',
+                                value: 'NotificationImportant',
+                              },
+                              {
+                                name: 'Notifications',
+                                value: 'Notifications',
+                              },
+                              {
+                                name: 'NotificationsActive',
+                                value: 'NotificationsActive',
+                              },
+                              {
+                                name: 'Opacity',
+                                value: 'Opacity',
+                              },
+                              {
+                                name: 'Palette',
+                                value: 'Palette',
+                              },
+                              {
+                                name: 'Pause',
+                                value: 'Pause',
+                              },
+                              {
+                                name: 'Payment',
+                                value: 'Payment',
+                              },
+                              {
+                                name: 'People',
+                                value: 'People',
+                              },
+                              {
+                                name: 'Person',
+                                value: 'Person',
+                              },
+                              {
+                                name: 'PersonAdd',
+                                value: 'PersonAdd',
+                              },
+                              {
+                                name: 'Pets',
+                                value: 'Pets',
+                              },
+                              {
+                                name: 'Phone',
+                                value: 'Phone',
+                              },
+                              {
+                                name: 'Photo',
+                                value: 'Photo',
+                              },
+                              {
+                                name: 'PhotoCamera',
+                                value: 'PhotoCamera',
+                              },
+                              {
+                                name: 'PieChart',
+                                value: 'PieChart',
+                              },
+                              {
+                                name: 'Place',
+                                value: 'Place',
+                              },
+                              {
+                                name: 'PlayArrow',
+                                value: 'PlayArrow',
+                              },
+                              {
+                                name: 'PlayCircleFilled',
+                                value: 'PlayCircleFilled',
+                              },
+                              {
+                                name: 'PlayCircleFilledWhite',
+                                value: 'PlayCircleFilledWhite',
+                              },
+                              {
+                                name: 'PlayCircleOutline',
+                                value: 'PlayCircleOutline',
+                              },
+                              {
+                                name: 'Power',
+                                value: 'Power',
+                              },
+                              {
+                                name: 'Public',
+                                value: 'Public',
+                              },
+                              {
+                                name: 'Radio',
+                                value: 'Radio',
+                              },
+                              {
+                                name: 'Redo',
+                                value: 'Redo',
+                              },
+                              {
+                                name: 'Refresh',
+                                value: 'Refresh',
+                              },
+                              {
+                                name: 'Remove',
+                                value: 'Remove',
+                              },
+                              {
+                                name: 'RemoveCircle',
+                                value: 'RemoveCircle',
+                              },
+                              {
+                                name: 'RemoveCircleOutline',
+                                value: 'RemoveCircleOutline',
+                              },
+                              {
+                                name: 'Replay',
+                                value: 'Replay',
+                              },
+                              {
+                                name: 'Reply',
+                                value: 'Reply',
+                              },
+                              {
+                                name: 'Report',
+                                value: 'Report',
+                              },
+                              {
+                                name: 'ReportProblem',
+                                value: 'ReportProblem',
+                              },
+                              {
+                                name: 'Restaurant',
+                                value: 'Restaurant',
+                              },
+                              {
+                                name: 'RssFeed',
+                                value: 'RssFeed',
+                              },
+                              {
+                                name: 'Save',
+                                value: 'Save',
+                              },
+                              {
+                                name: 'SaveAlt',
+                                value: 'SaveAlt',
+                              },
+                              {
+                                name: 'School',
+                                value: 'School',
+                              },
+                              {
+                                name: 'Search',
+                                value: 'Search',
+                              },
+                              {
+                                name: 'Security',
+                                value: 'Security',
+                              },
+                              {
+                                name: 'Send',
+                                value: 'Send',
+                              },
+                              {
+                                name: 'Settings',
+                                value: 'Settings',
+                              },
+                              {
+                                name: 'ShoppingCart',
+                                value: 'ShoppingCart',
+                              },
+                              {
+                                name: 'ShowChart',
+                                value: 'ShowChart',
+                              },
+                              {
+                                name: 'Smartphone',
+                                value: 'Smartphone',
+                              },
+                              {
+                                name: 'SmokeFree',
+                                value: 'SmokeFree',
+                              },
+                              {
+                                name: 'SmokingRooms',
+                                value: 'SmokingRooms',
+                              },
+                              {
+                                name: 'Speaker',
+                                value: 'Speaker',
+                              },
+                              {
+                                name: 'Speed',
+                                value: 'Speed',
+                              },
+                              {
+                                name: 'Spellcheck',
+                                value: 'Spellcheck',
+                              },
+                              {
+                                name: 'SquareFoot',
+                                value: 'SquareFoot',
+                              },
+                              {
+                                name: 'Star',
+                                value: 'Star',
+                              },
+                              {
+                                name: 'StarBorder',
+                                value: 'StarBorder',
+                              },
+                              {
+                                name: 'StarHalf',
+                                value: 'StarHalf',
+                              },
+                              {
+                                name: 'StarOutline',
+                                value: 'StarOutline',
+                              },
+                              {
+                                name: 'StarRate',
+                                value: 'StarRate',
+                              },
+                              {
+                                name: 'Stars',
+                                value: 'Stars',
+                              },
+                              {
+                                name: 'Stop',
+                                value: 'Stop',
+                              },
+                              {
+                                name: 'Storefront',
+                                value: 'Storefront',
+                              },
+                              {
+                                name: 'Sync',
+                                value: 'Sync',
+                              },
+                              {
+                                name: 'Tab',
+                                value: 'Tab',
+                              },
+                              {
+                                name: 'TextFields',
+                                value: 'TextFields',
+                              },
+                              {
+                                name: 'ThumbDown',
+                                value: 'ThumbDown',
+                              },
+                              {
+                                name: 'ThumbDownAlt',
+                                value: 'ThumbDownAlt',
+                              },
+                              {
+                                name: 'ThumbUp',
+                                value: 'ThumbUp',
+                              },
+                              {
+                                name: 'ThumbUpAlt',
+                                value: 'ThumbUpAlt',
+                              },
+                              {
+                                name: 'ThumbsUpDown',
+                                value: 'ThumbsUpDown',
+                              },
+                              {
+                                name: 'Title',
+                                value: 'Title',
+                              },
+                              {
+                                name: 'TouchApp',
+                                value: 'TouchApp',
+                              },
+                              {
+                                name: 'Traffic',
+                                value: 'Traffic',
+                              },
+                              {
+                                name: 'Train',
+                                value: 'Train',
+                              },
+                              {
+                                name: 'Tram',
+                                value: 'Tram',
+                              },
+                              {
+                                name: 'Translate',
+                                value: 'Translate',
+                              },
+                              {
+                                name: 'TrendingDown',
+                                value: 'TrendingDown',
+                              },
+                              {
+                                name: 'TrendingFlat',
+                                value: 'TrendingFlat',
+                              },
+                              {
+                                name: 'TrendingUp',
+                                value: 'TrendingUp',
+                              },
+                              {
+                                name: 'Undo',
+                                value: 'Undo',
+                              },
+                              {
+                                name: 'Update',
+                                value: 'Update',
+                              },
+                              {
+                                name: 'Usb',
+                                value: 'Usb',
+                              },
+                              {
+                                name: 'VerifiedUser',
+                                value: 'VerifiedUser',
+                              },
+                              {
+                                name: 'VideoCall',
+                                value: 'VideoCall',
+                              },
+                              {
+                                name: 'Visibility',
+                                value: 'Visibility',
+                              },
+                              {
+                                name: 'VisibilityOff',
+                                value: 'VisibilityOff',
+                              },
+                              {
+                                name: 'Voicemail',
+                                value: 'Voicemail',
+                              },
+                              {
+                                name: 'VolumeDown',
+                                value: 'VolumeDown',
+                              },
+                              {
+                                name: 'VolumeMute',
+                                value: 'VolumeMute',
+                              },
+                              {
+                                name: 'VolumeOff',
+                                value: 'VolumeOff',
+                              },
+                              {
+                                name: 'VolumeUp',
+                                value: 'VolumeUp',
+                              },
+                              {
+                                name: 'Warning',
+                                value: 'Warning',
+                              },
+                              {
+                                name: 'Watch',
+                                value: 'Watch',
+                              },
+                              {
+                                name: 'WatchLater',
+                                value: 'WatchLater',
+                              },
+                              {
+                                name: 'Wc',
+                                value: 'Wc',
+                              },
+                              {
+                                name: 'Widgets',
+                                value: 'Widgets',
+                              },
+                              {
+                                name: 'Wifi',
+                                value: 'Wifi',
+                              },
+                              {
+                                name: 'Work',
+                                value: 'Work',
+                              },
+                            ],
+                          },
+                        },
+                        {
+                          type: 'CUSTOM',
+                          label: 'Position',
+                          key: 'adornmentPosition',
+                          value: 'end',
+                          configuration: {
+                            condition: {
+                              type: 'HIDE',
+                              option: 'adornmentIcon',
+                              comparator: 'EQ',
+                              value: 'none',
+                            },
+                            as: 'BUTTONGROUP',
+                            dataType: 'string',
+                            allowedInput: [
+                              { name: 'Start', value: 'start' },
+                              { name: 'End', value: 'end' },
+                            ],
+                          },
+                        },
+                        {
+                          label: 'Type',
+                          key: 'type',
+                          value: 'email',
+                          type: 'TEXT',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'adornmentIcon',
+                              comparator: 'EQ',
+                              value: 0,
                             },
                           },
-                        ],
-                        descendants: [],
-                      };
+                        },
+                        {
+                          value: false,
+                          label: 'Styles',
+                          key: 'styles',
+                          type: 'TOGGLE',
+                        },
+                        {
+                          type: 'COLOR',
+                          label: 'Background color',
+                          key: 'backgroundColor',
+                          value: 'White',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'styles',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          type: 'COLOR',
+                          label: 'Border color',
+                          key: 'borderColor',
+                          value: 'Accent1',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'styles',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          type: 'COLOR',
+                          label: 'Border color (hover)',
+                          key: 'borderHoverColor',
+                          value: 'Black',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'styles',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          type: 'COLOR',
+                          label: 'Border color (focus)',
+                          key: 'borderFocusColor',
+                          value: 'Primary',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'styles',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          value: false,
+                          label: 'Hide label',
+                          key: 'hideLabel',
+                          type: 'TOGGLE',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'styles',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          type: 'COLOR',
+                          label: 'Label color',
+                          key: 'labelColor',
+                          value: 'Accent3',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'styles',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          type: 'COLOR',
+                          label: 'Text color',
+                          key: 'textColor',
+                          value: 'Black',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'styles',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          type: 'COLOR',
+                          label: 'Placeholder color',
+                          key: 'placeholderColor',
+                          value: 'Light',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'styles',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          type: 'COLOR',
+                          label: 'Helper color',
+                          key: 'helperColor',
+                          value: 'Accent2',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'styles',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          type: 'COLOR',
+                          label: 'Error color',
+                          key: 'errorColor',
+                          value: 'Danger',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'styles',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          value: false,
+                          label: 'Advanced settings',
+                          key: 'advancedSettings',
+                          type: 'TOGGLE',
+                        },
+                        {
+                          type: 'VARIABLE',
+                          label: 'name attribute',
+                          key: 'nameAttribute',
+                          value: [],
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'advancedSettings',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                      ],
+                      descendants: [],
+                    };
                   }
-                });
+                  case 'PASSWORD': {
+                    return {
+                      name: 'TextField',
+                      options: [
+                        {
+                          value: {
+                            label: [property.label],
+                            value: [
+                              {
+                                id: [property.id],
+                                type: 'PROPERTY',
+                              },
+                            ],
+                            propertyIds: [property.id],
+                            ref: {
+                              id: `#login_attribute_${property.id}`,
+                            },
+                          },
+                          label: 'Label',
+                          key: 'customModelAttribute',
+                          type: 'CUSTOM_MODEL_ATTRIBUTE',
+                          configuration: {
+                            allowedTypes: ['string'],
+                          },
+                        },
+                        {
+                          value: false,
+                          label: 'Validation options',
+                          key: 'validationOptions',
+                          type: 'TOGGLE',
+                        },
+                        {
+                          label: 'Validation pattern',
+                          key: 'pattern',
+                          value: '',
+                          type: 'TEXT',
+                          configuration: {
+                            placeholder: '(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,}',
+                            condition: {
+                              type: 'SHOW',
+                              option: 'validationOptions',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          label: 'Min length',
+                          key: 'minlength',
+                          value: '',
+                          type: 'NUMBER',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'validationOptions',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          label: 'Max length',
+                          key: 'maxlength',
+                          value: '',
+                          type: 'NUMBER',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'validationOptions',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          value: ['This field is required'],
+                          label: 'Value required message',
+                          key: 'validationValueMissing',
+                          type: 'VARIABLE',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'validationOptions',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          value: [
+                            'Password must contain 8 characters, 1 lowercase character, 1 upper case character and 1 digit',
+                          ],
+                          label: 'Pattern mismatch message',
+                          key: 'validationPatternMismatch',
+                          type: 'VARIABLE',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'validationOptions',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          value: ['This value is too short'],
+                          label: 'Value too short message',
+                          key: 'validationTooShort',
+                          type: 'VARIABLE',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'validationOptions',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          value: ['This value is too long'],
+                          label: 'Value too long message',
+                          key: 'validationTooLong',
+                          type: 'VARIABLE',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'validationOptions',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          type: 'TOGGLE',
+                          label: 'Disabled',
+                          key: 'disabled',
+                          value: false,
+                        },
+                        {
+                          value: [],
+                          label: 'Placeholder',
+                          key: 'placeholder',
+                          type: 'VARIABLE',
+                        },
+                        {
+                          value: [],
+                          label: 'Helper text',
+                          key: 'helperText',
+                          type: 'VARIABLE',
+                        },
+                        {
+                          label: 'Variant',
+                          key: 'variant',
+                          value: 'outlined',
+                          type: 'CUSTOM',
+                          configuration: {
+                            as: 'BUTTONGROUP',
+                            dataType: 'string',
+                            allowedInput: [
+                              {
+                                name: 'Standard',
+                                value: 'standard',
+                              },
+                              {
+                                name: 'Outlined',
+                                value: 'outlined',
+                              },
+                              { name: 'Filled', value: 'filled' },
+                            ],
+                          },
+                        },
+                        {
+                          type: 'TOGGLE',
+                          label: 'Full width',
+                          key: 'fullWidth',
+                          value: true,
+                        },
+                        {
+                          label: 'Size',
+                          key: 'size',
+                          value: 'medium',
+                          type: 'CUSTOM',
+                          configuration: {
+                            as: 'BUTTONGROUP',
+                            dataType: 'string',
+                            allowedInput: [
+                              { name: 'Medium', value: 'medium' },
+                              { name: 'Small', value: 'small' },
+                            ],
+                          },
+                        },
+                        {
+                          label: 'Margin',
+                          key: 'margin',
+                          value: 'normal',
+                          type: 'CUSTOM',
+                          configuration: {
+                            as: 'BUTTONGROUP',
+                            dataType: 'string',
+                            allowedInput: [
+                              { name: 'None', value: 'none' },
+                              { name: 'Dense', value: 'dense' },
+                              { name: 'Normal', value: 'normal' },
+                            ],
+                          },
+                        },
+                        {
+                          label: 'Show password toggle',
+                          key: 'adornment',
+                          value: true,
+                          type: 'TOGGLE',
+                        },
+                        {
+                          type: 'CUSTOM',
+                          label: 'Position',
+                          key: 'adornmentPosition',
+                          value: 'end',
+                          configuration: {
+                            condition: {
+                              type: 'HIDE',
+                              option: 'adornment',
+                              comparator: 'EQ',
+                              value: false,
+                            },
+                            as: 'BUTTONGROUP',
+                            dataType: 'string',
+                            allowedInput: [
+                              { name: 'Start', value: 'start' },
+                              { name: 'End', value: 'end' },
+                            ],
+                          },
+                        },
+                        {
+                          label: 'Type',
+                          key: 'type',
+                          value: 'password',
+                          type: 'TEXT',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'adornmentPosition',
+                              comparator: 'EQ',
+                              value: 0,
+                            },
+                          },
+                        },
+                        {
+                          value: false,
+                          label: 'Styles',
+                          key: 'styles',
+                          type: 'TOGGLE',
+                        },
+                        {
+                          type: 'COLOR',
+                          label: 'Background color',
+                          key: 'backgroundColor',
+                          value: 'White',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'styles',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          type: 'COLOR',
+                          label: 'Border color',
+                          key: 'borderColor',
+                          value: 'Accent1',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'styles',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          type: 'COLOR',
+                          label: 'Border color (hover)',
+                          key: 'borderHoverColor',
+                          value: 'Black',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'styles',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          type: 'COLOR',
+                          label: 'Border color (focus)',
+                          key: 'borderFocusColor',
+                          value: 'Primary',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'styles',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          value: false,
+                          label: 'Hide label',
+                          key: 'hideLabel',
+                          type: 'TOGGLE',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'styles',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          type: 'COLOR',
+                          label: 'Label color',
+                          key: 'labelColor',
+                          value: 'Accent3',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'styles',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          type: 'COLOR',
+                          label: 'Text color',
+                          key: 'textColor',
+                          value: 'Black',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'styles',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          type: 'COLOR',
+                          label: 'Placeholder color',
+                          key: 'placeholderColor',
+                          value: 'Light',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'styles',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          type: 'COLOR',
+                          label: 'Helper color',
+                          key: 'helperColor',
+                          value: 'Accent2',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'styles',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          type: 'COLOR',
+                          label: 'Error color',
+                          key: 'errorColor',
+                          value: 'Danger',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'styles',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          value: false,
+                          label: 'Advanced settings',
+                          key: 'advancedSettings',
+                          type: 'TOGGLE',
+                        },
+                        {
+                          type: 'VARIABLE',
+                          label: 'name attribute',
+                          key: 'nameAttribute',
+                          value: [],
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'advancedSettings',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                      ],
+                      descendants: [],
+                    };
+                  }
+                  default:
+                    return {
+                      name: 'TextField',
+                      options: [
+                        {
+                          value: {
+                            label: [property.label],
+                            value: [
+                              {
+                                id: [property.id],
+                                type: 'PROPERTY',
+                              },
+                            ],
+                            propertyIds: [property.id],
+                            ref: {
+                              id: `#login_attribute_${property.id}`,
+                            },
+                          },
+                          label: 'Label',
+                          key: 'customModelAttribute',
+                          type: 'CUSTOM_MODEL_ATTRIBUTE',
+                          configuration: {
+                            allowedTypes: ['string'],
+                          },
+                        },
+                        {
+                          value: false,
+                          label: 'Validation options',
+                          key: 'validationOptions',
+                          type: 'TOGGLE',
+                        },
+                        {
+                          label: 'Validation pattern',
+                          key: 'pattern',
+                          value: '',
+                          type: 'TEXT',
+                          configuration: {
+                            placeholder: '(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,}',
+                            condition: {
+                              type: 'SHOW',
+                              option: 'validationOptions',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          label: 'Min length',
+                          key: 'minlength',
+                          value: '',
+                          type: 'NUMBER',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'validationOptions',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          label: 'Max length',
+                          key: 'maxlength',
+                          value: '',
+                          type: 'NUMBER',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'validationOptions',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          value: ['This field is required'],
+                          label: 'Value required message',
+                          key: 'validationValueMissing',
+                          type: 'VARIABLE',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'validationOptions',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          value: ['Invalid value'],
+                          label: 'Pattern mismatch message',
+                          key: 'validationPatternMismatch',
+                          type: 'VARIABLE',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'validationOptions',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          value: ['This value is too short'],
+                          label: 'Value too short message',
+                          key: 'validationTooShort',
+                          type: 'VARIABLE',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'validationOptions',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          value: ['This value is too long'],
+                          label: 'Value too long message',
+                          key: 'validationTooLong',
+                          type: 'VARIABLE',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'validationOptions',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          type: 'TOGGLE',
+                          label: 'Disabled',
+                          key: 'disabled',
+                          value: false,
+                        },
+                        {
+                          value: [],
+                          label: 'Placeholder',
+                          key: 'placeholder',
+                          type: 'VARIABLE',
+                        },
+                        {
+                          value: [],
+                          label: 'Helper text',
+                          key: 'helperText',
+                          type: 'VARIABLE',
+                        },
+                        {
+                          label: 'Variant',
+                          key: 'variant',
+                          value: 'outlined',
+                          type: 'CUSTOM',
+                          configuration: {
+                            as: 'BUTTONGROUP',
+                            dataType: 'string',
+                            allowedInput: [
+                              {
+                                name: 'Standard',
+                                value: 'standard',
+                              },
+                              {
+                                name: 'Outlined',
+                                value: 'outlined',
+                              },
+                              {
+                                name: 'Filled',
+                                value: 'filled',
+                              },
+                            ],
+                          },
+                        },
+                        {
+                          type: 'TOGGLE',
+                          label: 'Full width',
+                          key: 'fullWidth',
+                          value: true,
+                        },
+                        {
+                          label: 'Size',
+                          key: 'size',
+                          value: 'medium',
+                          type: 'CUSTOM',
+                          configuration: {
+                            as: 'BUTTONGROUP',
+                            dataType: 'string',
+                            allowedInput: [
+                              {
+                                name: 'Medium',
+                                value: 'medium',
+                              },
+                              { name: 'Small', value: 'small' },
+                            ],
+                          },
+                        },
+                        {
+                          label: 'Margin',
+                          key: 'margin',
+                          value: 'normal',
+                          type: 'CUSTOM',
+                          configuration: {
+                            as: 'BUTTONGROUP',
+                            dataType: 'string',
+                            allowedInput: [
+                              { name: 'None', value: 'none' },
+                              { name: 'Dense', value: 'dense' },
+                              {
+                                name: 'Normal',
+                                value: 'normal',
+                              },
+                            ],
+                          },
+                        },
+                        {
+                          label: 'Adornment',
+                          key: 'adornmentIcon',
+                          value: 'none',
+                          type: 'CUSTOM',
+                          configuration: {
+                            as: 'DROPDOWN',
+                            dataType: 'string',
+                            allowedInput: [
+                              { name: 'None', value: 'none' },
+                              {
+                                name: 'AcUnit',
+                                value: 'AcUnit',
+                              },
+                              {
+                                name: 'AccessTime',
+                                value: 'AccessTime',
+                              },
+                              {
+                                name: 'AccessibilityNew',
+                                value: 'AccessibilityNew',
+                              },
+                              {
+                                name: 'Accessible',
+                                value: 'Accessible',
+                              },
+                              {
+                                name: 'AccountBalance',
+                                value: 'AccountBalance',
+                              },
+                              {
+                                name: 'AccountBalanceWallet',
+                                value: 'AccountBalanceWallet',
+                              },
+                              {
+                                name: 'AccountCircle',
+                                value: 'AccountCircle',
+                              },
+                              {
+                                name: 'AccountTree',
+                                value: 'AccountTree',
+                              },
+                              {
+                                name: 'Add',
+                                value: 'Add',
+                              },
+                              {
+                                name: 'AddAPhoto',
+                                value: 'AddAPhoto',
+                              },
+                              {
+                                name: 'AddBox',
+                                value: 'AddBox',
+                              },
+                              {
+                                name: 'AddCircle',
+                                value: 'AddCircle',
+                              },
+                              {
+                                name: 'AddCircleOutline',
+                                value: 'AddCircleOutline',
+                              },
+                              {
+                                name: 'AddComment',
+                                value: 'AddComment',
+                              },
+                              {
+                                name: 'Adjust',
+                                value: 'Adjust',
+                              },
+                              {
+                                name: 'AirplanemodeActive',
+                                value: 'AirplanemodeActive',
+                              },
+                              {
+                                name: 'AirplanemodeInactive',
+                                value: 'AirplanemodeInactive',
+                              },
+                              {
+                                name: 'Airplay',
+                                value: 'Airplay',
+                              },
+                              {
+                                name: 'AirportShuttle',
+                                value: 'AirportShuttle',
+                              },
+                              {
+                                name: 'Alarm',
+                                value: 'Alarm',
+                              },
+                              {
+                                name: 'Album',
+                                value: 'Album',
+                              },
+                              {
+                                name: 'AllInbox',
+                                value: 'AllInbox',
+                              },
+                              {
+                                name: 'AllInclusive',
+                                value: 'AllInclusive',
+                              },
+                              {
+                                name: 'AlternateEmail',
+                                value: 'AlternateEmail',
+                              },
+                              {
+                                name: 'Announcement',
+                                value: 'Announcement',
+                              },
+                              {
+                                name: 'Apartment',
+                                value: 'Apartment',
+                              },
+                              {
+                                name: 'Apps',
+                                value: 'Apps',
+                              },
+                              {
+                                name: 'Archive',
+                                value: 'Archive',
+                              },
+                              {
+                                name: 'ArrowBack',
+                                value: 'ArrowBack',
+                              },
+                              {
+                                name: 'ArrowBackIos',
+                                value: 'ArrowBackIos',
+                              },
+                              {
+                                name: 'ArrowDownward',
+                                value: 'ArrowDownward',
+                              },
+                              {
+                                name: 'ArrowDropDown',
+                                value: 'ArrowDropDown',
+                              },
+                              {
+                                name: 'ArrowDropDownCircle',
+                                value: 'ArrowDropDownCircle',
+                              },
+                              {
+                                name: 'ArrowDropUp',
+                                value: 'ArrowDropUp',
+                              },
+                              {
+                                name: 'ArrowForward',
+                                value: 'ArrowForward',
+                              },
+                              {
+                                name: 'ArrowForwardIos',
+                                value: 'ArrowForwardIos',
+                              },
+                              {
+                                name: 'ArrowLeft',
+                                value: 'ArrowLeft',
+                              },
+                              {
+                                name: 'ArrowRight',
+                                value: 'ArrowRight',
+                              },
+                              {
+                                name: 'ArrowRightAlt',
+                                value: 'ArrowRightAlt',
+                              },
+                              {
+                                name: 'ArrowUpward',
+                                value: 'ArrowUpward',
+                              },
+                              {
+                                name: 'Assessment',
+                                value: 'Assessment',
+                              },
+                              {
+                                name: 'Assignment',
+                                value: 'Assignment',
+                              },
+                              {
+                                name: 'AssignmentInd',
+                                value: 'AssignmentInd',
+                              },
+                              {
+                                name: 'AssignmentLate',
+                                value: 'AssignmentLate',
+                              },
+                              {
+                                name: 'AssignmentReturn',
+                                value: 'AssignmentReturn',
+                              },
+                              {
+                                name: 'AssignmentReturned',
+                                value: 'AssignmentReturned',
+                              },
+                              {
+                                name: 'AssignmentTurnedIn',
+                                value: 'AssignmentTurnedIn',
+                              },
+                              {
+                                name: 'Assistant',
+                                value: 'Assistant',
+                              },
+                              {
+                                name: 'AssistantPhoto',
+                                value: 'AssistantPhoto',
+                              },
+                              {
+                                name: 'AttachFile',
+                                value: 'AttachFile',
+                              },
+                              {
+                                name: 'AttachMoney',
+                                value: 'AttachMoney',
+                              },
+                              {
+                                name: 'Attachment',
+                                value: 'Attachment',
+                              },
+                              {
+                                name: 'Audiotrack',
+                                value: 'Audiotrack',
+                              },
+                              {
+                                name: 'Autorenew',
+                                value: 'Autorenew',
+                              },
+                              {
+                                name: 'AvTimer',
+                                value: 'AvTimer',
+                              },
+                              {
+                                name: 'Backspace',
+                                value: 'Backspace',
+                              },
+                              {
+                                name: 'Backup',
+                                value: 'Backup',
+                              },
+                              {
+                                name: 'BarChart',
+                                value: 'BarChart',
+                              },
+                              {
+                                name: 'Battery20',
+                                value: 'Battery20',
+                              },
+                              {
+                                name: 'Beenhere',
+                                value: 'Beenhere',
+                              },
+                              {
+                                name: 'Block',
+                                value: 'Block',
+                              },
+                              {
+                                name: 'Bluetooth',
+                                value: 'Bluetooth',
+                              },
+                              {
+                                name: 'Book',
+                                value: 'Book',
+                              },
+                              {
+                                name: 'Bookmark',
+                                value: 'Bookmark',
+                              },
+                              {
+                                name: 'BookmarkBorder',
+                                value: 'BookmarkBorder',
+                              },
+                              {
+                                name: 'Bookmarks',
+                                value: 'Bookmarks',
+                              },
+                              {
+                                name: 'Brush',
+                                value: 'Brush',
+                              },
+                              {
+                                name: 'BubbleChart',
+                                value: 'BubbleChart',
+                              },
+                              {
+                                name: 'BugReport',
+                                value: 'BugReport',
+                              },
+                              {
+                                name: 'Build',
+                                value: 'Build',
+                              },
+                              {
+                                name: 'Cached',
+                                value: 'Cached',
+                              },
+                              {
+                                name: 'Cake',
+                                value: 'Cake',
+                              },
+                              {
+                                name: 'CalendarToday',
+                                value: 'CalendarToday',
+                              },
+                              {
+                                name: 'Call',
+                                value: 'Call',
+                              },
+                              {
+                                name: 'CameraAlt',
+                                value: 'CameraAlt',
+                              },
+                              {
+                                name: 'CameraRoll',
+                                value: 'CameraRoll',
+                              },
+                              {
+                                name: 'Cancel',
+                                value: 'Cancel',
+                              },
+                              {
+                                name: 'CardTravel',
+                                value: 'CardTravel',
+                              },
+                              {
+                                name: 'Cast',
+                                value: 'Cast',
+                              },
+                              {
+                                name: 'Category',
+                                value: 'Category',
+                              },
+                              {
+                                name: 'Chat',
+                                value: 'Chat',
+                              },
+                              {
+                                name: 'Check',
+                                value: 'Check',
+                              },
+                              {
+                                name: 'CheckBox',
+                                value: 'CheckBox',
+                              },
+                              {
+                                name: 'CheckCircle',
+                                value: 'CheckCircle',
+                              },
+                              {
+                                name: 'CheckCircleOutline',
+                                value: 'CheckCircleOutline',
+                              },
+                              {
+                                name: 'ChevronLeft',
+                                value: 'ChevronLeft',
+                              },
+                              {
+                                name: 'ChevronRight',
+                                value: 'ChevronRight',
+                              },
+                              {
+                                name: 'ChildCare',
+                                value: 'ChildCare',
+                              },
+                              {
+                                name: 'Clear',
+                                value: 'Clear',
+                              },
+                              {
+                                name: 'Close',
+                                value: 'Close',
+                              },
+                              {
+                                name: 'Cloud',
+                                value: 'Cloud',
+                              },
+                              {
+                                name: 'CloudDownload',
+                                value: 'CloudDownload',
+                              },
+                              {
+                                name: 'CloudUpload',
+                                value: 'CloudUpload',
+                              },
+                              {
+                                name: 'Code',
+                                value: 'Code',
+                              },
+                              {
+                                name: 'Collections',
+                                value: 'Collections',
+                              },
+                              {
+                                name: 'ColorLens',
+                                value: 'ColorLens',
+                              },
+                              {
+                                name: 'Colorize',
+                                value: 'Colorize',
+                              },
+                              {
+                                name: 'Commute',
+                                value: 'Commute',
+                              },
+                              {
+                                name: 'Computer',
+                                value: 'Computer',
+                              },
+                              {
+                                name: 'CreditCard',
+                                value: 'CreditCard',
+                              },
+                              {
+                                name: 'Dashboard',
+                                value: 'Dashboard',
+                              },
+                              {
+                                name: 'DataUsage',
+                                value: 'DataUsage',
+                              },
+                              {
+                                name: 'Deck',
+                                value: 'Deck',
+                              },
+                              {
+                                name: 'Dehaze',
+                                value: 'Dehaze',
+                              },
+                              {
+                                name: 'Delete',
+                                value: 'Delete',
+                              },
+                              {
+                                name: 'DeleteForever',
+                                value: 'DeleteForever',
+                              },
+                              {
+                                name: 'DesktopMac',
+                                value: 'DesktopMac',
+                              },
+                              {
+                                name: 'DeveloperMode',
+                                value: 'DeveloperMode',
+                              },
+                              {
+                                name: 'Devices',
+                                value: 'Devices',
+                              },
+                              {
+                                name: 'Dialpad',
+                                value: 'Dialpad',
+                              },
+                              {
+                                name: 'Directions',
+                                value: 'Directions',
+                              },
+                              {
+                                name: 'DirectionsBike',
+                                value: 'DirectionsBike',
+                              },
+                              {
+                                name: 'DirectionsBoat',
+                                value: 'DirectionsBoat',
+                              },
+                              {
+                                name: 'DirectionsBus',
+                                value: 'DirectionsBus',
+                              },
+                              {
+                                name: 'DirectionsCar',
+                                value: 'DirectionsCar',
+                              },
+                              {
+                                name: 'DirectionsRailway',
+                                value: 'DirectionsRailway',
+                              },
+                              {
+                                name: 'DirectionsRun',
+                                value: 'DirectionsRun',
+                              },
+                              {
+                                name: 'DirectionsSubway',
+                                value: 'DirectionsSubway',
+                              },
+                              {
+                                name: 'DirectionsTransit',
+                                value: 'DirectionsTransit',
+                              },
+                              {
+                                name: 'DirectionsWalk',
+                                value: 'DirectionsWalk',
+                              },
+                              {
+                                name: 'DiscFull',
+                                value: 'DiscFull',
+                              },
+                              {
+                                name: 'Dns',
+                                value: 'Dns',
+                              },
+                              {
+                                name: 'Done',
+                                value: 'Done',
+                              },
+                              {
+                                name: 'DoneAll',
+                                value: 'DoneAll',
+                              },
+                              {
+                                name: 'DoubleArrow',
+                                value: 'DoubleArrow',
+                              },
+                              {
+                                name: 'Drafts',
+                                value: 'Drafts',
+                              },
+                              {
+                                name: 'Eco',
+                                value: 'Eco',
+                              },
+                              {
+                                name: 'Edit',
+                                value: 'Edit',
+                              },
+                              {
+                                name: 'Email',
+                                value: 'Email',
+                              },
+                              {
+                                name: 'Equalizer',
+                                value: 'Equalizer',
+                              },
+                              {
+                                name: 'Error',
+                                value: 'Error',
+                              },
+                              {
+                                name: 'Euro',
+                                value: 'Euro',
+                              },
+                              {
+                                name: 'Event',
+                                value: 'Event',
+                              },
+                              {
+                                name: 'ExpandLess',
+                                value: 'ExpandLess',
+                              },
+                              {
+                                name: 'ExpandMore',
+                                value: 'ExpandMore',
+                              },
+                              {
+                                name: 'Explore',
+                                value: 'Explore',
+                              },
+                              {
+                                name: 'Extension',
+                                value: 'Extension',
+                              },
+                              {
+                                name: 'Face',
+                                value: 'Face',
+                              },
+                              {
+                                name: 'Facebook',
+                                value: 'Facebook',
+                              },
+                              {
+                                name: 'FastForward',
+                                value: 'FastForward',
+                              },
+                              {
+                                name: 'FastRewind',
+                                value: 'FastRewind',
+                              },
+                              {
+                                name: 'Favorite',
+                                value: 'Favorite',
+                              },
+                              {
+                                name: 'FavoriteBorder',
+                                value: 'FavoriteBorder',
+                              },
+                              {
+                                name: 'FilterList',
+                                value: 'FilterList',
+                              },
+                              {
+                                name: 'Flag',
+                                value: 'Flag',
+                              },
+                              {
+                                name: 'Flare',
+                                value: 'Flare',
+                              },
+                              {
+                                name: 'Flight',
+                                value: 'Flight',
+                              },
+                              {
+                                name: 'Folder',
+                                value: 'Folder',
+                              },
+                              {
+                                name: 'Forum',
+                                value: 'Forum',
+                              },
+                              {
+                                name: 'Forward',
+                                value: 'Forward',
+                              },
+                              {
+                                name: 'FreeBreakfast',
+                                value: 'FreeBreakfast',
+                              },
+                              {
+                                name: 'Fullscreen',
+                                value: 'Fullscreen',
+                              },
+                              {
+                                name: 'Functions',
+                                value: 'Functions',
+                              },
+                              {
+                                name: 'Games',
+                                value: 'Games',
+                              },
+                              {
+                                name: 'Gavel',
+                                value: 'Gavel',
+                              },
+                              {
+                                name: 'Gesture',
+                                value: 'Gesture',
+                              },
+                              {
+                                name: 'GetApp',
+                                value: 'GetApp',
+                              },
+                              {
+                                name: 'Gif',
+                                value: 'Gif',
+                              },
+                              {
+                                name: 'GpsFixed',
+                                value: 'GpsFixed',
+                              },
+                              {
+                                name: 'Grade',
+                                value: 'Grade',
+                              },
+                              {
+                                name: 'Group',
+                                value: 'Group',
+                              },
+                              {
+                                name: 'Headset',
+                                value: 'Headset',
+                              },
+                              {
+                                name: 'Hearing',
+                                value: 'Hearing',
+                              },
+                              {
+                                name: 'Height',
+                                value: 'Height',
+                              },
+                              {
+                                name: 'Help',
+                                value: 'Help',
+                              },
+                              {
+                                name: 'HelpOutline',
+                                value: 'HelpOutline',
+                              },
+                              {
+                                name: 'Highlight',
+                                value: 'Highlight',
+                              },
+                              {
+                                name: 'History',
+                                value: 'History',
+                              },
+                              {
+                                name: 'Home',
+                                value: 'Home',
+                              },
+                              {
+                                name: 'Hotel',
+                                value: 'Hotel',
+                              },
+                              {
+                                name: 'HourglassEmpty',
+                                value: 'HourglassEmpty',
+                              },
+                              {
+                                name: 'Http',
+                                value: 'Http',
+                              },
+                              {
+                                name: 'Https',
+                                value: 'Https',
+                              },
+                              {
+                                name: 'Image',
+                                value: 'Image',
+                              },
+                              {
+                                name: 'ImportExport',
+                                value: 'ImportExport',
+                              },
+                              {
+                                name: 'Inbox',
+                                value: 'Inbox',
+                              },
+                              {
+                                name: 'Info',
+                                value: 'Info',
+                              },
+                              {
+                                name: 'Input',
+                                value: 'Input',
+                              },
+                              {
+                                name: 'Keyboard',
+                                value: 'Keyboard',
+                              },
+                              {
+                                name: 'KeyboardArrowDown',
+                                value: 'KeyboardArrowDown',
+                              },
+                              {
+                                name: 'KeyboardArrowLeft',
+                                value: 'KeyboardArrowLeft',
+                              },
+                              {
+                                name: 'KeyboardArrowRight',
+                                value: 'KeyboardArrowRight',
+                              },
+                              {
+                                name: 'KeyboardArrowUp',
+                                value: 'KeyboardArrowUp',
+                              },
+                              {
+                                name: 'KeyboardVoice',
+                                value: 'KeyboardVoice',
+                              },
+                              {
+                                name: 'Label',
+                                value: 'Label',
+                              },
+                              {
+                                name: 'Landscape',
+                                value: 'Landscape',
+                              },
+                              {
+                                name: 'Language',
+                                value: 'Language',
+                              },
+                              {
+                                name: 'Laptop',
+                                value: 'Laptop',
+                              },
+                              {
+                                name: 'LastPage',
+                                value: 'LastPage',
+                              },
+                              {
+                                name: 'Launch',
+                                value: 'Launch',
+                              },
+                              {
+                                name: 'Layers',
+                                value: 'Layers',
+                              },
+                              {
+                                name: 'Link',
+                                value: 'Link',
+                              },
+                              {
+                                name: 'List',
+                                value: 'List',
+                              },
+                              {
+                                name: 'LocalBar',
+                                value: 'LocalBar',
+                              },
+                              {
+                                name: 'Lock',
+                                value: 'Lock',
+                              },
+                              {
+                                name: 'LockOpen',
+                                value: 'LockOpen',
+                              },
+                              {
+                                name: 'Loop',
+                                value: 'Loop',
+                              },
+                              {
+                                name: 'Mail',
+                                value: 'Mail',
+                              },
+                              {
+                                name: 'Map',
+                                value: 'Map',
+                              },
+                              {
+                                name: 'Menu',
+                                value: 'Menu',
+                              },
+                              {
+                                name: 'Message',
+                                value: 'Message',
+                              },
+                              {
+                                name: 'Mic',
+                                value: 'Mic',
+                              },
+                              {
+                                name: 'Mms',
+                                value: 'Mms',
+                              },
+                              {
+                                name: 'Money',
+                                value: 'Money',
+                              },
+                              {
+                                name: 'Mood',
+                                value: 'Mood',
+                              },
+                              {
+                                name: 'MoodBad',
+                                value: 'MoodBad',
+                              },
+                              {
+                                name: 'More',
+                                value: 'More',
+                              },
+                              {
+                                name: 'MoreHoriz',
+                                value: 'MoreHoriz',
+                              },
+                              {
+                                name: 'MoreVert',
+                                value: 'MoreVert',
+                              },
+                              {
+                                name: 'Motorcycle',
+                                value: 'Motorcycle',
+                              },
+                              {
+                                name: 'Movie',
+                                value: 'Movie',
+                              },
+                              {
+                                name: 'MusicNote',
+                                value: 'MusicNote',
+                              },
+                              {
+                                name: 'MyLocation',
+                                value: 'MyLocation',
+                              },
+                              {
+                                name: 'Nature',
+                                value: 'Nature',
+                              },
+                              {
+                                name: 'Navigation',
+                                value: 'Navigation',
+                              },
+                              {
+                                name: 'NewReleases',
+                                value: 'NewReleases',
+                              },
+                              {
+                                name: 'NotInterested',
+                                value: 'NotInterested',
+                              },
+                              {
+                                name: 'Note',
+                                value: 'Note',
+                              },
+                              {
+                                name: 'NotificationImportant',
+                                value: 'NotificationImportant',
+                              },
+                              {
+                                name: 'Notifications',
+                                value: 'Notifications',
+                              },
+                              {
+                                name: 'NotificationsActive',
+                                value: 'NotificationsActive',
+                              },
+                              {
+                                name: 'Opacity',
+                                value: 'Opacity',
+                              },
+                              {
+                                name: 'Palette',
+                                value: 'Palette',
+                              },
+                              {
+                                name: 'Pause',
+                                value: 'Pause',
+                              },
+                              {
+                                name: 'Payment',
+                                value: 'Payment',
+                              },
+                              {
+                                name: 'People',
+                                value: 'People',
+                              },
+                              {
+                                name: 'Person',
+                                value: 'Person',
+                              },
+                              {
+                                name: 'PersonAdd',
+                                value: 'PersonAdd',
+                              },
+                              {
+                                name: 'Pets',
+                                value: 'Pets',
+                              },
+                              {
+                                name: 'Phone',
+                                value: 'Phone',
+                              },
+                              {
+                                name: 'Photo',
+                                value: 'Photo',
+                              },
+                              {
+                                name: 'PhotoCamera',
+                                value: 'PhotoCamera',
+                              },
+                              {
+                                name: 'PieChart',
+                                value: 'PieChart',
+                              },
+                              {
+                                name: 'Place',
+                                value: 'Place',
+                              },
+                              {
+                                name: 'PlayArrow',
+                                value: 'PlayArrow',
+                              },
+                              {
+                                name: 'PlayCircleFilled',
+                                value: 'PlayCircleFilled',
+                              },
+                              {
+                                name: 'PlayCircleFilledWhite',
+                                value: 'PlayCircleFilledWhite',
+                              },
+                              {
+                                name: 'PlayCircleOutline',
+                                value: 'PlayCircleOutline',
+                              },
+                              {
+                                name: 'Power',
+                                value: 'Power',
+                              },
+                              {
+                                name: 'Public',
+                                value: 'Public',
+                              },
+                              {
+                                name: 'Radio',
+                                value: 'Radio',
+                              },
+                              {
+                                name: 'Redo',
+                                value: 'Redo',
+                              },
+                              {
+                                name: 'Refresh',
+                                value: 'Refresh',
+                              },
+                              {
+                                name: 'Remove',
+                                value: 'Remove',
+                              },
+                              {
+                                name: 'RemoveCircle',
+                                value: 'RemoveCircle',
+                              },
+                              {
+                                name: 'RemoveCircleOutline',
+                                value: 'RemoveCircleOutline',
+                              },
+                              {
+                                name: 'Replay',
+                                value: 'Replay',
+                              },
+                              {
+                                name: 'Reply',
+                                value: 'Reply',
+                              },
+                              {
+                                name: 'Report',
+                                value: 'Report',
+                              },
+                              {
+                                name: 'ReportProblem',
+                                value: 'ReportProblem',
+                              },
+                              {
+                                name: 'Restaurant',
+                                value: 'Restaurant',
+                              },
+                              {
+                                name: 'RssFeed',
+                                value: 'RssFeed',
+                              },
+                              {
+                                name: 'Save',
+                                value: 'Save',
+                              },
+                              {
+                                name: 'SaveAlt',
+                                value: 'SaveAlt',
+                              },
+                              {
+                                name: 'School',
+                                value: 'School',
+                              },
+                              {
+                                name: 'Search',
+                                value: 'Search',
+                              },
+                              {
+                                name: 'Security',
+                                value: 'Security',
+                              },
+                              {
+                                name: 'Send',
+                                value: 'Send',
+                              },
+                              {
+                                name: 'Settings',
+                                value: 'Settings',
+                              },
+                              {
+                                name: 'ShoppingCart',
+                                value: 'ShoppingCart',
+                              },
+                              {
+                                name: 'ShowChart',
+                                value: 'ShowChart',
+                              },
+                              {
+                                name: 'Smartphone',
+                                value: 'Smartphone',
+                              },
+                              {
+                                name: 'SmokeFree',
+                                value: 'SmokeFree',
+                              },
+                              {
+                                name: 'SmokingRooms',
+                                value: 'SmokingRooms',
+                              },
+                              {
+                                name: 'Speaker',
+                                value: 'Speaker',
+                              },
+                              {
+                                name: 'Speed',
+                                value: 'Speed',
+                              },
+                              {
+                                name: 'Spellcheck',
+                                value: 'Spellcheck',
+                              },
+                              {
+                                name: 'SquareFoot',
+                                value: 'SquareFoot',
+                              },
+                              {
+                                name: 'Star',
+                                value: 'Star',
+                              },
+                              {
+                                name: 'StarBorder',
+                                value: 'StarBorder',
+                              },
+                              {
+                                name: 'StarHalf',
+                                value: 'StarHalf',
+                              },
+                              {
+                                name: 'StarOutline',
+                                value: 'StarOutline',
+                              },
+                              {
+                                name: 'StarRate',
+                                value: 'StarRate',
+                              },
+                              {
+                                name: 'Stars',
+                                value: 'Stars',
+                              },
+                              {
+                                name: 'Stop',
+                                value: 'Stop',
+                              },
+                              {
+                                name: 'Storefront',
+                                value: 'Storefront',
+                              },
+                              {
+                                name: 'Sync',
+                                value: 'Sync',
+                              },
+                              {
+                                name: 'Tab',
+                                value: 'Tab',
+                              },
+                              {
+                                name: 'TextFields',
+                                value: 'TextFields',
+                              },
+                              {
+                                name: 'ThumbDown',
+                                value: 'ThumbDown',
+                              },
+                              {
+                                name: 'ThumbDownAlt',
+                                value: 'ThumbDownAlt',
+                              },
+                              {
+                                name: 'ThumbUp',
+                                value: 'ThumbUp',
+                              },
+                              {
+                                name: 'ThumbUpAlt',
+                                value: 'ThumbUpAlt',
+                              },
+                              {
+                                name: 'ThumbsUpDown',
+                                value: 'ThumbsUpDown',
+                              },
+                              {
+                                name: 'Title',
+                                value: 'Title',
+                              },
+                              {
+                                name: 'TouchApp',
+                                value: 'TouchApp',
+                              },
+                              {
+                                name: 'Traffic',
+                                value: 'Traffic',
+                              },
+                              {
+                                name: 'Train',
+                                value: 'Train',
+                              },
+                              {
+                                name: 'Tram',
+                                value: 'Tram',
+                              },
+                              {
+                                name: 'Translate',
+                                value: 'Translate',
+                              },
+                              {
+                                name: 'TrendingDown',
+                                value: 'TrendingDown',
+                              },
+                              {
+                                name: 'TrendingFlat',
+                                value: 'TrendingFlat',
+                              },
+                              {
+                                name: 'TrendingUp',
+                                value: 'TrendingUp',
+                              },
+                              {
+                                name: 'Undo',
+                                value: 'Undo',
+                              },
+                              {
+                                name: 'Update',
+                                value: 'Update',
+                              },
+                              {
+                                name: 'Usb',
+                                value: 'Usb',
+                              },
+                              {
+                                name: 'VerifiedUser',
+                                value: 'VerifiedUser',
+                              },
+                              {
+                                name: 'VideoCall',
+                                value: 'VideoCall',
+                              },
+                              {
+                                name: 'Visibility',
+                                value: 'Visibility',
+                              },
+                              {
+                                name: 'VisibilityOff',
+                                value: 'VisibilityOff',
+                              },
+                              {
+                                name: 'Voicemail',
+                                value: 'Voicemail',
+                              },
+                              {
+                                name: 'VolumeDown',
+                                value: 'VolumeDown',
+                              },
+                              {
+                                name: 'VolumeMute',
+                                value: 'VolumeMute',
+                              },
+                              {
+                                name: 'VolumeOff',
+                                value: 'VolumeOff',
+                              },
+                              {
+                                name: 'VolumeUp',
+                                value: 'VolumeUp',
+                              },
+                              {
+                                name: 'Warning',
+                                value: 'Warning',
+                              },
+                              {
+                                name: 'Watch',
+                                value: 'Watch',
+                              },
+                              {
+                                name: 'WatchLater',
+                                value: 'WatchLater',
+                              },
+                              {
+                                name: 'Wc',
+                                value: 'Wc',
+                              },
+                              {
+                                name: 'Widgets',
+                                value: 'Widgets',
+                              },
+                              {
+                                name: 'Wifi',
+                                value: 'Wifi',
+                              },
+                              {
+                                name: 'Work',
+                                value: 'Work',
+                              },
+                            ],
+                          },
+                        },
+                        {
+                          type: 'CUSTOM',
+                          label: 'Position',
+                          key: 'adornmentPosition',
+                          value: 'start',
+                          configuration: {
+                            condition: {
+                              type: 'HIDE',
+                              option: 'adornmentIcon',
+                              comparator: 'EQ',
+                              value: '',
+                            },
+                            as: 'BUTTONGROUP',
+                            dataType: 'string',
+                            allowedInput: [
+                              { name: 'Start', value: 'start' },
+                              { name: 'End', value: 'end' },
+                            ],
+                          },
+                        },
+                        {
+                          value: false,
+                          label: 'Styles',
+                          key: 'styles',
+                          type: 'TOGGLE',
+                        },
+                        {
+                          type: 'COLOR',
+                          label: 'Background color',
+                          key: 'backgroundColor',
+                          value: 'White',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'styles',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          type: 'COLOR',
+                          label: 'Border color',
+                          key: 'borderColor',
+                          value: 'Accent1',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'styles',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          type: 'COLOR',
+                          label: 'Border color (hover)',
+                          key: 'borderHoverColor',
+                          value: 'Black',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'styles',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          type: 'COLOR',
+                          label: 'Border color (focus)',
+                          key: 'borderFocusColor',
+                          value: 'Primary',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'styles',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          value: false,
+                          label: 'Hide label',
+                          key: 'hideLabel',
+                          type: 'TOGGLE',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'styles',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          type: 'COLOR',
+                          label: 'Label color',
+                          key: 'labelColor',
+                          value: 'Accent3',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'styles',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          type: 'COLOR',
+                          label: 'Text color',
+                          key: 'textColor',
+                          value: 'Black',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'styles',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          type: 'COLOR',
+                          label: 'Placeholder color',
+                          key: 'placeholderColor',
+                          value: 'Light',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'styles',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          type: 'COLOR',
+                          label: 'Helper color',
+                          key: 'helperColor',
+                          value: 'Accent2',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'styles',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          type: 'COLOR',
+                          label: 'Error color',
+                          key: 'errorColor',
+                          value: 'Danger',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'styles',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                        {
+                          value: false,
+                          label: 'Advanced settings',
+                          key: 'advancedSettings',
+                          type: 'TOGGLE',
+                        },
+                        {
+                          type: 'VARIABLE',
+                          label: 'name attribute',
+                          key: 'nameAttribute',
+                          value: [],
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'advancedSettings',
+                              comparator: 'EQ',
+                              value: true,
+                            },
+                          },
+                        },
+                      ],
+                      descendants: [],
+                    };
+                }
+              });
 
               const loginAlertErrorDescendant = [
                 {
@@ -11971,6 +12019,15 @@
     },
   ],
   interactions: [
+    {
+      name: 'login',
+      sourceEvent: 'onActionSuccess',
+      ref: {
+        sourceComponentId: '#loginFormId',
+      },
+      parameters: [],
+      type: 'Global',
+    },
     {
       name: 'Show',
       sourceEvent: 'onActionError',
