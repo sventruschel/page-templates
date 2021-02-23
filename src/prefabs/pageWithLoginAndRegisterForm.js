@@ -40,7 +40,7 @@
       !value || Object.keys(value).length === 0 || value.id === '';
 
     React.useEffect(() => {
-      authProfileId && redirectTo
+      authProfileId && !(isEmptyRedirect(redirectTo))
         ? setHeaderTitle('Configure register form')
         : setHeaderTitle('Configure login form');
     }, [authProfileId, redirectTo]);
@@ -89,7 +89,7 @@
               }}
             />
           </Field>
-          {authProfileId && redirectTo && (
+          {authProfileId && !(isEmptyRedirect(redirectTo)) && (
             <Field label="Input fields in the register form">
               <Text size="small" color="grey700" as="div" margin={{ "bottom": "0.5rem" }}>
                 The selected properties will show up as input fields in the register
@@ -161,7 +161,7 @@
               newPrefab.actions[1].events[0].options.authenticationProfileId = id;
               loginFormPrefab.options[0].value.modelId = loginModel;
               loginFormPrefab.options[1].value = loginModel;
-              newPrefab.variables[0].options.modelId = loginModel;
+              // newPrefab.variables[0].options.modelId = loginModel;
               // newPrefab.actions[0].events[0].options.assign = properties.map(
               //   property => {
               //     const isPassword = property.kind === 'PASSWORD';
@@ -5344,7 +5344,7 @@
                   .descendants[0].descendants[1].descendants[0];
               registerFormPrefab.options[0].value.modelId = loginModel;
               registerFormPrefab.options[1].value = loginModel;
-              newPrefab.variables[3].options.modelId = loginModel;
+              newPrefab.variables[2].options.modelId = loginModel;
               newPrefab.actions[2].events[0].options.modelId = loginModel;
               newPrefab.actions[2].events[0].options.assign = registerProperties.map(
                 property => ({
@@ -11905,20 +11905,20 @@
     );
   },
   variables: [
-    {
-      kind: 'construct',
-      name: 'test',
-      ref: {
-        id: '#customModelVariableId',
-        endpointId: '#endpointId',
-      },
-      options: {
-        modelId: '',
-        ref: {
-          customModelId: '#customModelId',
-        },
-      },
-    },
+    // {
+    //   kind: 'construct',
+    //   name: 'test',
+    //   ref: {
+    //     id: '#customModelVariableId',
+    //     endpointId: '#endpointId',
+    //   },
+    //   options: {
+    //     modelId: '',
+    //     ref: {
+    //       customModelId: '#customModelId',
+    //     },
+    //   },
+    // },
     {
       ref: {
         id: '#usernameVariableId',
