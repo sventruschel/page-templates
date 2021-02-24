@@ -44,9 +44,14 @@
           </Field>
           {modelId && (
             <Field label="Input fields in the register form">
-              <Text size="small" color="grey700" as="div" margin={{ "bottom": "0.5rem" }}>
-                The selected properties will show up as input fields in the register
-                form.
+              <Text
+                size="small"
+                color="grey700"
+                as="div"
+                margin={{ bottom: '0.5rem' }}
+              >
+                The selected properties will show up as input fields in the
+                register form.
               </Text>
               <PropertiesSelector
                 modelId={modelId}

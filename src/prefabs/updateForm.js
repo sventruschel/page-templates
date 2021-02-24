@@ -15,7 +15,7 @@
       PropertiesSelector,
       Text,
     },
-    helpers: { useModelQuery },
+    helpers: { useModelQuery, camelToSnakeCase },
   }) => {
     const [modelId, setModelId] = React.useState('');
     const [properties, setProperties] = React.useState([]);
