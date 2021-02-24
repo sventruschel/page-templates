@@ -5,6 +5,7 @@
   description: 'Page with grid view',
   category: 'LAYOUT',
   beforeCreate: ({
+    helpers: { useModelQuery, camelToSnakeCase },
     prefab,
     save,
     close,
@@ -15,12 +16,28 @@
       Footer,
       Text,
       ModelSelector,
-      PropertiesSelector,
+      PropertySelector,
     },
   }) => {
     const [showValidation, setShowValidation] = React.useState(false);
     const [modelId, setModelId] = React.useState('');
-    const [properties, setProperties] = React.useState([]);
+    const [imageProperty, setImageProperty] = React.useState('');
+    const [titleProperty, setTitleProperty] = React.useState('');
+    const [subheaderProperty, setSubheaderProperty] = React.useState('');
+    const [descriptionProperty, setDescriptionProperty] = React.useState('');
+
+    const { data } = useModelQuery({
+      variables: { id: modelId },
+      skip: !modelId,
+    });
+
+    const enrichVarObj = (obj) => {
+      if (data && data.model) {
+        const property = data.model.properties.find(prop => prop.id === obj.id);
+        obj['name'] = `{{ ${data.model.name}.${property.name} }}`;
+      }
+      return obj;
+    }
 
     return (
       <>
@@ -38,8 +55,60 @@
               onChange={value => {
                 setShowValidation(false);
                 setModelId(value);
+                setImageProperty('');
+                setTitleProperty('');
+                setSubheaderProperty('');
+                setDescriptionProperty('');
               }}
               value={modelId}
+            />
+          </Field>
+          <Field
+            label="Select image property"
+          >
+            <PropertySelector
+              modelId={modelId}
+              onChange={value => {
+                setImageProperty(value);
+              }}
+              value={imageProperty}
+              disabled={modelId ? false : true}
+            />
+          </Field>
+          <Field
+            label="Select title property"
+          >
+            <PropertySelector
+              modelId={modelId}
+              onChange={value => {
+                setTitleProperty(value);
+              }}
+              value={titleProperty}
+              disabled={modelId ? false : true}
+            />
+          </Field>
+          <Field
+            label="Select subheader property"
+          >
+            <PropertySelector
+              modelId={modelId}
+              onChange={value => {
+                setSubheaderProperty(value);
+              }}
+              value={subheaderProperty}
+              disabled={modelId ? false : true}
+            />
+          </Field>
+          <Field
+            label="Select description property"
+          >
+            <PropertySelector
+              modelId={modelId}
+              onChange={value => {
+                setDescriptionProperty(value);
+              }}
+              value={descriptionProperty}
+              disabled={modelId ? false : true}
             />
           </Field>
         </Content>
@@ -55,7 +124,35 @@
               return;
             }
             const newPrefab = { ...prefab };
-            save(newPrefab);
+            if (modelId) {
+              const dataList =
+                newPrefab.structure[0].descendants[1].descendants[0]
+                  .descendants[0].descendants[2].descendants[0].descendants[0];
+              dataList.options[0].value = modelId;
+              imageProperty && (dataList.descendants[0].descendants[0].descendants[0].descendants[0]
+                .descendants[0].descendants[0].options[1].value = [enrichVarObj(imageProperty)]);
+              titleProperty && (dataList.descendants[0].descendants[0].descendants[0].descendants[0]
+                .descendants[1].descendants[0].options[0].value = [enrichVarObj(titleProperty)]);
+              subheaderProperty && (dataList.descendants[0].descendants[0].descendants[0].descendants[0]
+                .descendants[1].descendants[1].options[0].value = [enrichVarObj(subheaderProperty)]);
+              descriptionProperty && (dataList.descendants[0].descendants[0].descendants[0].descendants[0]
+                .descendants[1].descendants[2].options[0].value = [enrichVarObj(descriptionProperty)]);
+
+              const dataGrid =
+                newPrefab.structure[0].descendants[1].descendants[0]
+                  .descendants[0].descendants[2].descendants[1].descendants[0];
+              dataGrid.options[0].value = modelId;
+              imageProperty && (dataGrid.descendants[0].descendants[0].options[1].value =
+                [enrichVarObj(imageProperty)]);
+              titleProperty && (dataGrid.descendants[0].descendants[1].options[2].value =
+                [enrichVarObj(titleProperty)]);
+              subheaderProperty && (dataGrid.descendants[0].descendants[1].options[3].value =
+                [enrichVarObj(subheaderProperty)]);
+              descriptionProperty && (dataGrid.descendants[0].descendants[2].descendants[0].options[0].value =
+                [enrichVarObj(descriptionProperty)]);
+
+              save(newPrefab);
+            }
           }}
         />
       </>
@@ -8236,7 +8333,7 @@
                                           value: 'Primary',
                                         },
                                         {
-                                          value: ['0rem', 'M', '0rem', '0rem'],
+                                          value: ['0rem', '0rem', '0rem', '0rem'],
                                           label: 'Outer space',
                                           key: 'outerSpacing',
                                           type: 'SIZES',
