@@ -15,6 +15,8 @@
       Field,
       Footer,
       Text,
+      Box,
+      Button,
       ModelSelector,
       PropertySelector,
     },
@@ -34,7 +36,9 @@
     const enrichVarObj = (obj) => {
       if (data && data.model) {
         const property = data.model.properties.find(prop => prop.id === obj.id);
-        obj['name'] = `{{ ${data.model.name}.${property.name} }}`;
+        if (property) {
+          obj['name'] = `{{ ${data.model.name}.${property.name} }}`;
+        }
       }
       return obj;
     }
@@ -43,74 +47,134 @@
       <>
         <Header onClose={close} title="Configure data grid" />
         <Content>
-          <Field
-            label="Select model"
-            error={
-              showValidation && (
-                <Text color="#e82600">Selecting a model is required</Text>
-              )
-            }
+          <Box
+            direction="row"
           >
-            <ModelSelector
-              onChange={value => {
-                setShowValidation(false);
-                setModelId(value);
-                setImageProperty('');
-                setTitleProperty('');
-                setSubheaderProperty('');
-                setDescriptionProperty('');
-              }}
-              value={modelId}
-            />
-          </Field>
-          <Field
-            label="Select image property"
-          >
-            <PropertySelector
-              modelId={modelId}
-              onChange={value => {
-                setImageProperty(value);
-              }}
-              value={imageProperty}
-              disabled={modelId ? false : true}
-            />
-          </Field>
-          <Field
-            label="Select title property"
-          >
-            <PropertySelector
-              modelId={modelId}
-              onChange={value => {
-                setTitleProperty(value);
-              }}
-              value={titleProperty}
-              disabled={modelId ? false : true}
-            />
-          </Field>
-          <Field
-            label="Select subheader property"
-          >
-            <PropertySelector
-              modelId={modelId}
-              onChange={value => {
-                setSubheaderProperty(value);
-              }}
-              value={subheaderProperty}
-              disabled={modelId ? false : true}
-            />
-          </Field>
-          <Field
-            label="Select description property"
-          >
-            <PropertySelector
-              modelId={modelId}
-              onChange={value => {
-                setDescriptionProperty(value);
-              }}
-              value={descriptionProperty}
-              disabled={modelId ? false : true}
-            />
-          </Field>
+            <Box
+              direction="column"
+              basis="1/2"
+            >
+              <Field
+                label="Select model"
+                error={
+                  showValidation && (
+                    <Text color="#e82600">Selecting a model is required</Text>
+                  )
+                }
+              >
+                <ModelSelector
+                  onChange={value => {
+                    setShowValidation(false);
+                    setModelId(value);
+                    setImageProperty('');
+                    setTitleProperty('');
+                    setSubheaderProperty('');
+                    setDescriptionProperty('');
+                  }}
+                  value={modelId}
+                />
+              </Field>
+              <Field
+                label="Select image property"
+              >
+                <PropertySelector
+                  modelId={modelId}
+                  onChange={value => {
+                    setImageProperty(value);
+                  }}
+                  value={imageProperty}
+                  disabled={modelId ? false : true}
+                />
+              </Field>
+              <Field
+                label="Select title property"
+              >
+                <PropertySelector
+                  modelId={modelId}
+                  onChange={value => {
+                    setTitleProperty(value);
+                  }}
+                  value={titleProperty}
+                  disabled={modelId ? false : true}
+                />
+              </Field>
+              <Field
+                label="Select subheader property"
+              >
+                <PropertySelector
+                  modelId={modelId}
+                  onChange={value => {
+                    setSubheaderProperty(value);
+                  }}
+                  value={subheaderProperty}
+                  disabled={modelId ? false : true}
+                />
+              </Field>
+              <Field
+                label="Select description property"
+              >
+                <PropertySelector
+                  modelId={modelId}
+                  onChange={value => {
+                    setDescriptionProperty(value);
+                  }}
+                  value={descriptionProperty}
+                  disabled={modelId ? false : true}
+                />
+              </Field>
+            </Box>
+            <Box
+              direction="column"
+              basis="1/2"
+            >
+              <Text>Preview:</Text>
+              <Box
+                fill="true"
+              >
+                <Box
+                  pad="medium"
+                  background="dark-3"
+                  flex={{ "grow": "27" }}
+                  justify="center"
+                  align="center"
+                >
+                  <Text color="white" truncate="true">
+                    {imageProperty.id ? enrichVarObj(imageProperty).name : 'Image'}
+                  </Text>
+                </Box>
+                <Box
+                  pad="medium"
+                  background="light-3"
+                >
+                  <Text size="large" truncate="true">
+                    {titleProperty.id ? enrichVarObj(titleProperty).name : 'Title'}
+                  </Text>
+                  <Text color="darkGrey" truncate="true">
+                    {subheaderProperty.id ? enrichVarObj(subheaderProperty).name : 'Subheader'}
+                  </Text>
+                </Box>
+                <Box
+                  pad={{ "top": "none", "bottom": "medium", "horizontal": "medium" }}
+                  background="light-3"
+                  flex={{ "grow": "33" }}
+                >
+                  <Text truncate="true">
+                    {descriptionProperty.id ? enrichVarObj(descriptionProperty).name : 'Description'}
+                  </Text>
+                </Box>
+                <Box
+                  pad="medium"
+                  background="light-3"
+                  border={{
+                    "color": "border",
+                    "size": "small",
+                    "style": "solid",
+                    "side": "top"
+                  }}
+                />
+              </Box>
+            </Box>
+          </Box>
         </Content>
         <Footer
           onClose={close}
@@ -129,26 +193,26 @@
                 newPrefab.structure[0].descendants[1].descendants[0]
                   .descendants[0].descendants[2].descendants[0].descendants[0];
               dataList.options[0].value = modelId;
-              imageProperty && (dataList.descendants[0].descendants[0].descendants[0].descendants[0]
+              imageProperty.id && (dataList.descendants[0].descendants[0].descendants[0].descendants[0]
                 .descendants[0].descendants[0].options[1].value = [enrichVarObj(imageProperty)]);
-              titleProperty && (dataList.descendants[0].descendants[0].descendants[0].descendants[0]
+              titleProperty.id && (dataList.descendants[0].descendants[0].descendants[0].descendants[0]
                 .descendants[1].descendants[0].options[0].value = [enrichVarObj(titleProperty)]);
-              subheaderProperty && (dataList.descendants[0].descendants[0].descendants[0].descendants[0]
+              subheaderProperty.id && (dataList.descendants[0].descendants[0].descendants[0].descendants[0]
                 .descendants[1].descendants[1].options[0].value = [enrichVarObj(subheaderProperty)]);
-              descriptionProperty && (dataList.descendants[0].descendants[0].descendants[0].descendants[0]
+              descriptionProperty.id && (dataList.descendants[0].descendants[0].descendants[0].descendants[0]
                 .descendants[1].descendants[2].options[0].value = [enrichVarObj(descriptionProperty)]);
 
               const dataGrid =
                 newPrefab.structure[0].descendants[1].descendants[0]
                   .descendants[0].descendants[2].descendants[1].descendants[0];
               dataGrid.options[0].value = modelId;
-              imageProperty && (dataGrid.descendants[0].descendants[0].options[1].value =
+              imageProperty.id && (dataGrid.descendants[0].descendants[0].options[1].value =
                 [enrichVarObj(imageProperty)]);
-              titleProperty && (dataGrid.descendants[0].descendants[1].options[2].value =
+              titleProperty.id && (dataGrid.descendants[0].descendants[1].options[2].value =
                 [enrichVarObj(titleProperty)]);
-              subheaderProperty && (dataGrid.descendants[0].descendants[1].options[3].value =
+              subheaderProperty.id && (dataGrid.descendants[0].descendants[1].options[3].value =
                 [enrichVarObj(subheaderProperty)]);
-              descriptionProperty && (dataGrid.descendants[0].descendants[2].descendants[0].options[0].value =
+              descriptionProperty.id && (dataGrid.descendants[0].descendants[2].descendants[0].options[0].value =
                 [enrichVarObj(descriptionProperty)]);
 
               save(newPrefab);
