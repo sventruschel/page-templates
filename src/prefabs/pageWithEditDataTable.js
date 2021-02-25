@@ -1,6 +1,6 @@
 (() => ({
-  name: 'Page With Master Detail',
-  description: 'This is a page with a master detail view',
+  name: 'Page With Edit Data Table',
+  description: 'This is a page which contains a datatable with edit dialog',
   icon: 'DataTable',
   category: 'DATA',
   beforeCreate: ({
@@ -78,45 +78,47 @@
           </Field>
           <Field label="Edit Form">
             <CheckBox
-              label="Use the same properties as the data table"
+              label="Use the same properties as the data table in the edit form"
               checked={editFormUseDataProperties}
               onChange={() =>
                 setEditFormUseDataProperties(!editFormUseDataProperties)
               }
             />
             {!editFormUseDataProperties && (
-              <PropertiesSelector
-                modelId={modelId}
-                value={editFormProperties}
-                disabledNames={['created_at', 'updated_at', 'id']}
-                disabledKinds={[
-                  'BELONGS_TO',
-                  'HAS_AND_BELONGS_TO_MANY',
-                  'HAS_MANY',
-                  'MULTI_FILE',
-                  'AUTO_INCREMENT',
-                  'COUNT',
-                  'MULTI_IMAGE',
-                  'PDF',
-                  'RICH_TEXT',
-                  'SIGNED_PDF',
-                  'SUM',
-                  'BOOLEAN_EXPRESSION',
-                  'DATE_EXPRESSION',
-                  'DATE_TIME_EXPRESSION',
-                  'DECIMAL_EXPRESSION',
-                  'INTEGER_EXPRESSION',
-                  'MINUTES_EXPRESSION',
-                  'PRICE_EXPRESSION',
-                  'STRING_EXPRESSION',
-                  'TEXT_EXPRESSION',
-                  'MINUTES',
-                  'ZIPCODE',
-                ]}
-                onChange={value => {
-                  setEditFormProperties(value);
-                }}
-              />
+              <Field label="Input fields in the edit form">
+                <PropertiesSelector
+                  modelId={modelId}
+                  value={editFormProperties}
+                  disabledNames={['created_at', 'updated_at', 'id']}
+                  disabledKinds={[
+                    'BELONGS_TO',
+                    'HAS_AND_BELONGS_TO_MANY',
+                    'HAS_MANY',
+                    'MULTI_FILE',
+                    'AUTO_INCREMENT',
+                    'COUNT',
+                    'MULTI_IMAGE',
+                    'PDF',
+                    'RICH_TEXT',
+                    'SIGNED_PDF',
+                    'SUM',
+                    'BOOLEAN_EXPRESSION',
+                    'DATE_EXPRESSION',
+                    'DATE_TIME_EXPRESSION',
+                    'DECIMAL_EXPRESSION',
+                    'INTEGER_EXPRESSION',
+                    'MINUTES_EXPRESSION',
+                    'PRICE_EXPRESSION',
+                    'STRING_EXPRESSION',
+                    'TEXT_EXPRESSION',
+                    'MINUTES',
+                    'ZIPCODE',
+                  ]}
+                  onChange={value => {
+                    setEditFormProperties(value);
+                  }}
+                />
+              </Field>
             )}
           </Field>
         </Content>
@@ -236,7 +238,7 @@
               );
             });
 
-            const EditDataTableColumn = {
+            const editDataTableColumn = {
               name: 'DataTableColumn',
               options: [
                 {
@@ -11771,7 +11773,7 @@
               ];
             }
             newPrefab.structure[0].descendants[0].descendants[0].descendants.push(
-              EditDataTableColumn,
+              editDataTableColumn,
             );
             newPrefab.structure[0].descendants[0].descendants[1].descendants[0].descendants[0].descendants[0].descendants[1].descendants[0].descendants[0].options[0].value.modelId = modelId;
             newPrefab.structure[0].descendants[0].descendants[1].descendants[0].descendants[0].descendants[0].descendants[1].descendants[0].descendants[0].options[1].value = modelId;
