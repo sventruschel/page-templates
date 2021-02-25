@@ -5,7 +5,7 @@
   description: 'Page with grid and list view',
   category: 'LAYOUT',
   beforeCreate: ({
-    helpers: { useModelQuery, camelToSnakeCase },
+    helpers: { useModelQuery },
     prefab,
     save,
     close,
