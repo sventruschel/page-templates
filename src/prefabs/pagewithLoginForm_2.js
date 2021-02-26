@@ -6451,13 +6451,13 @@
                                   },
                                 },
                                 {
-                                  value: ['0rem', '0rem', '0rem', '0rem'],
+                                  value: ['0rem', 'XL', '0rem', 'XL'],
                                   label: 'Outer space',
                                   key: 'outerSpacing',
                                   type: 'SIZES',
                                 },
                                 {
-                                  value: ['M', 'M', 'M', 'M'],
+                                  value: ['0rem', 'XL', '0rem', 'XL'],
                                   label: 'Inner space',
                                   key: 'innerSpacing',
                                   type: 'SIZES',
@@ -6484,7 +6484,7 @@
                                     },
                                     {
                                       value: [
-                                        'https://www.bettyblocks.com/hubfs/Betty_Blocks_December2018/Images/logo-red.svg',
+                                        'https://via.placeholder.com/550x100/?text=[Insert logo here]',
                                       ],
                                       label: 'Source',
                                       key: 'imageSource',
@@ -6820,7 +6820,7 @@
                                       type: 'VARIABLE',
                                       label: 'Content',
                                       key: 'content',
-                                      value: ['Login page'],
+                                      value: ['Login'],
                                       configuration: {
                                         as: 'MULTILINE',
                                       },
