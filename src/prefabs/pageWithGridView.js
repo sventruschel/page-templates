@@ -3855,7 +3855,7 @@
               <Field
                 info={
                   <Text size="small" color="grey700">
-                    This is how the component will look like on the canvas.
+                    This is how each grid item will look like on the canvas.
                   </Text>
                 }
               >
@@ -3881,7 +3881,7 @@
                       "style": "dashed",
                       "side": "all",
                     }
-                    : "false"
+                    : ""
                   }
                   background={imageProperty.id
                     ? "#F0F1F5"
