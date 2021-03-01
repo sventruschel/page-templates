@@ -51,7 +51,7 @@
           >
             <Box
               direction="column"
-              basis="1/2"
+              basis="2/3"
             >
               <Field
                 label="Select model"
@@ -74,7 +74,7 @@
                 />
               </Field>
               <Field
-                label="Select image property"
+                label="Image property"
               >
                 <PropertySelector
                   modelId={modelId}
@@ -86,7 +86,7 @@
                 />
               </Field>
               <Field
-                label="Select title property"
+                label="Title property"
               >
                 <PropertySelector
                   modelId={modelId}
@@ -98,7 +98,7 @@
                 />
               </Field>
               <Field
-                label="Select subheader property"
+                label="Subheader property"
               >
                 <PropertySelector
                   modelId={modelId}
@@ -110,7 +110,7 @@
                 />
               </Field>
               <Field
-                label="Select description property"
+                label="Description property"
               >
                 <PropertySelector
                   modelId={modelId}
@@ -124,53 +124,67 @@
             </Box>
             <Box
               direction="column"
-              basis="1/2"
+              basis="1/3"
             >
-              <Text>Preview:</Text>
+              <Field
+                info={
+                  <Text size="small" color="grey700">
+                    This is how the component will look like on the canvas.
+                  </Text>
+                }
+              >
+                <Text>Preview:</Text>
+              </Field>
               <Box
                 fill="true"
+                round="4px"
+                overflow="hidden"
+                border={{
+                  "color": "#E0E0E0",
+                  "size": "xsmall",
+                  "style": "solid",
+                  "side": "all",
+                }}
               >
                 <Box
-                  pad="medium"
-                  background="dark-3"
-                  flex={{ "grow": "27" }}
+                  pad={imageProperty.id ? "large" : "medium"}
+                  border={imageProperty.id
+                    ? {
+                      "color": "#AFB5C8",
+                      "size": "xsmall",
+                      "style": "dashed",
+                      "side": "all",
+                    }
+                    : "false"
+                  }
+                  background={imageProperty.id
+                    ? "#F0F1F5"
+                    : "url(https://material-ui.com/static/images/cards/contemplative-reptile.jpg)"
+                  }
+                  flex={{ "grow": "30" }}
                   justify="center"
                   align="center"
                 >
-                  <Text color="white" truncate="true">
-                    {imageProperty.id ? enrichVarObj(imageProperty).name : 'Image'}
+                  <Text truncate="true">
+                    {imageProperty.id ? enrichVarObj(imageProperty).name : ''}
                   </Text>
                 </Box>
-                <Box
-                  pad="medium"
-                  background="light-3"
-                >
-                  <Text size="large" truncate="true">
+                <Box pad="medium">
+                  <Text color="#000000DE" truncate="true">
                     {titleProperty.id ? enrichVarObj(titleProperty).name : 'Title'}
                   </Text>
-                  <Text color="darkGrey" truncate="true">
+                  <Text size="small" color="#0000008A" truncate="true">
                     {subheaderProperty.id ? enrichVarObj(subheaderProperty).name : 'Subheader'}
                   </Text>
                 </Box>
-                <Box
-                  pad={{ "top": "none", "bottom": "medium", "horizontal": "medium" }}
-                  background="light-3"
-                  flex={{ "grow": "33" }}
-                >
-                  <Text truncate="true">
+                <Box pad={{ "top": "none", "bottom": "medium", "horizontal": "medium" }}>
+                  <Text size="small" truncate="true">
                     {descriptionProperty.id ? enrichVarObj(descriptionProperty).name : 'Description'}
                   </Text>
                 </Box>
-                <Box
-                  pad="medium"
-                  background="light-3"
-                  border={{
-                    "color": "border",
-                    "size": "small",
-                    "style": "solid",
-                    "side": "top"
-                  }}
-                />
+                <Box pad={{ "horizontal": "medium", "vertical": "small" }}>
+                  <Text size="large" textAlign="end">›</Text>
+                </Box>
               </Box>
             </Box>
           </Box>
@@ -211,8 +225,8 @@
                 [enrichVarObj(titleProperty)]);
               subheaderProperty.id && (dataGrid.descendants[0].descendants[1].options[3].value =
                 [enrichVarObj(subheaderProperty)]);
-              descriptionProperty.id && (dataGrid.descendants[0].descendants[2].descendants[0].options[0].value =
-                [enrichVarObj(descriptionProperty)]);
+              descriptionProperty.id && (dataGrid.descendants[0].descendants[2].descendants[0]
+                .options[0].value = [enrichVarObj(descriptionProperty)]);
 
               save(newPrefab);
             }
@@ -11267,9 +11281,7 @@
                                                           type: 'VARIABLE',
                                                           label: 'Content',
                                                           key: 'content',
-                                                          value: [
-                                                            'Lorem ipsum dolor sit amet, consectetur adiscing elit. Suspendisse sodales lectus acru, facilisis luctus dui dictum non. In ornare sodales fermentum. Proin ac posuere eros. Sed quis lorem convallis, eleifend sem nec, sollicitudin lorem. Quisque quis sem quis elit sollicitudin. Aenean auctor faucibus libero, non mollis velit. Suspendisse sit amet pulvinar ligula, nec porttitor felis.'
-                                                          ],
+                                                          value: ['Description'],
                                                           configuration: {
                                                             as: 'MULTILINE',
                                                           },
@@ -14886,9 +14898,7 @@
                                               type: 'VARIABLE',
                                               label: 'Content',
                                               key: 'content',
-                                              value: [
-                                                'Lorem ipsum dolor sit amet, consectetur adiscing elit. Suspendisse sodales lectus acru, facilisis luctus dui dictum non. In ornare sodales fermentum. Proin ac posuere eros. Sed quis lorem convallis, eleifend sem nec, sollicitudin lorem. Quisque quis sem quis elit sollicitudin.',
-                                              ],
+                                              value: ['Description'],
                                               configuration: {
                                                 as: 'MULTILINE',
                                               },

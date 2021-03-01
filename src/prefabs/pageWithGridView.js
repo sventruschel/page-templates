@@ -74,7 +74,7 @@
                 />
               </Field>
               <Field
-                label="Select image property"
+                label="Image property"
               >
                 <PropertySelector
                   modelId={modelId}
@@ -86,7 +86,7 @@
                 />
               </Field>
               <Field
-                label="Select title property"
+                label="Title property"
               >
                 <PropertySelector
                   modelId={modelId}
@@ -98,7 +98,7 @@
                 />
               </Field>
               <Field
-                label="Select subheader property"
+                label="Subheader property"
               >
                 <PropertySelector
                   modelId={modelId}
@@ -110,7 +110,7 @@
                 />
               </Field>
               <Field
-                label="Select description property"
+                label="Description property"
               >
                 <PropertySelector
                   modelId={modelId}
@@ -126,51 +126,65 @@
               direction="column"
               basis="1/3"
             >
-              <Text>Preview:</Text>
+              <Field
+                info={
+                  <Text size="small" color="grey700">
+                    This is how the component will look like on the canvas.
+                  </Text>
+                }
+              >
+                <Text>Preview:</Text>
+              </Field>
               <Box
                 fill="true"
+                round="4px"
+                overflow="hidden"
+                border={{
+                  "color": "#E0E0E0",
+                  "size": "xsmall",
+                  "style": "solid",
+                  "side": "all",
+                }}
               >
                 <Box
                   pad={imageProperty.id ? "large" : "medium"}
-                  background={imageProperty.id ? "dark-3" : "url(https://material-ui.com/static/images/cards/contemplative-reptile.jpg)"}
-                  flex={{ "grow": "27" }}
+                  border={imageProperty.id
+                    ? {
+                      "color": "#AFB5C8",
+                      "size": "xsmall",
+                      "style": "dashed",
+                      "side": "all",
+                    }
+                    : "false"
+                  }
+                  background={imageProperty.id
+                    ? "#F0F1F5"
+                    : "url(https://material-ui.com/static/images/cards/contemplative-reptile.jpg)"
+                  }
+                  flex={{ "grow": "30" }}
                   justify="center"
                   align="center"
                 >
-                  <Text color="white" truncate="true">
-                    {imageProperty.id ? enrichVarObj(imageProperty).name : ' '}
+                  <Text truncate="true">
+                    {imageProperty.id ? enrichVarObj(imageProperty).name : ''}
                   </Text>
                 </Box>
-                <Box
-                  pad="medium"
-                  background="light-3"
-                >
-                  <Text truncate="true">
+                <Box pad="medium">
+                  <Text color="#000000DE" truncate="true">
                     {titleProperty.id ? enrichVarObj(titleProperty).name : 'Title'}
                   </Text>
-                  <Text size="small" color="darkGrey" truncate="true">
+                  <Text size="small" color="#0000008A" truncate="true">
                     {subheaderProperty.id ? enrichVarObj(subheaderProperty).name : 'Subheader'}
                   </Text>
                 </Box>
-                <Box
-                  pad={{ "top": "none", "bottom": "medium", "horizontal": "medium" }}
-                  background="light-3"
-                  flex={{ "grow": "33" }}
-                >
+                <Box pad={{ "top": "none", "bottom": "medium", "horizontal": "medium" }}>
                   <Text size="small" truncate="true">
                     {descriptionProperty.id ? enrichVarObj(descriptionProperty).name : 'Description'}
                   </Text>
                 </Box>
-                <Box
-                  pad="medium"
-                  background="light-3"
-                  border={{
-                    "color": "border",
-                    "size": "small",
-                    "style": "solid",
-                    "side": "top"
-                  }}
-                />
+                <Box pad={{ "horizontal": "medium", "vertical": "small" }}>
+                  <Text size="large" textAlign="end">›</Text>
+                </Box>
               </Box>
             </Box>
           </Box>
