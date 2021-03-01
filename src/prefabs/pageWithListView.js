@@ -4994,6 +4994,7 @@
             if (modelId) {
               const dataList = prefabStructure[1].descendants[0].descendants[0].descendants[2];
               dataList.options[0].value = modelId;
+              dataList.options[4].value = titleProperty.id;
               imageProperty.id && (dataList.descendants[0].descendants[0].descendants[0].descendants[0]
                 .descendants[0].descendants[0].options[1].value = [enrichVarObj(imageProperty)]);
               titleProperty.id && (dataList.descendants[0].descendants[0].descendants[0].descendants[0]
