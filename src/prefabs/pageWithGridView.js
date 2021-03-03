@@ -3765,7 +3765,7 @@
           },
         ],
       },
-    ]
+    ];
 
     return (
       <>
@@ -3930,8 +3930,7 @@
             const newPrefab = { ...prefab };
             if (modelId) {
               const dataGrid =
-                prefabStructure[1].descendants[0]
-                  .descendants[0].descendants[2];
+                prefabStructure[1].descendants[0].descendants[0].descendants[2];
               dataGrid.options[0].value = modelId;
               imageProperty.id && (dataGrid.descendants[0].descendants[0]
                 .options[1].value = [enrichVarObj(imageProperty)]);
