@@ -132,17 +132,6 @@
             newPrefab.structure[0].descendants[0].descendants[0].options[0].value = modelId;
             newPrefab.variables[1].options.modelId = modelId;
             properties.filter(property => property.kind !== 'SERIAL');
-            newPrefab.actions[0].events[0].options.assign = properties.map(
-              property => ({
-                leftHandSide: property.id[0],
-                ref: {
-                  path: [
-                    '#customModelVariableId',
-                    `#attribute_${property.id[0]}`,
-                  ],
-                },
-              }),
-            );
             properties.forEach(property => {
               newPrefab.structure[0].descendants[0].descendants[0].descendants.push(
                 {
@@ -11764,6 +11753,18 @@
               newPrefab.structure[0].descendants[0].descendants[1].descendants[0].descendants[0].descendants[0].descendants[1].descendants[0].descendants[0].descendants = [
                 ...descendantsArray,
               ];
+
+              newPrefab.actions[0].events[0].options.assign = editFormProperties.map(
+                property => ({
+                  leftHandSide: property.id[0],
+                  ref: {
+                    path: [
+                      '#customModelVariableId',
+                      `#attribute_${property.id[0]}`,
+                    ],
+                  },
+                }),
+              );
             } else {
               const descendantsArray = makeDescendantsArray(properties).filter(
                 item => item !== undefined,
@@ -11771,6 +11772,18 @@
               newPrefab.structure[0].descendants[0].descendants[1].descendants[0].descendants[0].descendants[0].descendants[1].descendants[0].descendants[0].descendants = [
                 ...descendantsArray,
               ];
+
+              newPrefab.actions[0].events[0].options.assign = properties.map(
+                property => ({
+                  leftHandSide: property.id[0],
+                  ref: {
+                    path: [
+                      '#customModelVariableId',
+                      `#attribute_${property.id[0]}`,
+                    ],
+                  },
+                }),
+              );
             }
             newPrefab.structure[0].descendants[0].descendants[0].descendants.push(
               editDataTableColumn,

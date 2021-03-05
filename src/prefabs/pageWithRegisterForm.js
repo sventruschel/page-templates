@@ -1,8 +1,8 @@
 (() => ({
-  name: 'Page with register form',
+  name: 'Register Form - Sidebar',
   icon: 'LoginFormIcon',
-  // type: 'page',
-  description: 'Page with register form',
+  description: 'Page with register form and side image',
+  type: 'page',
   category: 'LAYOUT',
   beforeCreate: ({
     prefab,
@@ -2274,7 +2274,7 @@
                                 },
                               },
                               {
-                                value: ['0rem', 'XL', '0rem', 'XL'],
+                                value: ['XL', 'XL', '0rem', 'XL'],
                                 label: 'Outer space',
                                 key: 'outerSpacing',
                                 type: 'SIZES',
@@ -3275,12 +3275,7 @@
                                         value: 'Dark',
                                       },
                                       {
-                                        value: [
-                                          '0rem',
-                                          '0rem',
-                                          '0rem',
-                                          '0rem',
-                                        ],
+                                        value: ['0rem', '0rem', '0rem', '0rem'],
                                         label: 'Outer space',
                                         key: 'outerSpacing',
                                         type: 'SIZES',
@@ -3759,23 +3754,13 @@
                                         },
                                       },
                                       {
-                                        value: [
-                                          '0rem',
-                                          '0rem',
-                                          '0rem',
-                                          '0rem',
-                                        ],
+                                        value: ['0rem', '0rem', '0rem', '0rem'],
                                         label: 'Outer space',
                                         key: 'outerSpacing',
                                         type: 'SIZES',
                                       },
                                       {
-                                        value: [
-                                          '0rem',
-                                          '0rem',
-                                          '0rem',
-                                          '0rem',
-                                        ],
+                                        value: ['0rem', '0rem', '0rem', '0rem'],
                                         label: 'Inner space',
                                         key: 'innerSpacing',
                                         type: 'SIZES',
@@ -4219,8 +4204,7 @@
                                             },
                                           },
                                           {
-                                            label:
-                                              'Toggle tooltip visibility',
+                                            label: 'Toggle tooltip visibility',
                                             key: 'hasVisibleTooltip',
                                             value: true,
                                             type: 'TOGGLE',
@@ -4345,7 +4329,7 @@
           },
         ],
       },
-    ]
+    ];
 
     return (
       <>

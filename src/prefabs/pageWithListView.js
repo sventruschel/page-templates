@@ -1,7 +1,7 @@
 (() => ({
-  name: 'Page with list view',
+  name: 'List View',
   icon: 'DataList',
-  // type: 'page',
+  type: 'page',
   description: 'Page with list view',
   category: 'LAYOUT',
   beforeCreate: ({
@@ -32,15 +32,16 @@
       skip: !modelId,
     });
 
-    const enrichVarObj = (obj) => {
+    const enrichVarObj = obj => {
+      const returnObject = obj;
       if (data && data.model) {
         const property = data.model.properties.find(prop => prop.id === obj.id);
         if (property) {
-          obj['name'] = `{{ ${data.model.name}.${property.name} }}`;
+          returnObject.name = `{{ ${data.model.name}.${property.name} }}`;
         }
       }
-      return obj;
-    }
+      return returnObject;
+    };
 
     const iconConfiguration = {
       as: 'DROPDOWN',
@@ -3128,7 +3129,10 @@
                                   as: 'DROPDOWN',
                                   dataType: 'string',
                                   allowedInput: [
-                                    { name: 'Fit content', value: 'fitContent' },
+                                    {
+                                      name: 'Fit content',
+                                      value: 'fitContent',
+                                    },
                                     { name: 'Flexible', value: 'flexible' },
                                     { name: 'Hidden', value: 'hidden' },
                                     { name: '1', value: '1' },
@@ -3155,7 +3159,10 @@
                                   as: 'DROPDOWN',
                                   dataType: 'string',
                                   allowedInput: [
-                                    { name: 'Fit content', value: 'fitContent' },
+                                    {
+                                      name: 'Fit content',
+                                      value: 'fitContent',
+                                    },
                                     { name: 'Flexible', value: 'flexible' },
                                     { name: 'Hidden', value: 'hidden' },
                                     { name: '1', value: '1' },
@@ -3182,7 +3189,10 @@
                                   as: 'DROPDOWN',
                                   dataType: 'string',
                                   allowedInput: [
-                                    { name: 'Fit content', value: 'fitContent' },
+                                    {
+                                      name: 'Fit content',
+                                      value: 'fitContent',
+                                    },
                                     { name: 'Flexible', value: 'flexible' },
                                     { name: 'Hidden', value: 'hidden' },
                                     { name: '1', value: '1' },
@@ -3209,7 +3219,10 @@
                                   as: 'DROPDOWN',
                                   dataType: 'string',
                                   allowedInput: [
-                                    { name: 'Fit content', value: 'fitContent' },
+                                    {
+                                      name: 'Fit content',
+                                      value: 'fitContent',
+                                    },
                                     { name: 'Flexible', value: 'flexible' },
                                     { name: 'Hidden', value: 'hidden' },
                                     { name: '1', value: '1' },
@@ -3307,7 +3320,10 @@
                                       dataType: 'string',
                                       allowedInput: [
                                         { name: 'Flat', value: 'flat' },
-                                        { name: 'Elevation', value: 'elevation' },
+                                        {
+                                          name: 'Elevation',
+                                          value: 'elevation',
+                                        },
                                         { name: 'Outlined', value: 'outlined' },
                                       ],
                                     },
@@ -3420,9 +3436,18 @@
                                               as: 'DROPDOWN',
                                               dataType: 'string',
                                               allowedInput: [
-                                                { name: 'Fit content', value: 'fitContent' },
-                                                { name: 'Flexible', value: 'flexible' },
-                                                { name: 'Hidden', value: 'hidden' },
+                                                {
+                                                  name: 'Fit content',
+                                                  value: 'fitContent',
+                                                },
+                                                {
+                                                  name: 'Flexible',
+                                                  value: 'flexible',
+                                                },
+                                                {
+                                                  name: 'Hidden',
+                                                  value: 'hidden',
+                                                },
                                                 { name: '1', value: '1' },
                                                 { name: '2', value: '2' },
                                                 { name: '3', value: '3' },
@@ -3440,16 +3465,26 @@
                                           },
                                           {
                                             value: '3',
-                                            label: 'Column width (tablet landscape)',
+                                            label:
+                                              'Column width (tablet landscape)',
                                             key: 'columnWidthTabletLandscape',
                                             type: 'CUSTOM',
                                             configuration: {
                                               as: 'DROPDOWN',
                                               dataType: 'string',
                                               allowedInput: [
-                                                { name: 'Fit content', value: 'fitContent' },
-                                                { name: 'Flexible', value: 'flexible' },
-                                                { name: 'Hidden', value: 'hidden' },
+                                                {
+                                                  name: 'Fit content',
+                                                  value: 'fitContent',
+                                                },
+                                                {
+                                                  name: 'Flexible',
+                                                  value: 'flexible',
+                                                },
+                                                {
+                                                  name: 'Hidden',
+                                                  value: 'hidden',
+                                                },
                                                 { name: '1', value: '1' },
                                                 { name: '2', value: '2' },
                                                 { name: '3', value: '3' },
@@ -3467,16 +3502,26 @@
                                           },
                                           {
                                             value: '3',
-                                            label: 'Column width (tablet portrait)',
+                                            label:
+                                              'Column width (tablet portrait)',
                                             key: 'columnWidthTabletPortrait',
                                             type: 'CUSTOM',
                                             configuration: {
                                               as: 'DROPDOWN',
                                               dataType: 'string',
                                               allowedInput: [
-                                                { name: 'Fit content', value: 'fitContent' },
-                                                { name: 'Flexible', value: 'flexible' },
-                                                { name: 'Hidden', value: 'hidden' },
+                                                {
+                                                  name: 'Fit content',
+                                                  value: 'fitContent',
+                                                },
+                                                {
+                                                  name: 'Flexible',
+                                                  value: 'flexible',
+                                                },
+                                                {
+                                                  name: 'Hidden',
+                                                  value: 'hidden',
+                                                },
                                                 { name: '1', value: '1' },
                                                 { name: '2', value: '2' },
                                                 { name: '3', value: '3' },
@@ -3501,9 +3546,18 @@
                                               as: 'DROPDOWN',
                                               dataType: 'string',
                                               allowedInput: [
-                                                { name: 'Fit content', value: 'fitContent' },
-                                                { name: 'Flexible', value: 'flexible' },
-                                                { name: 'Hidden', value: 'hidden' },
+                                                {
+                                                  name: 'Fit content',
+                                                  value: 'fitContent',
+                                                },
+                                                {
+                                                  name: 'Flexible',
+                                                  value: 'flexible',
+                                                },
+                                                {
+                                                  name: 'Hidden',
+                                                  value: 'hidden',
+                                                },
                                                 { name: '1', value: '1' },
                                                 { name: '2', value: '2' },
                                                 { name: '3', value: '3' },
@@ -3543,10 +3597,22 @@
                                               as: 'BUTTONGROUP',
                                               dataType: 'string',
                                               allowedInput: [
-                                                { name: 'None', value: 'inherit' },
-                                                { name: 'Left', value: 'flex-start' },
-                                                { name: 'Center', value: 'center' },
-                                                { name: 'Right', value: 'flex-end' },
+                                                {
+                                                  name: 'None',
+                                                  value: 'inherit',
+                                                },
+                                                {
+                                                  name: 'Left',
+                                                  value: 'flex-start',
+                                                },
+                                                {
+                                                  name: 'Center',
+                                                  value: 'center',
+                                                },
+                                                {
+                                                  name: 'Right',
+                                                  value: 'flex-end',
+                                                },
                                               ],
                                             },
                                           },
@@ -3559,15 +3625,32 @@
                                               as: 'BUTTONGROUP',
                                               dataType: 'string',
                                               allowedInput: [
-                                                { name: 'None', value: 'inherit' },
-                                                { name: 'Top', value: 'flex-start' },
-                                                { name: 'Center', value: 'center' },
-                                                { name: 'Bottom', value: 'flex-end' },
+                                                {
+                                                  name: 'None',
+                                                  value: 'inherit',
+                                                },
+                                                {
+                                                  name: 'Top',
+                                                  value: 'flex-start',
+                                                },
+                                                {
+                                                  name: 'Center',
+                                                  value: 'center',
+                                                },
+                                                {
+                                                  name: 'Bottom',
+                                                  value: 'flex-end',
+                                                },
                                               ],
                                             },
                                           },
                                           {
-                                            value: ['0rem', '0rem', '0rem', '0rem'],
+                                            value: [
+                                              '0rem',
+                                              '0rem',
+                                              '0rem',
+                                              '0rem',
+                                            ],
                                             label: 'Outer space',
                                             key: 'outerSpacing',
                                             type: 'SIZES',
@@ -3592,15 +3675,24 @@
                                                   as: 'BUTTONGROUP',
                                                   dataType: 'string',
                                                   allowedInput: [
-                                                    { name: 'Image', value: 'img' },
-                                                    { name: 'Video', value: 'video' },
-                                                    { name: 'I-frame', value: 'iframe' },
+                                                    {
+                                                      name: 'Image',
+                                                      value: 'img',
+                                                    },
+                                                    {
+                                                      name: 'Video',
+                                                      value: 'video',
+                                                    },
+                                                    {
+                                                      name: 'I-frame',
+                                                      value: 'iframe',
+                                                    },
                                                   ],
                                                 },
                                               },
                                               {
                                                 value: [
-                                                  'https://material-ui.com/static/images/cards/contemplative-reptile.jpg'
+                                                  'https://material-ui.com/static/images/cards/contemplative-reptile.jpg',
                                                 ],
                                                 label: 'Source',
                                                 key: 'imageSource',
@@ -3681,7 +3773,12 @@
                                                 },
                                               },
                                               {
-                                                value: ['0rem', '0rem', '0rem', '0rem'],
+                                                value: [
+                                                  '0rem',
+                                                  '0rem',
+                                                  '0rem',
+                                                  '0rem',
+                                                ],
                                                 label: 'Outer space',
                                                 key: 'outerSpacing',
                                                 type: 'SIZES',
@@ -3712,9 +3809,18 @@
                                               as: 'DROPDOWN',
                                               dataType: 'string',
                                               allowedInput: [
-                                                { name: 'Fit content', value: 'fitContent' },
-                                                { name: 'Flexible', value: 'flexible' },
-                                                { name: 'Hidden', value: 'hidden' },
+                                                {
+                                                  name: 'Fit content',
+                                                  value: 'fitContent',
+                                                },
+                                                {
+                                                  name: 'Flexible',
+                                                  value: 'flexible',
+                                                },
+                                                {
+                                                  name: 'Hidden',
+                                                  value: 'hidden',
+                                                },
                                                 { name: '1', value: '1' },
                                                 { name: '2', value: '2' },
                                                 { name: '3', value: '3' },
@@ -3732,16 +3838,26 @@
                                           },
                                           {
                                             value: '8',
-                                            label: 'Column width (tablet landscape)',
+                                            label:
+                                              'Column width (tablet landscape)',
                                             key: 'columnWidthTabletLandscape',
                                             type: 'CUSTOM',
                                             configuration: {
                                               as: 'DROPDOWN',
                                               dataType: 'string',
                                               allowedInput: [
-                                                { name: 'Fit content', value: 'fitContent' },
-                                                { name: 'Flexible', value: 'flexible' },
-                                                { name: 'Hidden', value: 'hidden' },
+                                                {
+                                                  name: 'Fit content',
+                                                  value: 'fitContent',
+                                                },
+                                                {
+                                                  name: 'Flexible',
+                                                  value: 'flexible',
+                                                },
+                                                {
+                                                  name: 'Hidden',
+                                                  value: 'hidden',
+                                                },
                                                 { name: '1', value: '1' },
                                                 { name: '2', value: '2' },
                                                 { name: '3', value: '3' },
@@ -3759,16 +3875,26 @@
                                           },
                                           {
                                             value: '8',
-                                            label: 'Column width (tablet portrait)',
+                                            label:
+                                              'Column width (tablet portrait)',
                                             key: 'columnWidthTabletPortrait',
                                             type: 'CUSTOM',
                                             configuration: {
                                               as: 'DROPDOWN',
                                               dataType: 'string',
                                               allowedInput: [
-                                                { name: 'Fit content', value: 'fitContent' },
-                                                { name: 'Flexible', value: 'flexible' },
-                                                { name: 'Hidden', value: 'hidden' },
+                                                {
+                                                  name: 'Fit content',
+                                                  value: 'fitContent',
+                                                },
+                                                {
+                                                  name: 'Flexible',
+                                                  value: 'flexible',
+                                                },
+                                                {
+                                                  name: 'Hidden',
+                                                  value: 'hidden',
+                                                },
                                                 { name: '1', value: '1' },
                                                 { name: '2', value: '2' },
                                                 { name: '3', value: '3' },
@@ -3793,9 +3919,18 @@
                                               as: 'DROPDOWN',
                                               dataType: 'string',
                                               allowedInput: [
-                                                { name: 'Fit content', value: 'fitContent' },
-                                                { name: 'Flexible', value: 'flexible' },
-                                                { name: 'Hidden', value: 'hidden' },
+                                                {
+                                                  name: 'Fit content',
+                                                  value: 'fitContent',
+                                                },
+                                                {
+                                                  name: 'Flexible',
+                                                  value: 'flexible',
+                                                },
+                                                {
+                                                  name: 'Hidden',
+                                                  value: 'hidden',
+                                                },
                                                 { name: '1', value: '1' },
                                                 { name: '2', value: '2' },
                                                 { name: '3', value: '3' },
@@ -3835,10 +3970,22 @@
                                               as: 'BUTTONGROUP',
                                               dataType: 'string',
                                               allowedInput: [
-                                                { name: 'None', value: 'inherit' },
-                                                { name: 'Left', value: 'flex-start' },
-                                                { name: 'Center', value: 'center' },
-                                                { name: 'Right', value: 'flex-end' },
+                                                {
+                                                  name: 'None',
+                                                  value: 'inherit',
+                                                },
+                                                {
+                                                  name: 'Left',
+                                                  value: 'flex-start',
+                                                },
+                                                {
+                                                  name: 'Center',
+                                                  value: 'center',
+                                                },
+                                                {
+                                                  name: 'Right',
+                                                  value: 'flex-end',
+                                                },
                                               ],
                                             },
                                           },
@@ -3851,15 +3998,32 @@
                                               as: 'BUTTONGROUP',
                                               dataType: 'string',
                                               allowedInput: [
-                                                { name: 'None', value: 'inherit' },
-                                                { name: 'Top', value: 'flex-start' },
-                                                { name: 'Center', value: 'center' },
-                                                { name: 'Bottom', value: 'flex-end' },
+                                                {
+                                                  name: 'None',
+                                                  value: 'inherit',
+                                                },
+                                                {
+                                                  name: 'Top',
+                                                  value: 'flex-start',
+                                                },
+                                                {
+                                                  name: 'Center',
+                                                  value: 'center',
+                                                },
+                                                {
+                                                  name: 'Bottom',
+                                                  value: 'flex-end',
+                                                },
                                               ],
                                             },
                                           },
                                           {
-                                            value: ['0rem', '0rem', '0rem', '0rem'],
+                                            value: [
+                                              '0rem',
+                                              '0rem',
+                                              '0rem',
+                                              '0rem',
+                                            ],
                                             label: 'Outer space',
                                             key: 'outerSpacing',
                                             type: 'SIZES',
@@ -3905,14 +4069,28 @@
                                                   as: 'BUTTONGROUP',
                                                   dataType: 'string',
                                                   allowedInput: [
-                                                    { name: 'Left', value: 'left' },
-                                                    { name: 'Center', value: 'center' },
-                                                    { name: 'Right', value: 'right' },
+                                                    {
+                                                      name: 'Left',
+                                                      value: 'left',
+                                                    },
+                                                    {
+                                                      name: 'Center',
+                                                      value: 'center',
+                                                    },
+                                                    {
+                                                      name: 'Right',
+                                                      value: 'right',
+                                                    },
                                                   ],
                                                 },
                                               },
                                               {
-                                                value: ['0rem', '0rem', '0rem', '0rem'],
+                                                value: [
+                                                  '0rem',
+                                                  '0rem',
+                                                  '0rem',
+                                                  '0rem',
+                                                ],
                                                 label: 'Outer space',
                                                 key: 'outerSpacing',
                                                 type: 'SIZES',
@@ -3926,8 +4104,14 @@
                                                   as: 'BUTTONGROUP',
                                                   dataType: 'string',
                                                   allowedInput: [
-                                                    { name: 'Internal page', value: 'internal' },
-                                                    { name: 'External page', value: 'external' },
+                                                    {
+                                                      name: 'Internal page',
+                                                      value: 'internal',
+                                                    },
+                                                    {
+                                                      name: 'External page',
+                                                      value: 'external',
+                                                    },
                                                   ],
                                                 },
                                               },
@@ -3951,7 +4135,8 @@
                                                 key: 'linkToExternal',
                                                 type: 'VARIABLE',
                                                 configuration: {
-                                                  placeholder: 'Starts with https:// or http://',
+                                                  placeholder:
+                                                    'Starts with https:// or http://',
                                                   condition: {
                                                     type: 'SHOW',
                                                     option: 'linkType',
@@ -3989,15 +4174,42 @@
                                                   as: 'DROPDOWN',
                                                   dataType: 'string',
                                                   allowedInput: [
-                                                    { name: '100', value: '100' },
-                                                    { name: '200', value: '200' },
-                                                    { name: '300', value: '300' },
-                                                    { name: '400', value: '400' },
-                                                    { name: '500', value: '500' },
-                                                    { name: '600', value: '600' },
-                                                    { name: '700', value: '700' },
-                                                    { name: '800', value: '800' },
-                                                    { name: '900', value: '900' },
+                                                    {
+                                                      name: '100',
+                                                      value: '100',
+                                                    },
+                                                    {
+                                                      name: '200',
+                                                      value: '200',
+                                                    },
+                                                    {
+                                                      name: '300',
+                                                      value: '300',
+                                                    },
+                                                    {
+                                                      name: '400',
+                                                      value: '400',
+                                                    },
+                                                    {
+                                                      name: '500',
+                                                      value: '500',
+                                                    },
+                                                    {
+                                                      name: '600',
+                                                      value: '600',
+                                                    },
+                                                    {
+                                                      name: '700',
+                                                      value: '700',
+                                                    },
+                                                    {
+                                                      name: '800',
+                                                      value: '800',
+                                                    },
+                                                    {
+                                                      name: '900',
+                                                      value: '900',
+                                                    },
                                                   ],
                                                   condition: {
                                                     type: 'SHOW',
@@ -4043,14 +4255,28 @@
                                                   as: 'BUTTONGROUP',
                                                   dataType: 'string',
                                                   allowedInput: [
-                                                    { name: 'Left', value: 'left' },
-                                                    { name: 'Center', value: 'center' },
-                                                    { name: 'Right', value: 'right' },
+                                                    {
+                                                      name: 'Left',
+                                                      value: 'left',
+                                                    },
+                                                    {
+                                                      name: 'Center',
+                                                      value: 'center',
+                                                    },
+                                                    {
+                                                      name: 'Right',
+                                                      value: 'right',
+                                                    },
                                                   ],
                                                 },
                                               },
                                               {
-                                                value: ['0rem', '0rem', 'S', '0rem'],
+                                                value: [
+                                                  '0rem',
+                                                  '0rem',
+                                                  'S',
+                                                  '0rem',
+                                                ],
                                                 label: 'Outer space',
                                                 key: 'outerSpacing',
                                                 type: 'SIZES',
@@ -4064,8 +4290,14 @@
                                                   as: 'BUTTONGROUP',
                                                   dataType: 'string',
                                                   allowedInput: [
-                                                    { name: 'Internal page', value: 'internal' },
-                                                    { name: 'External page', value: 'external' },
+                                                    {
+                                                      name: 'Internal page',
+                                                      value: 'internal',
+                                                    },
+                                                    {
+                                                      name: 'External page',
+                                                      value: 'external',
+                                                    },
                                                   ],
                                                 },
                                               },
@@ -4089,7 +4321,8 @@
                                                 key: 'linkToExternal',
                                                 type: 'VARIABLE',
                                                 configuration: {
-                                                  placeholder: 'Starts with https:// or http://',
+                                                  placeholder:
+                                                    'Starts with https:// or http://',
                                                   condition: {
                                                     type: 'SHOW',
                                                     option: 'linkType',
@@ -4127,15 +4360,42 @@
                                                   as: 'DROPDOWN',
                                                   dataType: 'string',
                                                   allowedInput: [
-                                                    { name: '100', value: '100' },
-                                                    { name: '200', value: '200' },
-                                                    { name: '300', value: '300' },
-                                                    { name: '400', value: '400' },
-                                                    { name: '500', value: '500' },
-                                                    { name: '600', value: '600' },
-                                                    { name: '700', value: '700' },
-                                                    { name: '800', value: '800' },
-                                                    { name: '900', value: '900' },
+                                                    {
+                                                      name: '100',
+                                                      value: '100',
+                                                    },
+                                                    {
+                                                      name: '200',
+                                                      value: '200',
+                                                    },
+                                                    {
+                                                      name: '300',
+                                                      value: '300',
+                                                    },
+                                                    {
+                                                      name: '400',
+                                                      value: '400',
+                                                    },
+                                                    {
+                                                      name: '500',
+                                                      value: '500',
+                                                    },
+                                                    {
+                                                      name: '600',
+                                                      value: '600',
+                                                    },
+                                                    {
+                                                      name: '700',
+                                                      value: '700',
+                                                    },
+                                                    {
+                                                      name: '800',
+                                                      value: '800',
+                                                    },
+                                                    {
+                                                      name: '900',
+                                                      value: '900',
+                                                    },
                                                   ],
                                                   condition: {
                                                     type: 'SHOW',
@@ -4181,14 +4441,28 @@
                                                   as: 'BUTTONGROUP',
                                                   dataType: 'string',
                                                   allowedInput: [
-                                                    { name: 'Left', value: 'left' },
-                                                    { name: 'Center', value: 'center' },
-                                                    { name: 'Right', value: 'right' },
+                                                    {
+                                                      name: 'Left',
+                                                      value: 'left',
+                                                    },
+                                                    {
+                                                      name: 'Center',
+                                                      value: 'center',
+                                                    },
+                                                    {
+                                                      name: 'Right',
+                                                      value: 'right',
+                                                    },
                                                   ],
                                                 },
                                               },
                                               {
-                                                value: ['0rem', '0rem', '0rem', '0rem'],
+                                                value: [
+                                                  '0rem',
+                                                  '0rem',
+                                                  '0rem',
+                                                  '0rem',
+                                                ],
                                                 label: 'Outer space',
                                                 key: 'outerSpacing',
                                                 type: 'SIZES',
@@ -4202,8 +4476,14 @@
                                                   as: 'BUTTONGROUP',
                                                   dataType: 'string',
                                                   allowedInput: [
-                                                    { name: 'Internal page', value: 'internal' },
-                                                    { name: 'External page', value: 'external' },
+                                                    {
+                                                      name: 'Internal page',
+                                                      value: 'internal',
+                                                    },
+                                                    {
+                                                      name: 'External page',
+                                                      value: 'external',
+                                                    },
                                                   ],
                                                 },
                                               },
@@ -4227,7 +4507,8 @@
                                                 key: 'linkToExternal',
                                                 type: 'VARIABLE',
                                                 configuration: {
-                                                  placeholder: 'Starts with https:// or http://',
+                                                  placeholder:
+                                                    'Starts with https:// or http://',
                                                   condition: {
                                                     type: 'SHOW',
                                                     option: 'linkType',
@@ -4265,15 +4546,42 @@
                                                   as: 'DROPDOWN',
                                                   dataType: 'string',
                                                   allowedInput: [
-                                                    { name: '100', value: '100' },
-                                                    { name: '200', value: '200' },
-                                                    { name: '300', value: '300' },
-                                                    { name: '400', value: '400' },
-                                                    { name: '500', value: '500' },
-                                                    { name: '600', value: '600' },
-                                                    { name: '700', value: '700' },
-                                                    { name: '800', value: '800' },
-                                                    { name: '900', value: '900' },
+                                                    {
+                                                      name: '100',
+                                                      value: '100',
+                                                    },
+                                                    {
+                                                      name: '200',
+                                                      value: '200',
+                                                    },
+                                                    {
+                                                      name: '300',
+                                                      value: '300',
+                                                    },
+                                                    {
+                                                      name: '400',
+                                                      value: '400',
+                                                    },
+                                                    {
+                                                      name: '500',
+                                                      value: '500',
+                                                    },
+                                                    {
+                                                      name: '600',
+                                                      value: '600',
+                                                    },
+                                                    {
+                                                      name: '700',
+                                                      value: '700',
+                                                    },
+                                                    {
+                                                      name: '800',
+                                                      value: '800',
+                                                    },
+                                                    {
+                                                      name: '900',
+                                                      value: '900',
+                                                    },
                                                   ],
                                                   condition: {
                                                     type: 'SHOW',
@@ -4309,9 +4617,18 @@
                                               as: 'DROPDOWN',
                                               dataType: 'string',
                                               allowedInput: [
-                                                { name: 'Fit content', value: 'fitContent' },
-                                                { name: 'Flexible', value: 'flexible' },
-                                                { name: 'Hidden', value: 'hidden' },
+                                                {
+                                                  name: 'Fit content',
+                                                  value: 'fitContent',
+                                                },
+                                                {
+                                                  name: 'Flexible',
+                                                  value: 'flexible',
+                                                },
+                                                {
+                                                  name: 'Hidden',
+                                                  value: 'hidden',
+                                                },
                                                 { name: '1', value: '1' },
                                                 { name: '2', value: '2' },
                                                 { name: '3', value: '3' },
@@ -4329,16 +4646,26 @@
                                           },
                                           {
                                             value: '1',
-                                            label: 'Column width (tablet landscape)',
+                                            label:
+                                              'Column width (tablet landscape)',
                                             key: 'columnWidthTabletLandscape',
                                             type: 'CUSTOM',
                                             configuration: {
                                               as: 'DROPDOWN',
                                               dataType: 'string',
                                               allowedInput: [
-                                                { name: 'Fit content', value: 'fitContent' },
-                                                { name: 'Flexible', value: 'flexible' },
-                                                { name: 'Hidden', value: 'hidden' },
+                                                {
+                                                  name: 'Fit content',
+                                                  value: 'fitContent',
+                                                },
+                                                {
+                                                  name: 'Flexible',
+                                                  value: 'flexible',
+                                                },
+                                                {
+                                                  name: 'Hidden',
+                                                  value: 'hidden',
+                                                },
                                                 { name: '1', value: '1' },
                                                 { name: '2', value: '2' },
                                                 { name: '3', value: '3' },
@@ -4356,16 +4683,26 @@
                                           },
                                           {
                                             value: '1',
-                                            label: 'Column width (tablet portrait)',
+                                            label:
+                                              'Column width (tablet portrait)',
                                             key: 'columnWidthTabletPortrait',
                                             type: 'CUSTOM',
                                             configuration: {
                                               as: 'DROPDOWN',
                                               dataType: 'string',
                                               allowedInput: [
-                                                { name: 'Fit content', value: 'fitContent' },
-                                                { name: 'Flexible', value: 'flexible' },
-                                                { name: 'Hidden', value: 'hidden' },
+                                                {
+                                                  name: 'Fit content',
+                                                  value: 'fitContent',
+                                                },
+                                                {
+                                                  name: 'Flexible',
+                                                  value: 'flexible',
+                                                },
+                                                {
+                                                  name: 'Hidden',
+                                                  value: 'hidden',
+                                                },
                                                 { name: '1', value: '1' },
                                                 { name: '2', value: '2' },
                                                 { name: '3', value: '3' },
@@ -4390,9 +4727,18 @@
                                               as: 'DROPDOWN',
                                               dataType: 'string',
                                               allowedInput: [
-                                                { name: 'Fit content', value: 'fitContent' },
-                                                { name: 'Flexible', value: 'flexible' },
-                                                { name: 'Hidden', value: 'hidden' },
+                                                {
+                                                  name: 'Fit content',
+                                                  value: 'fitContent',
+                                                },
+                                                {
+                                                  name: 'Flexible',
+                                                  value: 'flexible',
+                                                },
+                                                {
+                                                  name: 'Hidden',
+                                                  value: 'hidden',
+                                                },
                                                 { name: '1', value: '1' },
                                                 { name: '2', value: '2' },
                                                 { name: '3', value: '3' },
@@ -4432,10 +4778,22 @@
                                               as: 'BUTTONGROUP',
                                               dataType: 'string',
                                               allowedInput: [
-                                                { name: 'None', value: 'inherit' },
-                                                { name: 'Left', value: 'flex-start' },
-                                                { name: 'Center', value: 'center' },
-                                                { name: 'Right', value: 'flex-end' },
+                                                {
+                                                  name: 'None',
+                                                  value: 'inherit',
+                                                },
+                                                {
+                                                  name: 'Left',
+                                                  value: 'flex-start',
+                                                },
+                                                {
+                                                  name: 'Center',
+                                                  value: 'center',
+                                                },
+                                                {
+                                                  name: 'Right',
+                                                  value: 'flex-end',
+                                                },
                                               ],
                                             },
                                           },
@@ -4448,15 +4806,32 @@
                                               as: 'BUTTONGROUP',
                                               dataType: 'string',
                                               allowedInput: [
-                                                { name: 'None', value: 'inherit' },
-                                                { name: 'Top', value: 'flex-start' },
-                                                { name: 'Center', value: 'center' },
-                                                { name: 'Bottom', value: 'flex-end' },
+                                                {
+                                                  name: 'None',
+                                                  value: 'inherit',
+                                                },
+                                                {
+                                                  name: 'Top',
+                                                  value: 'flex-start',
+                                                },
+                                                {
+                                                  name: 'Center',
+                                                  value: 'center',
+                                                },
+                                                {
+                                                  name: 'Bottom',
+                                                  value: 'flex-end',
+                                                },
                                               ],
                                             },
                                           },
                                           {
-                                            value: ['0rem', '0rem', '0rem', '0rem'],
+                                            value: [
+                                              '0rem',
+                                              '0rem',
+                                              '0rem',
+                                              '0rem',
+                                            ],
                                             label: 'Outer space',
                                             key: 'outerSpacing',
                                             type: 'SIZES',
@@ -4490,10 +4865,22 @@
                                                   as: 'BUTTONGROUP',
                                                   dataType: 'string',
                                                   allowedInput: [
-                                                    { name: 'Text', value: 'text' },
-                                                    { name: 'Outlined', value: 'outlined' },
-                                                    { name: 'Contain', value: 'contained' },
-                                                    { name: 'Icon', value: 'icon' },
+                                                    {
+                                                      name: 'Text',
+                                                      value: 'text',
+                                                    },
+                                                    {
+                                                      name: 'Outlined',
+                                                      value: 'outlined',
+                                                    },
+                                                    {
+                                                      name: 'Contain',
+                                                      value: 'contained',
+                                                    },
+                                                    {
+                                                      name: 'Icon',
+                                                      value: 'icon',
+                                                    },
                                                   ],
                                                 },
                                               },
@@ -4520,9 +4907,18 @@
                                                   as: 'BUTTONGROUP',
                                                   dataType: 'string',
                                                   allowedInput: [
-                                                    { name: 'Internal page', value: 'internal' },
-                                                    { name: 'External page', value: 'external' },
-                                                    { name: 'Action', value: 'action' },
+                                                    {
+                                                      name: 'Internal page',
+                                                      value: 'internal',
+                                                    },
+                                                    {
+                                                      name: 'External page',
+                                                      value: 'external',
+                                                    },
+                                                    {
+                                                      name: 'Action',
+                                                      value: 'action',
+                                                    },
                                                   ],
                                                 },
                                               },
@@ -4546,7 +4942,8 @@
                                                 key: 'linkToExternal',
                                                 type: 'VARIABLE',
                                                 configuration: {
-                                                  placeholder: 'Starts with https:// or http://',
+                                                  placeholder:
+                                                    'Starts with https:// or http://',
                                                   condition: {
                                                     type: 'SHOW',
                                                     option: 'linkType',
@@ -4570,8 +4967,14 @@
                                                   as: 'BUTTONGROUP',
                                                   dataType: 'string',
                                                   allowedInput: [
-                                                    { name: 'Current Tab', value: '_self' },
-                                                    { name: 'New Tab', value: '_blank' },
+                                                    {
+                                                      name: 'Current Tab',
+                                                      value: '_self',
+                                                    },
+                                                    {
+                                                      name: 'New Tab',
+                                                      value: '_blank',
+                                                    },
                                                   ],
                                                 },
                                               },
@@ -4592,7 +4995,8 @@
                                               },
                                               {
                                                 value: [],
-                                                label: 'Objects to pass to action',
+                                                label:
+                                                  'Objects to pass to action',
                                                 key: 'actionModels',
                                                 type: 'ACTION_INPUT_OBJECTS',
                                                 configuration: {
@@ -4628,9 +5032,18 @@
                                                   as: 'BUTTONGROUP',
                                                   dataType: 'string',
                                                   allowedInput: [
-                                                    { name: 'Large', value: 'large' },
-                                                    { name: 'Medium', value: 'medium' },
-                                                    { name: 'Small', value: 'small' },
+                                                    {
+                                                      name: 'Large',
+                                                      value: 'large',
+                                                    },
+                                                    {
+                                                      name: 'Medium',
+                                                      value: 'medium',
+                                                    },
+                                                    {
+                                                      name: 'Small',
+                                                      value: 'small',
+                                                    },
                                                   ],
                                                 },
                                               },
@@ -4656,8 +5069,14 @@
                                                     value: 'icon',
                                                   },
                                                   allowedInput: [
-                                                    { name: 'Start', value: 'start' },
-                                                    { name: 'End', value: 'end' },
+                                                    {
+                                                      name: 'Start',
+                                                      value: 'start',
+                                                    },
+                                                    {
+                                                      name: 'End',
+                                                      value: 'end',
+                                                    },
                                                   ],
                                                 },
                                               },
@@ -4682,7 +5101,12 @@
                                                 value: 'Primary',
                                               },
                                               {
-                                                value: ['0rem', '0rem', '0rem', '0rem'],
+                                                value: [
+                                                  '0rem',
+                                                  '0rem',
+                                                  '0rem',
+                                                  '0rem',
+                                                ],
                                                 label: 'Outer space',
                                                 key: 'outerSpacing',
                                                 type: 'SIZES',
@@ -4700,7 +5124,8 @@
                                                 type: 'TOGGLE',
                                               },
                                               {
-                                                label: 'Toggle tooltip visibility',
+                                                label:
+                                                  'Toggle tooltip visibility',
                                                 key: 'hasVisibleTooltip',
                                                 value: true,
                                                 type: 'TOGGLE',
@@ -4833,13 +5258,8 @@
       <>
         <Header onClose={close} title="Configure data list" />
         <Content>
-          <Box
-            direction="row"
-          >
-            <Box
-              direction="column"
-              basis="1/3"
-            >
+          <Box direction="row">
+            <Box direction="column" basis="1/3">
               <Field
                 label="Select model"
                 error={
@@ -4860,61 +5280,48 @@
                   value={modelId}
                 />
               </Field>
-              <Field
-                label="Image property"
-              >
+              <Field label="Image property">
                 <PropertySelector
                   modelId={modelId}
                   onChange={value => {
-                    console.log(value);
                     setImageProperty(value);
                   }}
                   value={imageProperty}
-                  disabled={modelId ? false : true}
+                  disabled={!modelId}
                 />
               </Field>
-              <Field
-                label="Title property"
-              >
+              <Field label="Title property">
                 <PropertySelector
                   modelId={modelId}
                   onChange={value => {
                     setTitleProperty(value);
                   }}
                   value={titleProperty}
-                  disabled={modelId ? false : true}
+                  disabled={!modelId}
                 />
               </Field>
-              <Field
-                label="Subheader property"
-              >
+              <Field label="Subheader property">
                 <PropertySelector
                   modelId={modelId}
                   onChange={value => {
                     setSubheaderProperty(value);
                   }}
                   value={subheaderProperty}
-                  disabled={modelId ? false : true}
+                  disabled={!modelId}
                 />
               </Field>
-              <Field
-                label="Description property"
-              >
+              <Field label="Description property">
                 <PropertySelector
                   modelId={modelId}
                   onChange={value => {
                     setDescriptionProperty(value);
                   }}
                   value={descriptionProperty}
-                  disabled={modelId ? false : true}
+                  disabled={!modelId}
                 />
               </Field>
             </Box>
-            <Box
-              direction="column"
-              basis="2/3"
-              pad={{ "left": "large" }}
-            >
+            <Box direction="column" basis="2/3" pad={{ left: 'large' }}>
               <Field
                 info={
                   <Text size="small" color="grey700">
@@ -4931,47 +5338,65 @@
                 pad="small"
                 overflow="hidden"
                 border={{
-                  "color": "#E0E0E0",
-                  "size": "xsmall",
-                  "style": "solid",
-                  "side": "all",
+                  color: '#E0E0E0',
+                  size: 'xsmall',
+                  style: 'solid',
+                  side: 'all',
                 }}
               >
                 <Box
-                  pad={imageProperty.id ? "none" : "medium"}
-                  border={imageProperty.id
-                    ? {
-                      "color": "#AFB5C8",
-                      "size": "xsmall",
-                      "style": "dashed",
-                      "side": "all",
-                    }
-                    : ""
+                  pad={imageProperty.id ? 'none' : 'medium'}
+                  border={
+                    imageProperty.id
+                      ? {
+                          color: '#AFB5C8',
+                          size: 'xsmall',
+                          style: 'dashed',
+                          side: 'all',
+                        }
+                      : ''
                   }
-                  background={imageProperty.id
-                    ? "#F0F1F5"
-                    : "url(https://material-ui.com/static/images/cards/contemplative-reptile.jpg)"
+                  background={
+                    imageProperty.id
+                      ? '#F0F1F5'
+                      : 'url(https://material-ui.com/static/images/cards/contemplative-reptile.jpg)'
                   }
                   width="110px"
                   justify="center"
                   align="center"
                 >
-                  <Text size="xsmall" textAlign="center" style={{ "width": "100%" }} truncate="true">
+                  <Text
+                    size="xsmall"
+                    textAlign="center"
+                    style={{ width: '100%' }}
+                    truncate="true"
+                  >
                     {imageProperty.id ? enrichVarObj(imageProperty).name : ''}
                   </Text>
                 </Box>
-                <Box flex={{ "grow": "62" }} pad={{ "left": "medium" }}>
+                <Box flex={{ grow: '62' }} pad={{ left: 'medium' }}>
                   <Text color="#000000DE" truncate="true">
-                    {titleProperty.id ? enrichVarObj(titleProperty).name : 'Title'}
+                    {titleProperty.id
+                      ? enrichVarObj(titleProperty).name
+                      : 'Title'}
                   </Text>
-                  <Text size="small" color="#0000008A" truncate="true" margin={{ "bottom": "0.5rem" }}>
-                    {subheaderProperty.id ? enrichVarObj(subheaderProperty).name : 'Subheader'}
+                  <Text
+                    size="small"
+                    color="#0000008A"
+                    truncate="true"
+                    margin={{ bottom: '0.5rem' }}
+                  >
+                    {subheaderProperty.id
+                      ? enrichVarObj(subheaderProperty).name
+                      : 'Subheader'}
                   </Text>
                   <Text size="small" truncate="true">
-                    {descriptionProperty.id ? enrichVarObj(descriptionProperty).name : 'Description'}
+                    {descriptionProperty.id
+                      ? enrichVarObj(descriptionProperty).name
+                      : 'Description'}
                   </Text>
                 </Box>
-                <Box flex={{ "grow": "8" }} justify="center" align="center">
+                <Box flex={{ grow: '8' }} justify="center" align="center">
                   <Text size="large">›</Text>
                 </Box>
               </Box>
@@ -4992,19 +5417,30 @@
             }
             const newPrefab = { ...prefab };
             if (modelId) {
-              const dataList = prefabStructure[1].descendants[0].descendants[0].descendants[2];
+              const dataList =
+                prefabStructure[1].descendants[0].descendants[0].descendants[2];
               dataList.options[0].value = modelId;
-              imageProperty.id && (dataList.descendants[0].descendants[0].descendants[0].descendants[0]
-                .descendants[0].descendants[0].options[1].value = [enrichVarObj(imageProperty)]);
+              if (imageProperty.id) {
+                dataList.descendants[0].descendants[0].descendants[0].descendants[0].descendants[0].descendants[0].options[1].value = [
+                  enrichVarObj(imageProperty),
+                ];
+              }
               if (titleProperty.id) {
-                dataList.descendants[0].descendants[0].descendants[0].descendants[0]
-                  .descendants[1].descendants[0].options[0].value = [enrichVarObj(titleProperty)];
+                dataList.descendants[0].descendants[0].descendants[0].descendants[0].descendants[1].descendants[0].options[0].value = [
+                  enrichVarObj(titleProperty),
+                ];
                 dataList.options[4].value = titleProperty.id;
               }
-              subheaderProperty.id && (dataList.descendants[0].descendants[0].descendants[0].descendants[0]
-                .descendants[1].descendants[1].options[0].value = [enrichVarObj(subheaderProperty)]);
-              descriptionProperty.id && (dataList.descendants[0].descendants[0].descendants[0].descendants[0]
-                .descendants[1].descendants[2].options[0].value = [enrichVarObj(descriptionProperty)]);
+              if (subheaderProperty.id) {
+                dataList.descendants[0].descendants[0].descendants[0].descendants[0].descendants[1].descendants[1].options[0].value = [
+                  enrichVarObj(subheaderProperty),
+                ];
+              }
+              if (descriptionProperty.id) {
+                dataList.descendants[0].descendants[0].descendants[0].descendants[0].descendants[1].descendants[2].options[0].value = [
+                  enrichVarObj(descriptionProperty),
+                ];
+              }
 
               newPrefab.structure[0].descendants = prefabStructure;
               save(newPrefab);
@@ -5061,6 +5497,6 @@
         },
       ],
       descendants: [],
-    }
+    },
   ],
 }))();
