@@ -11746,45 +11746,26 @@
               return descendants;
             }
 
-            if (!editFormUseDataProperties) {
-              const descendantsArray = makeDescendantsArray(
-                editFormProperties,
-              ).filter(item => item !== undefined);
-              newPrefab.structure[0].descendants[0].descendants[1].descendants[0].descendants[0].descendants[0].descendants[1].descendants[0].descendants[0].descendants = [
-                ...descendantsArray,
-              ];
+            const descendantsArray = makeDescendantsArray(
+              editFormUseDataProperties ? properties : editFormProperties,
+            ).filter(item => item !== undefined);
+            newPrefab.structure[0].descendants[0].descendants[1].descendants[0].descendants[0].descendants[0].descendants[1].descendants[0].descendants[0].descendants = [
+              ...descendantsArray,
+            ];
 
-              newPrefab.actions[0].events[0].options.assign = editFormProperties.map(
-                property => ({
-                  leftHandSide: property.id[0],
-                  ref: {
-                    path: [
-                      '#customModelVariableId',
-                      `#attribute_${property.id[0]}`,
-                    ],
-                  },
-                }),
-              );
-            } else {
-              const descendantsArray = makeDescendantsArray(properties).filter(
-                item => item !== undefined,
-              );
-              newPrefab.structure[0].descendants[0].descendants[1].descendants[0].descendants[0].descendants[0].descendants[1].descendants[0].descendants[0].descendants = [
-                ...descendantsArray,
-              ];
+            newPrefab.actions[0].events[0].options.assign = (editFormUseDataProperties
+              ? properties
+              : editFormProperties
+            ).map(property => ({
+              leftHandSide: property.id[0],
+              ref: {
+                path: [
+                  '#customModelVariableId',
+                  `#attribute_${property.id[0]}`,
+                ],
+              },
+            }));
 
-              newPrefab.actions[0].events[0].options.assign = properties.map(
-                property => ({
-                  leftHandSide: property.id[0],
-                  ref: {
-                    path: [
-                      '#customModelVariableId',
-                      `#attribute_${property.id[0]}`,
-                    ],
-                  },
-                }),
-              );
-            }
             newPrefab.structure[0].descendants[0].descendants[0].descendants.push(
               editDataTableColumn,
             );
