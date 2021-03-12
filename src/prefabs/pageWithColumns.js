@@ -82,15 +82,46 @@
                     <ButtonGroupButton
                       label="5"
                       value="5"
-                      name={'options-' + row.row}
+                      name={`options-${row.row}`}
                     />
                     <ButtonGroupButton
                       label="6"
                       value="6"
-                      name={'options-' + row.row}
+                      name={`options-${row.row}`}
+                    />
+                    <ButtonGroupButton
+                      label="7"
+                      value="7"
+                      name={`options-${row.row}`}
+                    />
+                    <ButtonGroupButton
+                      label="8"
+                      value="8"
+                      name={`options-${row.row}`}
+                    />
+                    <ButtonGroupButton
+                      label="9"
+                      value="9"
+                      name={`options-${row.row}`}
+                    />
+                    <ButtonGroupButton
+                      label="10"
+                      value="10"
+                      name={`options-${row.row}`}
+                    />
+                    <ButtonGroupButton
+                      label="11"
+                      value="11"
+                      name={`options-${row.row}`}
+                    />
+                    <ButtonGroupButton
+                      label="12"
+                      value="12"
+                      name={`options-${row.row}`}
                     />
                   </ButtonGroup>
                 </Box>
+                []
                 <Box direction="column" basis="auto" pad={{ left: '5px' }}>
                   <DeleteButton
                     label="X"
@@ -99,14 +130,16 @@
                     onClick={event => {
                       const newRows = [...rows];
                       const index = newRows.findIndex(
-                        row => row.row === parseInt(event.target.value),
+                        currentRow =>
+                          currentRow.row === parseInt(event.target.value, 10),
                       );
                       if (index !== -1) {
                         newRows.splice(index, 1);
 
                         newRows.map((correctRow, rowIndex) => {
-                          correctRow.row = rowIndex + 1;
-                          return { ...correctRow };
+                          const newRow = correctRow;
+                          newRow.row = rowIndex + 1;
+                          return { ...newRow };
                         });
                         setRows([...newRows]);
                       }
@@ -119,10 +152,6 @@
         </Content>
         <Footer
           onClose={close}
-          onSkip={() => {
-            const newPrefab = { ...prefab };
-            save(newPrefab);
-          }}
           onSave={() => {
             const newPrefab = { ...prefab };
             rows.map(row => {
