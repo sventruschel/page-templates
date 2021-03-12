@@ -1,7 +1,7 @@
 (() => ({
   name: 'Page with grid view',
   icon: 'GridIcon',
-  type: 'page',
+  // type: 'page',
   description: 'Page with grid view',
   category: 'LAYOUT',
   beforeCreate: ({
