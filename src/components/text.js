@@ -40,7 +40,7 @@
           component={hasLink ? BLink : undefined}
           endpoint={hasLink ? linkTo : undefined}
         >
-          {parsedContent}
+          {content}aaa
         </Link>
       );
     }
