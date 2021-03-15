@@ -1,6 +1,9 @@
 (() => ({
   name: 'Page with Layout',
   icon: 'RowColumnIcon',
+  type: 'page',
+  description:
+    'With this page you can select the amount of rows and the number of columns for each row',
   category: 'LAYOUT',
   beforeCreate: ({
     close,
@@ -25,7 +28,14 @@
       <>
         <Header onClose={close} title="Configure Grid" />
         <Content>
-          <Field>
+          <Field
+            info={
+              <Text size="small" color="grey700">
+                Click the 'add rows' button to add a new row to the page. You
+                can specify the amount of columns per row
+              </Text>
+            }
+          >
             <Button
               label="+ Add Row"
               disabled={!(rows.length < 9)}
@@ -89,39 +99,8 @@
                       value="6"
                       name={`options-${row.row}`}
                     />
-                    <ButtonGroupButton
-                      label="7"
-                      value="7"
-                      name={`options-${row.row}`}
-                    />
-                    <ButtonGroupButton
-                      label="8"
-                      value="8"
-                      name={`options-${row.row}`}
-                    />
-                    <ButtonGroupButton
-                      label="9"
-                      value="9"
-                      name={`options-${row.row}`}
-                    />
-                    <ButtonGroupButton
-                      label="10"
-                      value="10"
-                      name={`options-${row.row}`}
-                    />
-                    <ButtonGroupButton
-                      label="11"
-                      value="11"
-                      name={`options-${row.row}`}
-                    />
-                    <ButtonGroupButton
-                      label="12"
-                      value="12"
-                      name={`options-${row.row}`}
-                    />
                   </ButtonGroup>
                 </Box>
-                []
                 <Box direction="column" basis="auto" pad={{ left: '5px' }}>
                   <DeleteButton
                     label="X"
