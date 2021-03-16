@@ -1,6 +1,7 @@
 (() => ({
   name: 'Login Form - Sidebar',
   icon: 'LoginFormIcon',
+  type: 'page',
   description: 'Page with login form and side image',
   category: 'FORM',
   beforeCreate: ({
