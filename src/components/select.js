@@ -117,7 +117,6 @@
     B.defineFunction('Refetch', () => refetch());
 
     const handleValidation = () => {
-      debugger;
       const hasError = required && !value;
       setErrorState(hasError);
       const message = useText(hasError ? validationValueMissing : helperText);
@@ -125,7 +124,6 @@
     };
 
     const handleChange = event => {
-      debugger;
       const {
         target: { value: eventValue },
       } = event;
@@ -138,14 +136,12 @@
     };
 
     const validationHandler = () => {
-      debugger;
       const hasError = required && !value;
       setAfterFirstInvalidation(hasError);
       handleValidation();
     };
 
     useEffect(() => {
-      debugger;
       if (isDev) {
         setCurrentValue(useText(defaultValue));
       }
