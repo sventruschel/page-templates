@@ -7,13 +7,7 @@
       name: 'Rating',
       options: [
         {
-          value: false,
-          label: 'Is read only',
-          key: 'readonly',
-          type: 'TOGGLE',
-        },
-        {
-          value: { label: ['rating'], value: [''] },
+          value: { label: ['Rating'], value: [''] },
           label: 'Label',
           key: 'customModelAttribute',
           type: 'CUSTOM_MODEL_ATTRIBUTE',
@@ -22,28 +16,60 @@
           },
         },
         {
+          value: false,
+          label: 'Validation options',
+          key: 'validationOptions',
+          type: 'TOGGLE',
+        },
+        {
+          value: ['This field is required'],
+          label: 'Value required message',
+          key: 'validationValueMissing',
+          type: 'VARIABLE',
+          configuration: {
+            condition: {
+              type: 'SHOW',
+              option: 'validationOptions',
+              comparator: 'EQ',
+              value: true,
+            },
+          },
+        },
+        {
+          value: false,
+          label: 'Is read only',
+          key: 'readonly',
+          type: 'TOGGLE',
+        },
+        {
           type: 'CUSTOM',
           label: 'Size',
           key: 'size',
-          value: 'medium',
+          value: '25px',
           configuration: {
             as: 'BUTTONGROUP',
             dataType: 'string',
             allowedInput: [
               {
                 name: 'Small',
-                value: 'small',
+                value: '20px',
               },
               {
                 name: 'Medium',
-                value: 'medium',
+                value: '25px',
               },
               {
                 name: 'Large',
-                value: 'large',
+                value: '30px',
               },
             ],
           },
+        },
+        {
+          value: [],
+          label: 'Helper text',
+          key: 'helperText',
+          type: 'VARIABLE',
         },
         {
           label: 'Empty Icon',
@@ -2602,6 +2628,26 @@
             condition: {
               type: 'SHOW',
               option: 'styles',
+              comparator: 'EQ',
+              value: true,
+            },
+          },
+        },
+        {
+          value: false,
+          label: 'Advanced settings',
+          key: 'advancedSettings',
+          type: 'TOGGLE',
+        },
+        {
+          type: 'VARIABLE',
+          label: 'name attribute',
+          key: 'nameAttribute',
+          value: [],
+          configuration: {
+            condition: {
+              type: 'SHOW',
+              option: 'advancedSettings',
               comparator: 'EQ',
               value: true,
             },

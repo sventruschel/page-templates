@@ -5,7 +5,7 @@
   orientation: 'VERTICAL',
   jsx: (() => {
     const { Icons } = window.MaterialUI;
-    const { Box } = window.MaterialUI.Core;
+    const { Box, FormControl, FormHelperText } = window.MaterialUI.Core;
     const { Rating } = window.MaterialUI.Lab;
     const { env, getCustomModelAttribute, useText } = B;
     const isDev = env === 'dev';
@@ -16,6 +16,10 @@
       readonly,
       icon,
       iconSelected,
+      nameAttribute,
+      validationValueMissing,
+      error,
+      helperText,
     } = options;
 
     const {
@@ -28,7 +32,11 @@
       customModelAttributeId,
     );
 
-    const [value, setValue] = useState(useText(defaultValue));
+    const [errorState, setErrorState] = useState(error);
+    const [helper, setHelper] = useState(useText(helperText));
+    const [afterFirstInvalidation, setAfterFirstInvalidation] = useState(false);
+    const [currentValue, setCurrentValue] = useState(useText(defaultValue));
+    const value = currentValue;
 
     const IconEmptyComponent = React.createElement(Icons[icon], {
       className: classes.root,
@@ -38,22 +46,66 @@
       className: classes.root,
     });
 
+    const { name: customModelAttributeName, validations: { required } = {} } =
+      customModelAttribute || {};
+    const nameAttributeValue = useText(nameAttribute);
+
+    const handleValidation = () => {
+      const hasError = required && !value;
+      setErrorState(hasError);
+      const message = useText(hasError ? validationValueMissing : helperText);
+      setHelper(message);
+    };
+
+    const validationHandler = () => {
+      const hasError = required && !value;
+      setAfterFirstInvalidation(hasError);
+      handleValidation();
+    };
+
+    const handleChange = (event, newValue) => {
+      setCurrentValue(newValue);
+      if (afterFirstInvalidation) {
+        handleValidation();
+      }
+    };
+
+    useEffect(() => {
+      if (isDev) {
+        setCurrentValue(useText(defaultValue));
+      }
+    }, [isDev, defaultValue]);
+
     const ratingBox = (
       <div>
         <Box component="fieldset" mb={3} borderColor="transparent">
-          <Rating
-            className={classes.root}
-            name="rating"
+          <FormControl required={required} error={errorState}>
+            <Rating
+              className={classes.root}
+              name={nameAttributeValue || customModelAttributeName}
+              value={value}
+              defaultValue={customModelAttributeObj.value}
+              precision={0.5}
+              size={size}
+              onChange={handleChange}
+              readOnly={readonly}
+              emptyIcon={IconEmptyComponent}
+              icon={IconSelectedComponent}
+              onBlur={validationHandler}
+            />
+          </FormControl>
+          {helper && (
+            <FormHelperText classes={{ root: classes.helper }}>
+              {helper}
+            </FormHelperText>
+          )}
+          <input
+            className={classes.validationInput}
+            onInvalid={validationHandler}
+            type="text"
+            tabIndex="-1"
+            required={required}
             value={value}
-            defaultValue={customModelAttributeObj.value}
-            precision={1}
-            size={size}
-            onChange={(event, newValue) => {
-              setValue(newValue);
-            }}
-            readOnly={readonly}
-            emptyIcon={IconEmptyComponent}
-            icon={IconSelectedComponent}
           />
         </Box>
       </div>
@@ -76,6 +128,18 @@
         '& .MuiRating-iconHover': {
           color: ({ options: { hoverColor } }) => style.getColor(hoverColor),
         },
+        '&.MuiSvgIcon-root': {
+          fontSize: ({ options: { size } }) => style.getIconSize(size),
+        },
+      },
+      helper: {},
+      validationInput: {
+        height: 0,
+        width: 0,
+        fontSize: 0,
+        padding: 0,
+        border: 'none',
+        pointerEvents: 'none',
       },
     };
   },
