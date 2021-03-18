@@ -4,25 +4,17 @@
   allowedTypes: ['STEP_COMPONENT'],
   orientation: 'HORIZONTAL',
   jsx: (() => {
-    const {
-      Stepper,
-      Step,
-      StepLabel,
-      StepButton,
-      StepContent,
-      MobileStepper,
-      Button,
-    } = window.MaterialUI.Core;
+    const { MobileStepper, Button } = window.MaterialUI.Core;
     const { Icons } = window.MaterialUI;
     const { env, useText, Children } = B;
     const {
       activeStep: stepIndex,
-      variant,
-      type,
-      alternativeLabel,
-      allSteps,
+      allImages,
       buttonNext,
       buttonPrev,
+      variant,
+      autoplay,
+      duration,
     } = options;
 
     const isDev = env === 'dev';
@@ -31,9 +23,23 @@
     const [activeStep, setActiveStep] = useState(activeStepIndex);
     const buttonNextText = useText(buttonNext);
     const buttonPrevText = useText(buttonPrev);
-    const isLinear = variant === 'linear';
     const numRendersRef = useRef(1);
     const [stepLabelData, setStepLabelData] = useState({});
+
+    if (autoplay && !isDev) {
+      useEffect(() => {
+        const interval = setInterval(() => {
+          setActiveStep(prevActiveStep => {
+            const nextStep = prevActiveStep + 1;
+            if (nextStep > children.length - 1) {
+              return 0;
+            }
+            return nextStep;
+          });
+        }, duration);
+        return () => clearInterval(interval);
+      }, [activeStep]);
+    }
 
     const handleNext = () => {
       setActiveStep(prevActiveStep => {
@@ -55,173 +61,97 @@
       });
     };
 
-    const handleStep = step => () => {
-      if (step < children.length && step > -1) {
-        setActiveStep(step);
-      }
-    };
-
     useEffect(() => {
       if (isDev) {
         setActiveStep(parseInt(stepIndex - 1, 10));
       }
     }, [isDev, stepIndex]);
 
-    const StepperCmp = (
-      <>
-        <Stepper
-          nonLinear={!isLinear}
-          alternativeLabel={alternativeLabel}
-          activeStep={activeStep}
-          orientation={type}
-          classes={{ root: classes.root }}
-        >
-          {React.Children.map(children, (child, index) => {
-            const { options: childOptions = {} } = child.props || {};
-
-            const {
-              label = stepLabelData[`label${index}`] || [`Step ${index + 1}`],
-              icon = stepLabelData[`icon${index}`] || 'None',
-            } = childOptions;
-            const isActive = index === activeStep || allSteps;
-            const labelText = useText(label);
-            const hasIcon = icon !== 'None';
-            let stepProps = {};
-            let labelProps = {};
-            if (allSteps) {
-              stepProps = {
-                ...stepProps,
-                active: true,
-              };
-            }
-
-            const IconCmp = () =>
-              hasIcon &&
-              React.createElement(Icons[icon], {
-                className: [
-                  classes.stepIcon,
-                  isActive ? classes.stepIconActive : '',
-                ].join(' '),
-              });
-
-            if (hasIcon) {
-              labelProps = {
-                ...labelProps,
-                StepIconComponent: IconCmp,
-              };
-            }
-
-            const StepComponent = (
-              <Step key={labelText} {...stepProps}>
-                {type === 'vertical' && (
-                  <StepContent>
-                    <Children
-                      stepLabelData={stepLabelData}
-                      setStepLabelData={setStepLabelData}
-                      active={isActive}
-                      isFirstRender={numRendersRef.current === 1}
-                    >
-                      {React.cloneElement(child, { ...childOptions })}
-                    </Children>
-                  </StepContent>
-                )}
-                {isLinear ? (
-                  <StepLabel
-                    classes={{ root: classes.stepLabel }}
-                    {...labelProps}
-                  >
-                    {labelText}
-                  </StepLabel>
-                ) : (
-                  <StepButton
-                    classes={{ root: classes.stepButton }}
-                    onClick={handleStep(index)}
-                  >
-                    <StepLabel
-                      classes={{ root: classes.stepLabel }}
-                      {...labelProps}
-                    >
-                      {labelText}
-                    </StepLabel>
-                  </StepButton>
-                )}
-              </Step>
-            );
-
-            return StepComponent;
-          })}
-        </Stepper>
-        {type === 'horizontal' && (
-          <>
-            {React.Children.map(children, (child, index) => {
-              const { options: childOptions = {} } = child.props || {};
-              const isActive = index === activeStep || allSteps;
-
-              return (
-                <Children
-                  stepLabelData={stepLabelData}
-                  setStepLabelData={setStepLabelData}
-                  active={isActive}
-                  isFirstRender={numRendersRef.current === 1}
-                >
-                  {React.cloneElement(child, { ...childOptions })}
-                </Children>
-              );
-            })}
-          </>
-        )}
-      </>
-    );
-
     const { KeyboardArrowLeft, KeyboardArrowRight } = Icons;
 
     const maxSteps = children.length;
 
+    const overlay = (
+      <MobileStepper
+        steps={maxSteps}
+        position="static"
+        variant="dots"
+        activeStep={activeStep}
+        classes={{ root: classes.overlay }}
+        nextButton={
+          <Button
+            size="small"
+            onClick={handleNext}
+            disabled={activeStep === maxSteps - 1}
+            classes={{ root: classes.arrowRight }}
+          >
+            <KeyboardArrowRight />
+          </Button>
+        }
+        backButton={
+          <Button
+            size="small"
+            onClick={handleBack}
+            disabled={activeStep === 0}
+            classes={{ root: classes.arrowLeft }}
+          >
+            <KeyboardArrowLeft />
+          </Button>
+        }
+      />
+    );
+
+    const bottom = (
+      <MobileStepper
+        steps={maxSteps}
+        position="static"
+        variant="text"
+        activeStep={activeStep}
+        classes={{ root: classes.mobileRoot }}
+        nextButton={
+          <Button
+            size="small"
+            onClick={handleNext}
+            disabled={activeStep === maxSteps - 1}
+            classes={{ root: classes.stepButtonMobile }}
+          >
+            {buttonNextText}
+            <KeyboardArrowRight />
+          </Button>
+        }
+        backButton={
+          <Button
+            size="small"
+            onClick={handleBack}
+            disabled={activeStep === 0}
+            classes={{ root: classes.stepButtonMobile }}
+          >
+            <KeyboardArrowLeft />
+            {buttonPrevText}
+          </Button>
+        }
+      />
+    );
+
+    const carouselVariant = variant === 'mobile' ? bottom : overlay;
+
     const MobileStepperCmp = (
-      <>
+      <div className={classes.container}>
         {React.Children.map(children, (child, index) => (
           <Children
             stepLabelData={stepLabelData}
             setStepLabelData={setStepLabelData}
-            active={index === activeStep || allSteps}
+            active={index === activeStep || allImages}
             isFirstRender={numRendersRef.current === 1}
           >
             {React.cloneElement(child)}
           </Children>
         ))}
-        <MobileStepper
-          steps={maxSteps}
-          position="static"
-          variant="text"
-          activeStep={activeStep}
-          classes={{ root: classes.mobileRoot }}
-          nextButton={
-            <Button
-              size="small"
-              onClick={handleNext}
-              disabled={activeStep === maxSteps - 1}
-              classes={{ root: classes.stepButtonMobile }}
-            >
-              {buttonNextText}
-              <KeyboardArrowRight />
-            </Button>
-          }
-          backButton={
-            <Button
-              size="small"
-              onClick={handleBack}
-              disabled={activeStep === 0}
-              classes={{ root: classes.stepButtonMobile }}
-            >
-              <KeyboardArrowLeft />
-              {buttonPrevText}
-            </Button>
-          }
-        />
-      </>
+        {carouselVariant}
+      </div>
     );
 
-    const StepperComponent = type === 'mobile' ? MobileStepperCmp : StepperCmp;
+    const StepperComponent = MobileStepperCmp;
 
     B.defineFunction('NextStep', () => handleNext());
     B.defineFunction('PreviousStep', () => handleBack());
@@ -243,40 +173,28 @@
     const style = new Styling(t);
     const isDev = env === 'dev';
     return {
-      root: {
-        backgroundColor: ({ options: { backgroundColor } }) => [
-          style.getColor(backgroundColor),
-          '!important',
-        ],
-        '& .MuiStepConnector-line': {
-          borderColor: ({ options: { connectorColor } }) =>
-            style.getColor(connectorColor),
+      root: {},
+      container: {
+        position: 'relative',
+        '& .MuiMobileStepper-root': {
+          background: 'transparent',
         },
-        '& .MuiStepContent-root': {
-          borderColor: ({ options: { connectorColor } }) =>
-            style.getColor(connectorColor),
+        '& .MuiButton-label': {
+          width: 'auto',
+          padding: '5px',
+          backgroundColor: 'rgba(255,255,255,0.3)',
+          borderRadius: '25px',
         },
-      },
-      stepLabel: {
-        '& .MuiStepIcon-root': {
-          color: ({ options: { inactiveColor } }) =>
-            style.getColor(inactiveColor),
-          '&.MuiStepIcon-active': {
-            color: ({ options: { activeColor } }) =>
-              style.getColor(activeColor),
-          },
+        '& .MuiMobileStepper-dot': {
+          width: '12px',
+          height: '12px',
         },
-        '& .MuiStepLabel-label': {
-          color: ({ options: { inactiveLabelColor } }) =>
-            style.getColor(inactiveLabelColor),
-          '&.MuiStepLabel-active': {
-            color: ({ options: { activeLabelColor } }) =>
-              style.getColor(activeLabelColor),
-          },
+        '& .MuiMobileStepper-dotActive': {
+          backgroundColor: ({ options: { dotColor } }) => [
+            style.getColor(dotColor),
+            '!important',
+          ],
         },
-      },
-      stepButton: {
-        pointerEvents: isDev && 'none',
       },
       mobileRoot: {
         backgroundColor: ({ options: { backgroundColor } }) => [
@@ -287,6 +205,10 @@
           style.getColor(stepProgressColor),
           '!important',
         ],
+      },
+      overlay: {
+        justifyContent: 'center !important',
+        marginTop: '-40px',
       },
       stepButtonMobile: {
         pointerEvents: isDev && 'none',
@@ -301,30 +223,23 @@
           ],
         },
       },
-      stepIcon: {
-        fill: ({ options: { inactiveColor } }) => [
-          style.getColor(inactiveColor),
-          '!important',
-        ],
+      arrowLeft: {
+        position: 'absolute !important',
+        top: '50%',
+        left: '8px',
+        transform: 'translate(0, -50%)',
+        '& svg': {
+          fontSize: '40px',
+        },
       },
-      stepIconActive: {
-        fill: ({ options: { activeColor } }) => [
-          style.getColor(activeColor),
-          '!important',
-        ],
-      },
-      empty: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '2.5rem',
-        fontSize: '0.75rem',
-        color: '#262A3A',
-        textTransform: 'uppercase',
-        borderWidth: '0.0625rem',
-        borderColor: '#AFB5C8',
-        borderStyle: 'dashed',
-        backgroundColor: '#F0F1F5',
+      arrowRight: {
+        position: 'absolute !important',
+        top: '50%',
+        right: '8px',
+        transform: 'translate(0, -50%)',
+        '& svg': {
+          fontSize: '40px',
+        },
       },
     };
   },
