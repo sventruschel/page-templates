@@ -1,9 +1,8 @@
 (() => ({
-  name: 'Page with Layout',
-  icon: 'RowColumnIcon',
-  type: 'page',
+  name: 'Column Layout',
+  icon: 'GridIcon',
   description:
-    'With this page you can select the amount of rows and the number of columns for each row',
+    'With this component you can select the amount of rows and the number of columns for each row',
   category: 'LAYOUT',
   beforeCreate: ({
     close,
@@ -22,118 +21,168 @@
     prefab,
     save,
   }) => {
-    const [rows, setRows] = React.useState([{ row: 1, columns: '1' }]);
+    const [rows, setRows] = React.useState([{ index: 1, columns: '2' }]);
+
+    const createElements = n => {
+      const elements = [];
+      for (let i = 0; i < n; i += 1) {
+        elements.push(
+          <Box
+            border={{
+              color: '#AFB5C8',
+              size: 'xsmall',
+              style: 'dashed',
+              side: 'all',
+            }}
+            margin="2px"
+            direction="column"
+            width={`${100 / n}%`}
+            background="#f0f1f5"
+          />,
+        );
+      }
+      return elements;
+    };
+
+    const maxRows = rows.length < 9;
 
     return (
       <>
-        <Header onClose={close} title="Configure Grid" />
+        <Header onClose={close} title="Configure Layout" />
         <Content>
-          <Field
-            info={
-              <Text size="small" color="grey700">
-                Click the 'add rows' button to add a new row to the page. You
-                can specify the amount of columns per row
-              </Text>
-            }
-          >
-            <Button
-              label="+ Add Row"
-              disabled={!(rows.length < 9)}
-              onClick={() => {
-                if (rows.length < 9) {
-                  setRows([...rows, { row: rows.length + 1, columns: '1' }]);
+          <Box direction="row">
+            <Box direction="column" basis="2/3">
+              <Field
+                info={
+                  <Text size="small" color="grey700">
+                    {`Click the Add rows button to add a new row to the page.
+                    You can specify the amount of columns per row`}
+                  </Text>
                 }
-              }}
-            />
-          </Field>
-          {rows.map(row => (
-            <Field>
-              <Box direction="row">
-                <Box
-                  direction="column"
-                  basis="auto"
-                  alignSelf="center"
-                  pad={{ right: '15px' }}
-                >
-                  <Text>Row {row.row}</Text>
-                </Box>
-                <Box direction="column" basis="auto">
-                  <ButtonGroup
-                    onChange={({ target: { value } }) => {
-                      const index = rows.findIndex(
-                        currentRow => currentRow.row === row.row,
-                      );
-                      const updatedRows = rows;
-                      updatedRows[index].columns = value;
-                      setRows([...updatedRows]);
-                    }}
-                    value={row.columns.toString()}
-                  >
-                    <ButtonGroupButton
-                      label="1"
-                      value="1"
-                      name={`options-${row.row}`}
-                    />
-                    <ButtonGroupButton
-                      label="2"
-                      value="2"
-                      name={`options-${row.row}`}
-                    />
-                    <ButtonGroupButton
-                      label="3"
-                      value="3"
-                      name={`options-${row.row}`}
-                    />
-                    <ButtonGroupButton
-                      label="4"
-                      value="4"
-                      name={`options-${row.row}`}
-                    />
-                    <ButtonGroupButton
-                      label="5"
-                      value="5"
-                      name={`options-${row.row}`}
-                    />
-                    <ButtonGroupButton
-                      label="6"
-                      value="6"
-                      name={`options-${row.row}`}
-                    />
-                  </ButtonGroup>
-                </Box>
-                <Box direction="column" basis="auto" pad={{ left: '5px' }}>
-                  <DeleteButton
-                    label="X"
-                    value={row.row}
-                    disabled={!(rows.length > 1)}
-                    onClick={event => {
-                      const newRows = [...rows];
-                      const index = newRows.findIndex(
-                        currentRow =>
-                          currentRow.row === parseInt(event.target.value, 10),
-                      );
-                      if (index !== -1) {
-                        newRows.splice(index, 1);
+              >
+                <Button
+                  label="Add row"
+                  disabled={!maxRows}
+                  onClick={() => {
+                    if (maxRows) {
+                      setRows([
+                        ...rows,
+                        { index: rows.length + 1, columns: '1' },
+                      ]);
+                    }
+                  }}
+                />
+              </Field>
+              {rows.map(row => (
+                <Field>
+                  <Box direction="row">
+                    <Box
+                      direction="column"
+                      basis="auto"
+                      alignSelf="center"
+                      pad={{ right: '15px' }}
+                    >
+                      <Text>Row {row.index}</Text>
+                    </Box>
+                    <Box direction="column" basis="auto">
+                      <ButtonGroup
+                        onChange={({ target: { value } }) => {
+                          const index = rows.findIndex(
+                            currentRow => currentRow.index === row.index,
+                          );
+                          const updatedRows = rows;
+                          updatedRows[index].columns = value;
+                          setRows([...updatedRows]);
+                        }}
+                        value={row.columns.toString()}
+                      >
+                        <ButtonGroupButton
+                          label="1"
+                          value="1"
+                          name={`options-${row.index}`}
+                        />
+                        <ButtonGroupButton
+                          label="2"
+                          value="2"
+                          name={`options-${row.index}`}
+                        />
+                        <ButtonGroupButton
+                          label="3"
+                          value="3"
+                          name={`options-${row.index}`}
+                        />
+                        <ButtonGroupButton
+                          label="4"
+                          value="4"
+                          name={`options-${row.index}`}
+                        />
+                        <ButtonGroupButton
+                          label="5"
+                          value="5"
+                          name={`options-${row.index}`}
+                        />
+                        <ButtonGroupButton
+                          label="6"
+                          value="6"
+                          name={`options-${row.index}`}
+                        />
+                      </ButtonGroup>
+                    </Box>
+                    <Box direction="column" basis="auto" pad={{ left: '5px' }}>
+                      <DeleteButton
+                        label="X"
+                        value={row.index}
+                        disabled={!(rows.length > 1)}
+                        onClick={event => {
+                          const newRows = [...rows];
+                          const index = newRows.findIndex(
+                            currentRow =>
+                              currentRow.index ===
+                              parseInt(event.target.value, 10),
+                          );
+                          if (index !== -1) {
+                            newRows.splice(index, 1);
 
-                        newRows.map((correctRow, rowIndex) => {
-                          const newRow = correctRow;
-                          newRow.row = rowIndex + 1;
-                          return { ...newRow };
-                        });
-                        setRows([...newRows]);
-                      }
-                    }}
-                  />
+                            newRows.map((correctRow, rowIndex) => {
+                              const newRow = correctRow;
+                              newRow.index = rowIndex + 1;
+                              return { ...newRow };
+                            });
+                            setRows([...newRows]);
+                          }
+                        }}
+                      />
+                    </Box>
+                  </Box>
+                </Field>
+              ))}
+            </Box>
+            <Box direction="column" basis="1/3" margin={{ top: '11%' }}>
+              <Text color="#666d85">Preview:</Text>
+              {rows.map(row => (
+                <Box
+                  border={{
+                    color: '#AFB5C8',
+                    size: 'xsmall',
+                    style: 'dashed',
+                    side: 'all',
+                  }}
+                  direction="row"
+                  height="100%"
+                  background="#FFFFFF"
+                  justify="center"
+                >
+                  {createElements(row.columns)}
                 </Box>
-              </Box>
-            </Field>
-          ))}
+              ))}
+            </Box>
+          </Box>
         </Content>
         <Footer
           onClose={close}
           onSave={() => {
             const newPrefab = { ...prefab };
-            rows.map(row => {
+            rows.forEach(row => {
               const newRow = {
                 name: 'Row',
                 options: [
