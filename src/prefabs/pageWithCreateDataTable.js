@@ -1,5 +1,5 @@
 (() => ({
-  name: 'DataTable with create modal',
+  name: 'Page with dataTable and create dialog',
   description: 'This is a page which contains a datatable with create dialog',
   icon: 'DataTable',
   category: 'DATA',
@@ -6632,7 +6632,8 @@
                     type: 'VARIABLE',
                     label: 'Header text',
                     key: 'headerText',
-                    value: [''],
+                    value:
+                      property.kind === 'IMAGE' ? [`${property.label}`] : [''],
                   },
                   {
                     value: 'Body1',
@@ -12007,7 +12008,10 @@
               },
             }));
 
-            properties.forEach(property => {
+            (createFormUseDataProperties
+              ? properties
+              : createFormProperties
+            ).forEach(property => {
               interactions.push({
                 name: 'Clear',
                 sourceEvent: 'onActionSuccess',
