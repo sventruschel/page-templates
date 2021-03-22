@@ -201,14 +201,6 @@
           {blancoText && <MenuItem value="">{blancoText}</MenuItem>}
           {renderOptions()}
         </TextField>
-        <input
-          className={classes.validationInput}
-          onInvalid={validationHandler}
-          type="text"
-          tabIndex="-1"
-          required={required}
-          value={value}
-        />
       </>
     );
 
