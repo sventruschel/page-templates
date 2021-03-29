@@ -349,6 +349,8 @@
               onChange={value => {
                 setModelValidation(false);
                 setModelId(value);
+                setPropertiesValidation(false);
+                setDetailsValidation(false);
               }}
               value={modelId}
             />
