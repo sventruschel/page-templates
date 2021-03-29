@@ -367,6 +367,9 @@
                   )
                 }
               >
+                <Text color="#666D85">
+                  These properties will be visible in the data table
+                </Text>
                 <PropertiesSelector
                   modelId={modelId}
                   value={properties}
@@ -397,6 +400,9 @@
                   )
                 }
               >
+                <Text color="#666D85">
+                  These properties will be visible in the detail section
+                </Text>
                 <PropertiesSelector
                   modelId={modelId}
                   value={details}
@@ -1566,7 +1572,7 @@
                       },
                     },
                     {
-                      value: property.kind === 'IMAGE' ? '' : property,
+                      value: property,
                       label: 'Property',
                       key: 'property',
                       type: 'PROPERTY',
