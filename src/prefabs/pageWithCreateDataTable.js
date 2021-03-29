@@ -6603,11 +6603,12 @@
           onSave={() => {
             const selectedCreateFormPropertiesLength =
               selectedCreateFormProperties.length;
+            const propertiesLength = properties.length;
             if (
               !modelId ||
               (selectedCreateFormPropertiesLength < 1 &&
                 !createFormUseDataProperties) ||
-              properties.length < 1
+              propertiesLength < 1
             ) {
               setModelValidation(!modelId);
               setCreatePropertiesValidation(
@@ -6615,7 +6616,7 @@
                   !createFormUseDataProperties,
               );
 
-              setPropertiesValidation(properties.length < 1);
+              setPropertiesValidation(propertiesLength < 1);
               return;
             }
             const createFormProperties = (createFormUseDataProperties
