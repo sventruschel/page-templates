@@ -42,28 +42,60 @@
           type: 'TOGGLE',
         },
         {
+          label: 'Icon count',
+          key: 'count',
+          value: '5',
+          type: 'NUMBER',
+        },
+        {
           type: 'CUSTOM',
           label: 'Size',
           key: 'size',
-          value: '25px',
+          value: 'small',
           configuration: {
             as: 'BUTTONGROUP',
             dataType: 'string',
             allowedInput: [
               {
                 name: 'Small',
-                value: '20px',
+                value: 'small',
               },
               {
                 name: 'Medium',
-                value: '25px',
+                value: 'medium',
               },
               {
                 name: 'Large',
-                value: '30px',
+                value: 'large',
               },
             ],
           },
+        },
+        {
+          type: 'CUSTOM',
+          label: 'Precision',
+          key: 'precision',
+          value: '1',
+          configuration: {
+            as: 'BUTTONGROUP',
+            dataType: 'string',
+            allowedInput: [
+              {
+                name: '0.5',
+                value: '0.5',
+              },
+              {
+                name: '1',
+                value: '1',
+              },
+            ],
+          },
+        },
+        {
+          value: ['M', 'M', 'M', 'M'],
+          label: 'Inner space',
+          key: 'innerSpacing',
+          type: 'SIZES',
         },
         {
           value: [],
@@ -2648,6 +2680,26 @@
             condition: {
               type: 'SHOW',
               option: 'advancedSettings',
+              comparator: 'EQ',
+              value: true,
+            },
+          },
+        },
+        {
+          value: false,
+          label: 'Styles',
+          key: 'styles',
+          type: 'TOGGLE',
+        },
+        {
+          type: 'COLOR',
+          label: 'Helper color',
+          key: 'helperColor',
+          value: 'Accent2',
+          configuration: {
+            condition: {
+              type: 'SHOW',
+              option: 'styles',
               comparator: 'EQ',
               value: true,
             },

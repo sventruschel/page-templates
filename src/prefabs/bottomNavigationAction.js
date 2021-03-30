@@ -1,10 +1,10 @@
 (() => ({
-  name: 'Button',
+  name: 'BottomNavigationAction',
   icon: 'ButtonIcon',
   category: 'BUTTON',
   structure: [
     {
-      name: 'Button',
+      name: 'BottomNavigationAction',
       options: [
         {
           label: 'Toggle visibility',
@@ -171,7 +171,7 @@
         {
           label: 'Icon',
           key: 'icon',
-          value: 'None',
+          value: 'Add',
           type: 'CUSTOM',
           configuration: {
             as: 'DROPDOWN',
@@ -1453,7 +1453,6 @@
             allowedInput: [
               { name: 'Start', value: 'start' },
               { name: 'End', value: 'end' },
-              { name: 'Top', value: 'top' },
             ],
           },
         },
