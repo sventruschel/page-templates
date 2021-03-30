@@ -25,6 +25,7 @@
     prefab,
     save,
   }) => {
+    debugger;
     const [rows, setRows] = React.useState([{ index: 1, columns: '2' }]);
     const [stepNumber, setStepNumber] = React.useState(1);
     const [appBarTitle, setAppBarTitle] = React.useState('Appbar');
@@ -2142,10 +2143,8 @@
             <Button
               label="Next"
               size="large"
+              disabled={stepNumber === stepper.stepAmount}
               onClick={() => {
-                if (stepNumber === stepper.stepAmount) {
-                  return;
-                }
                 if (useLogoutButton && isEmptyRedirect(redirectTo)) {
                   setShowEndpointValidation(true);
                   return;

@@ -1564,7 +1564,7 @@
                       },
                     },
                     {
-                      value: property.kind === 'IMAGE' ? '' : property,
+                      value: property,
                       label: 'Property',
                       key: 'property',
                       type: 'PROPERTY',
@@ -2536,8 +2536,6 @@
     );
   },
   interactions: [],
-  variables: [],
-  actions: [],
   structure: [
     {
       name: 'Row',

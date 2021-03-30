@@ -4,27 +4,22 @@
   category: 'LAYOUT',
   beforeCreate: ({
     close,
-    components: {
-      Content,
-      Field,
-      Footer,
-      Header,
-      Button,
-      Text,
-      ModelSelector,
-      Box,
-    },
+    components: { Content, Field, Footer, Header, Button, Text, Box },
     prefab,
     save,
   }) => {
     const [modelId, setModelId] = React.useState('');
     const [stepNumber, setStepNumber] = React.useState(1);
+    const appIdRegex = /(?<=app\/).*(?=\/page)/g;
+    const csrfRegex = /(?<=token=).*/g;
+    const appIdentifier = window.location.pathname.match(appIdRegex)[0];
+    const csrf = document.cookie.match(csrfRegex)[0];
 
     const stepper = {
       setStep: step => {
         switch (step) {
           case 1:
-            return <Text>Step 1</Text>; // Every case is a step
+            return <Text>Step 1</Text>;
 
           case 2:
             return <Text>Step 2</Text>;
