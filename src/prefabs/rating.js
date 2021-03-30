@@ -7,12 +7,12 @@
       name: 'Rating',
       options: [
         {
-          value: { label: ['Rating'], value: [''] },
+          value: { label: ['Rating'], value: [] },
           label: 'Label',
           key: 'customModelAttribute',
           type: 'CUSTOM_MODEL_ATTRIBUTE',
           configuration: {
-            allowedTypes: ['integer'],
+            allowedTypes: ['integer', 'decimal'],
           },
         },
         {
