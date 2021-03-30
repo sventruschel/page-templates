@@ -26,10 +26,17 @@
       false,
     );
     const [
+      createContainsNoEditableProperties,
+      setCreateContainsNoEditableProperties,
+    ] = React.useState(false);
+    const [
       createPropertiesValidation,
       setCreatePropertiesValidation,
     ] = React.useState(false);
-    const [createFormProperties, setCreateFormProperties] = React.useState([]);
+    const [
+      selectedCreateFormProperties,
+      setSelectedCreateFormProperties,
+    ] = React.useState([]);
     const [
       createFormUseDataProperties,
       setCreateFormUseDataProperties,
@@ -6519,6 +6526,7 @@
               ]}
               onChange={value => {
                 setProperties(value);
+                setCreateContainsNoEditableProperties(false);
               }}
             />
           </Field>
@@ -6528,7 +6536,19 @@
               checked={createFormUseDataProperties}
               onChange={() => {
                 setCreateFormUseDataProperties(!createFormUseDataProperties);
+                setCreateContainsNoEditableProperties(false);
               }}
+            />
+            <Field
+              error={
+                createContainsNoEditableProperties && (
+                  <Text color="#e82600">
+                    &quot;Id&quot;, &quot;Created at&quot; and &quot;Updated
+                    at&quot; are not editable. At least one editable property is
+                    necessary in the create form. Please select one.
+                  </Text>
+                )
+              }
             />
             {!createFormUseDataProperties && (
               <Field
@@ -6543,7 +6563,7 @@
               >
                 <PropertiesSelector
                   modelId={modelId}
-                  value={createFormProperties}
+                  value={selectedCreateFormProperties}
                   disabledNames={['created_at', 'updated_at', 'id']}
                   disabledKinds={[
                     'BELONGS_TO',
@@ -6571,7 +6591,8 @@
                   ]}
                   onChange={value => {
                     setCreatePropertiesValidation(!value.length);
-                    setCreateFormProperties(value);
+                    setSelectedCreateFormProperties(value);
+                    setCreateContainsNoEditableProperties(!value.length);
                   }}
                 />
               </Field>
@@ -6580,24 +6601,43 @@
         </Content>
         <Footer
           onSave={() => {
+            const selectedCreateFormPropertiesLength =
+              selectedCreateFormProperties.length;
+            const propertiesLength = properties.length;
             if (
               !modelId ||
-              (createFormProperties.length < 1 &&
+              (selectedCreateFormPropertiesLength < 1 &&
                 !createFormUseDataProperties) ||
-              properties.length < 1
+              propertiesLength < 1
             ) {
               setModelValidation(!modelId);
               setCreatePropertiesValidation(
-                createFormProperties.length < 1 && !createFormUseDataProperties,
+                selectedCreateFormPropertiesLength < 1 &&
+                  !createFormUseDataProperties,
               );
 
-              setPropertiesValidation(properties.length < 1);
+              setPropertiesValidation(propertiesLength < 1);
               return;
             }
+            const createFormProperties = (createFormUseDataProperties
+              ? properties
+              : selectedCreateFormProperties
+            ).filter(
+              property =>
+                property.label !== 'Created at' &&
+                property.label !== 'Updated at' &&
+                property.label !== 'Id',
+            );
+            if (createFormProperties.length < 1) {
+              setCreateContainsNoEditableProperties(true);
+              return;
+            }
+
             const newPrefab = { ...prefab };
             if (data && data.model) {
               newPrefab.variables[1].name = camelToSnakeCase(data.model.label);
             }
+
             newPrefab.variables[0].options.modelId = modelId;
             const dataTable = reduceStructure('#dataTable', prefabStructure);
             dataTable.options[0].value = modelId;
@@ -6617,7 +6657,7 @@
                     },
                   },
                   {
-                    value: property.kind === 'IMAGE' ? '' : property,
+                    value: property,
                     label: 'Property',
                     key: 'property',
                     type: 'PROPERTY',
@@ -6632,8 +6672,7 @@
                     type: 'VARIABLE',
                     label: 'Header text',
                     key: 'headerText',
-                    value:
-                      property.kind === 'IMAGE' ? [`${property.label}`] : [''],
+                    value: [''],
                   },
                   {
                     value: 'Body1',
@@ -6809,13 +6848,7 @@
             });
 
             function makeDescendantsArray(propertiesInput) {
-              const filteredPropertiesInput = propertiesInput.filter(
-                property =>
-                  property.label !== 'Created at' &&
-                  property.label !== 'Updated at',
-              );
-
-              const descendants = filteredPropertiesInput.map(property => {
+              const descendants = propertiesInput.map(property => {
                 switch (property.kind) {
                   case 'INTEGER': {
                     return {
@@ -11992,26 +12025,22 @@
             const createForm = reduceStructure('#createForm', prefabStructure);
 
             const createFormInputsArray = makeDescendantsArray(
-              createFormUseDataProperties ? properties : createFormProperties,
+              createFormProperties,
             ).filter(item => item !== undefined);
             createForm.descendants = [...createFormInputsArray];
-            newPrefab.actions[0].events[0].options.assign = (createFormUseDataProperties
-              ? properties
-              : createFormProperties
-            ).map(property => ({
-              leftHandSide: property.id[0],
-              ref: {
-                path: [
-                  '#customModelVariableId',
-                  `#attribute_${property.id[0]}`,
-                ],
-              },
-            }));
+            newPrefab.actions[0].events[0].options.assign = createFormProperties.map(
+              property => ({
+                leftHandSide: property.id[0],
+                ref: {
+                  path: [
+                    '#customModelVariableId',
+                    `#attribute_${property.id[0]}`,
+                  ],
+                },
+              }),
+            );
 
-            (createFormUseDataProperties
-              ? properties
-              : createFormProperties
-            ).forEach(property => {
+            createFormProperties.forEach(property => {
               interactions.push({
                 name: 'Clear',
                 sourceEvent: 'onActionSuccess',

@@ -5,17 +5,23 @@
   orientation: 'VERTICAL',
   jsx: (() => {
     const { Icons } = window.MaterialUI;
-    const { Box, FormControl, FormHelperText } = window.MaterialUI.Core;
+    const {
+      FormControl: MUIFormControl,
+      FormHelperText,
+    } = window.MaterialUI.Core;
     const { Rating } = window.MaterialUI.Lab;
     const { env, getCustomModelAttribute, useText } = B;
     const isDev = env === 'dev';
 
     const {
       customModelAttribute: customModelAttributeObj,
+      numberOfIcons,
       size,
+      customSize,
+      disabled,
       readonly,
+      precision,
       icon,
-      iconSelected,
       nameAttribute,
       validationValueMissing,
       error,
@@ -24,26 +30,21 @@
 
     const {
       id: customModelAttributeId,
-      label = [],
       value: defaultValue = [],
     } = customModelAttributeObj;
 
     const customModelAttribute = getCustomModelAttribute(
       customModelAttributeId,
     );
-
+    const maxIcons = parseInt(numberOfIcons, 10) || 0;
     const [errorState, setErrorState] = useState(error);
     const [helper, setHelper] = useState(useText(helperText));
     const [afterFirstInvalidation, setAfterFirstInvalidation] = useState(false);
     const [currentValue, setCurrentValue] = useState(useText(defaultValue));
     const value = currentValue;
 
-    const IconEmptyComponent = React.createElement(Icons[icon], {
-      className: classes.root,
-    });
-
-    const IconSelectedComponent = React.createElement(Icons[iconSelected], {
-      className: classes.root,
+    const IconComponent = React.createElement(Icons[icon], {
+      className: classes.ratingIcon,
     });
 
     const { name: customModelAttributeName, validations: { required } = {} } =
@@ -63,7 +64,8 @@
       handleValidation();
     };
 
-    const handleChange = (event, newValue) => {
+    const handleChange = (_event, val) => {
+      const newValue = val || '';
       setCurrentValue(newValue);
       if (afterFirstInvalidation) {
         handleValidation();
@@ -76,24 +78,29 @@
       }
     }, [isDev, defaultValue]);
 
-    const ratingBox = (
-      <div>
-        <Box component="fieldset" mb={3} borderColor="transparent">
-          <FormControl required={required} error={errorState}>
-            <Rating
-              className={classes.root}
-              name={nameAttributeValue || customModelAttributeName}
-              value={value}
-              defaultValue={customModelAttributeObj.value}
-              precision={0.5}
-              size={size}
-              onChange={handleChange}
-              readOnly={readonly}
-              emptyIcon={IconEmptyComponent}
-              icon={IconSelectedComponent}
-              onBlur={validationHandler}
-            />
-          </FormControl>
+    const RatingComponent = (
+      <div className={classes.root}>
+        <MUIFormControl
+          classes={{ root: classes.formControl }}
+          required={required}
+          component="fieldset"
+          error={errorState}
+        >
+          <Rating
+            className={classes.ratingIcon}
+            name={nameAttributeValue || customModelAttributeName}
+            value={value}
+            defaultValue={customModelAttributeObj.value}
+            precision={precision}
+            size={size === 'custom' ? customSize : size}
+            onChange={handleChange}
+            disabled={disabled}
+            readOnly={isDev || readonly}
+            emptyIcon={IconComponent}
+            icon={IconComponent}
+            onBlur={validationHandler}
+            max={maxIcons}
+          />
           {helper && (
             <FormHelperText classes={{ root: classes.helper }}>
               {helper}
@@ -107,32 +114,91 @@
             required={required}
             value={value}
           />
-        </Box>
+        </MUIFormControl>
       </div>
     );
 
-    return isDev ? <div>{ratingBox}</div> : <div>{ratingBox}</div>;
+    return isDev ? (
+      <div className={classes.wrapper}>{RatingComponent}</div>
+    ) : (
+      RatingComponent
+    );
   })(),
   styles: B => t => {
-    const { Styling } = B;
+    const { mediaMinWidth, Styling } = B;
     const style = new Styling(t);
+    const getSpacing = (idx, device = 'Mobile') =>
+      idx === '0' ? '0rem' : style.getSpacing(idx, device);
 
     return {
+      wrapper: {
+        display: 'inline-block',
+      },
       root: {
+        display: 'inline-block',
+        marginTop: ({ options: { outerSpacing } }) =>
+          getSpacing(outerSpacing[0]),
+        marginRight: ({ options: { outerSpacing } }) =>
+          getSpacing(outerSpacing[1]),
+        marginBottom: ({ options: { outerSpacing } }) =>
+          getSpacing(outerSpacing[2]),
+        marginLeft: ({ options: { outerSpacing } }) =>
+          getSpacing(outerSpacing[3]),
+        [`@media ${mediaMinWidth(600)}`]: {
+          marginTop: ({ options: { outerSpacing } }) =>
+            getSpacing(outerSpacing[0], 'Portrait'),
+          marginRight: ({ options: { outerSpacing } }) =>
+            getSpacing(outerSpacing[1], 'Portrait'),
+          marginBottom: ({ options: { outerSpacing } }) =>
+            getSpacing(outerSpacing[2], 'Portrait'),
+          marginLeft: ({ options: { outerSpacing } }) =>
+            getSpacing(outerSpacing[3], 'Portrait'),
+        },
+        [`@media ${mediaMinWidth(960)}`]: {
+          marginTop: ({ options: { outerSpacing } }) =>
+            getSpacing(outerSpacing[0], 'Landscape'),
+          marginRight: ({ options: { outerSpacing } }) =>
+            getSpacing(outerSpacing[1], 'Landscape'),
+          marginBottom: ({ options: { outerSpacing } }) =>
+            getSpacing(outerSpacing[2], 'Landscape'),
+          marginLeft: ({ options: { outerSpacing } }) =>
+            getSpacing(outerSpacing[3], 'Landscape'),
+        },
+        [`@media ${mediaMinWidth(1280)}`]: {
+          marginTop: ({ options: { outerSpacing } }) =>
+            getSpacing(outerSpacing[0], 'Desktop'),
+          marginRight: ({ options: { outerSpacing } }) =>
+            getSpacing(outerSpacing[1], 'Desktop'),
+          marginBottom: ({ options: { outerSpacing } }) =>
+            getSpacing(outerSpacing[2], 'Desktop'),
+          marginLeft: ({ options: { outerSpacing } }) =>
+            getSpacing(outerSpacing[3], 'Desktop'),
+        },
+      },
+      ratingIcon: {
         '& .MuiRating-iconEmpty': {
           color: ({ options: { emptyColor } }) => style.getColor(emptyColor),
         },
         '& .MuiRating-iconFilled': {
           color: ({ options: { filledColor } }) => style.getColor(filledColor),
         },
-        '& .MuiRating-iconHover': {
-          color: ({ options: { hoverColor } }) => style.getColor(hoverColor),
-        },
         '&.MuiSvgIcon-root': {
-          fontSize: ({ options: { size } }) => style.getIconSize(size),
+          fontSize: ({ options: { size, customSize } }) =>
+            size === 'custom' ? customSize : 'inherit',
         },
       },
-      helper: {},
+      helper: {
+        color: ({ options: { helperColor } }) => [
+          style.getColor(helperColor),
+          '!important',
+        ],
+        '&.Mui-error': {
+          color: ({ options: { errorColor } }) => [
+            style.getColor(errorColor),
+            '!important',
+          ],
+        },
+      },
       validationInput: {
         height: 0,
         width: 0,
@@ -140,6 +206,24 @@
         padding: 0,
         border: 'none',
         pointerEvents: 'none',
+      },
+      formControl: {
+        '& > legend': {
+          color: ({ options: { labelColor } }) => [
+            style.getColor(labelColor),
+            '!important',
+          ],
+          '&.Mui-error': {
+            color: ({ options: { errorColor } }) => [
+              style.getColor(errorColor),
+              '!important',
+            ],
+          },
+          '&.Mui-disabled': {
+            pointerEvents: 'none',
+            opacity: '0.7',
+          },
+        },
       },
     };
   },

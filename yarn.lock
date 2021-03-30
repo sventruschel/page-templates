@@ -171,9 +171,9 @@
     "to-fast-properties" "^2.0.0"
 
 "@betty-blocks/cli@^23.35.0":
-  "integrity" "sha512-4f5QNkZ6+Y+A66a/8zo2DbdGPoNvhcXUCTWuV4SZn4u8kVC671XrMRB++/lGnkcpy4sLHHEabkAGzQBSC5kcuw=="
-  "resolved" "https://registry.npmjs.org/@betty-blocks/cli/-/cli-23.39.0.tgz"
-  "version" "23.39.0"
+  "integrity" "sha512-MHu3ivIY9cWUpP1PcJ2fS3NaikkP76hkbvjBj0avpCZAbQRuuc9wUqcrlTkXmHl566dJ8Thcd3k7KQQBSz+Brw=="
+  "resolved" "https://registry.npmjs.org/@betty-blocks/cli/-/cli-23.40.1.tgz"
+  "version" "23.40.1"
   dependencies:
     "@azure/ms-rest-js" "^2.0.4"
     "@azure/storage-blob" "^10.3.0"
