@@ -25,7 +25,6 @@
     prefab,
     save,
   }) => {
-    debugger;
     const [rows, setRows] = React.useState([{ index: 1, columns: '2' }]);
     const [stepNumber, setStepNumber] = React.useState(1);
     const [appBarTitle, setAppBarTitle] = React.useState('Appbar');
@@ -1823,10 +1822,7 @@
           case 1:
             return (
               <>
-                <Field>
-                  <Text size="small" color="grey700">
-                    Appbar title:
-                  </Text>
+                <Field label='Appbar title'>
                   <TextInput
                     placeholder="Placeholder..."
                     value={appBarTitle}
@@ -1844,6 +1840,7 @@
                 </Field>
                 {useLogoutButton && (
                   <Field
+                    label="Redirect after logout"
                     error={
                       showEndpointValidation && (
                         <Text color="#e82600">
@@ -1852,9 +1849,6 @@
                       )
                     }
                   >
-                    <Text size="small" color="grey700">
-                      Page to redirect to after logout
-                    </Text>
                     <EndpointSelector
                       value={redirectTo}
                       size="large"
