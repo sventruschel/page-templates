@@ -7,12 +7,12 @@
       name: 'Rating',
       options: [
         {
-          value: { label: ['Rating'], value: [''] },
+          value: { label: ['Rating'], value: [] },
           label: 'Label',
           key: 'customModelAttribute',
           type: 'CUSTOM_MODEL_ATTRIBUTE',
           configuration: {
-            allowedTypes: ['integer'],
+            allowedTypes: ['integer', 'decimal'],
           },
         },
         {
@@ -1511,6 +1511,26 @@
             condition: {
               type: 'SHOW',
               option: 'advancedSettings',
+              comparator: 'EQ',
+              value: true,
+            },
+          },
+        },
+        {
+          value: false,
+          label: 'Styles',
+          key: 'styles',
+          type: 'TOGGLE',
+        },
+        {
+          type: 'COLOR',
+          label: 'Helper color',
+          key: 'helperColor',
+          value: 'Accent2',
+          configuration: {
+            condition: {
+              type: 'SHOW',
+              option: 'styles',
               comparator: 'EQ',
               value: true,
             },

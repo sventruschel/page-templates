@@ -26,6 +26,7 @@
       validationValueMissing,
       error,
       helperText,
+      count,
     } = options;
 
     const {
@@ -39,6 +40,7 @@
     const maxIcons = parseInt(numberOfIcons, 10) || 0;
     const [errorState, setErrorState] = useState(error);
     const [helper, setHelper] = useState(useText(helperText));
+    const [maxCount, setMaxCount] = useState(parseInt(count, 10));
     const [afterFirstInvalidation, setAfterFirstInvalidation] = useState(false);
     const [currentValue, setCurrentValue] = useState(useText(defaultValue));
     const value = currentValue;
@@ -75,8 +77,9 @@
     useEffect(() => {
       if (isDev) {
         setCurrentValue(useText(defaultValue));
+        setMaxCount(parseInt(count, 10));
       }
-    }, [isDev, defaultValue]);
+    }, [isDev, defaultValue, count]);
 
     const RatingComponent = (
       <div className={classes.root}>
