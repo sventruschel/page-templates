@@ -49,15 +49,6 @@
     const [reviewAuthor, setReviewAuthor] = React.useState('');
     const [reviewDataModel, setReviewDataModel] = React.useState({});
 
-    const [loggedInUserState, setLoggedInUserState] = React.useState({
-      authenticationProfile: null,
-    });
-
-    const [thisPageState, setThisPageState] = React.useState({
-      modelId: null,
-      component: null,
-    });
-
     const [validationMessage, setValidationMessage] = React.useState('');
 
     const [buttonGroupValue, setButtonGroupValue] = React.useState(
@@ -65,13 +56,15 @@
     );
     const pageUuid = useCurrentPageId();
 
-    useModelQuery({
-      variables: { id: reviewModelId },
-      onCompleted: reviewData => {
-        // use data here
-        setReviewDataModel(reviewData);
-      },
-    });
+    if (reviewDataModel.model?.relationships) {
+      useModelQuery({
+        variables: { id: reviewModelId },
+        onCompleted: reviewData => {
+          // use data here
+          setReviewDataModel(reviewData);
+        },
+      });
+    }
 
     const { data, loading } = useModelQuery({
       variables: { id: modelId },
@@ -109,30 +102,6 @@
             setValidationMessage('Model id is required.');
             return false;
           }
-          break;
-        case 'thisPage':
-          if (!thisPageState.component) {
-            setValidationMessage('Component is required.');
-            return false;
-          }
-          if (!data || !data.model) {
-            setValidationMessage('Model is required.');
-            return false;
-          }
-          if (!thisPageState.modelId) {
-            setValidationMessage(
-              'The selected component does not have a model.',
-            );
-            return false;
-          }
-          break;
-        case 'loggedInUser':
-          if (!loggedInUserState.authenticationProfile) {
-            setValidationMessage('Authentication Profile is required.');
-            return false;
-          }
-          break;
-
         default:
           break;
       }
@@ -4582,16 +4551,7 @@
                             type: 'MODEL',
                           },
                           {
-                            value: {
-                              '': {
-                                '': {
-                                  eq: {
-                                    id: '',
-                                    type: 'PROPERTY',
-                                  },
-                                },
-                              },
-                            },
+                            value: {},
                             label: 'Filter',
                             key: 'filter',
                             type: 'FILTER',
@@ -5189,188 +5149,6 @@
               },
             ],
           },
-          {
-            name: 'Column',
-            options: [
-              {
-                label: 'Toggle visibility',
-                key: 'visible',
-                value: true,
-                type: 'TOGGLE',
-                configuration: {
-                  as: 'VISIBILITY',
-                },
-              },
-              {
-                value: '4',
-                label: 'Column width',
-                key: 'columnWidth',
-                type: 'CUSTOM',
-                configuration: {
-                  as: 'DROPDOWN',
-                  dataType: 'string',
-                  allowedInput: [
-                    { name: 'Fit content', value: 'fitContent' },
-                    { name: 'Flexible', value: 'flexible' },
-                    { name: 'Hidden', value: 'hidden' },
-                    { name: '1', value: '1' },
-                    { name: '2', value: '2' },
-                    { name: '3', value: '3' },
-                    { name: '4', value: '4' },
-                    { name: '5', value: '5' },
-                    { name: '6', value: '6' },
-                    { name: '7', value: '7' },
-                    { name: '8', value: '8' },
-                    { name: '9', value: '9' },
-                    { name: '10', value: '10' },
-                    { name: '11', value: '11' },
-                    { name: '12', value: '12' },
-                  ],
-                },
-              },
-              {
-                value: '4',
-                label: 'Column width (tablet landscape)',
-                key: 'columnWidthTabletLandscape',
-                type: 'CUSTOM',
-                configuration: {
-                  as: 'DROPDOWN',
-                  dataType: 'string',
-                  allowedInput: [
-                    { name: 'Fit content', value: 'fitContent' },
-                    { name: 'Flexible', value: 'flexible' },
-                    { name: 'Hidden', value: 'hidden' },
-                    { name: '1', value: '1' },
-                    { name: '2', value: '2' },
-                    { name: '3', value: '3' },
-                    { name: '4', value: '4' },
-                    { name: '5', value: '5' },
-                    { name: '6', value: '6' },
-                    { name: '7', value: '7' },
-                    { name: '8', value: '8' },
-                    { name: '9', value: '9' },
-                    { name: '10', value: '10' },
-                    { name: '11', value: '11' },
-                    { name: '12', value: '12' },
-                  ],
-                },
-              },
-              {
-                value: '12',
-                label: 'Column width (tablet portrait)',
-                key: 'columnWidthTabletPortrait',
-                type: 'CUSTOM',
-                configuration: {
-                  as: 'DROPDOWN',
-                  dataType: 'string',
-                  allowedInput: [
-                    { name: 'Fit content', value: 'fitContent' },
-                    { name: 'Flexible', value: 'flexible' },
-                    { name: 'Hidden', value: 'hidden' },
-                    { name: '1', value: '1' },
-                    { name: '2', value: '2' },
-                    { name: '3', value: '3' },
-                    { name: '4', value: '4' },
-                    { name: '5', value: '5' },
-                    { name: '6', value: '6' },
-                    { name: '7', value: '7' },
-                    { name: '8', value: '8' },
-                    { name: '9', value: '9' },
-                    { name: '10', value: '10' },
-                    { name: '11', value: '11' },
-                    { name: '12', value: '12' },
-                  ],
-                },
-              },
-              {
-                value: '12',
-                label: 'Column width (mobile)',
-                key: 'columnWidthMobile',
-                type: 'CUSTOM',
-                configuration: {
-                  as: 'DROPDOWN',
-                  dataType: 'string',
-                  allowedInput: [
-                    { name: 'Fit content', value: 'fitContent' },
-                    { name: 'Flexible', value: 'flexible' },
-                    { name: 'Hidden', value: 'hidden' },
-                    { name: '1', value: '1' },
-                    { name: '2', value: '2' },
-                    { name: '3', value: '3' },
-                    { name: '4', value: '4' },
-                    { name: '5', value: '5' },
-                    { name: '6', value: '6' },
-                    { name: '7', value: '7' },
-                    { name: '8', value: '8' },
-                    { name: '9', value: '9' },
-                    { name: '10', value: '10' },
-                    { name: '11', value: '11' },
-                    { name: '12', value: '12' },
-                  ],
-                },
-              },
-              {
-                value: '',
-                label: 'Height',
-                key: 'columnHeight',
-                type: 'TEXT',
-                configuration: {
-                  as: 'UNIT',
-                },
-              },
-              {
-                value: 'transparent',
-                label: 'Background color',
-                key: 'backgroundColor',
-                type: 'COLOR',
-              },
-              {
-                type: 'CUSTOM',
-                label: 'Horizontal Alignment',
-                key: 'horizontalAlignment',
-                value: 'inherit',
-                configuration: {
-                  as: 'BUTTONGROUP',
-                  dataType: 'string',
-                  allowedInput: [
-                    { name: 'None', value: 'inherit' },
-                    { name: 'Left', value: 'flex-start' },
-                    { name: 'Center', value: 'center' },
-                    { name: 'Right', value: 'flex-end' },
-                  ],
-                },
-              },
-              {
-                type: 'CUSTOM',
-                label: 'Vertical Alignment',
-                key: 'verticalAlignment',
-                value: 'inherit',
-                configuration: {
-                  as: 'BUTTONGROUP',
-                  dataType: 'string',
-                  allowedInput: [
-                    { name: 'None', value: 'inherit' },
-                    { name: 'Top', value: 'flex-start' },
-                    { name: 'Center', value: 'center' },
-                    { name: 'Bottom', value: 'flex-end' },
-                  ],
-                },
-              },
-              {
-                value: ['0rem', '0rem', '0rem', '0rem'],
-                label: 'Outer space',
-                key: 'outerSpacing',
-                type: 'SIZES',
-              },
-              {
-                value: ['M', 'M', 'M', 'M'],
-                label: 'Inner space',
-                key: 'innerSpacing',
-                type: 'SIZES',
-              },
-            ],
-            descendants: [],
-          },
         ],
       },
     ];
@@ -5386,7 +5164,6 @@
         const idProperty = data.model.properties.find(
           property => property.name === 'id',
         );
-        // productId.id = idProperty.id;
         const variableName = `${camelToSnakeCase(data.model.label)}_id`;
         newPrefab.variables.push({
           kind: 'integer',
@@ -5397,7 +5174,7 @@
           },
         });
 
-        const productReviewRelation = reviewDataModel.model.relationships.find(
+        const productReviewRelation = reviewDataModel.model?.relationships.find(
           prop => prop.name === data.model.name.toLowerCase(),
         ).id;
 
@@ -5405,8 +5182,10 @@
           p => p.name === 'id',
         ).id;
 
-        const productReviewFilterOption = {
-          value: {
+        let reviewFilterValue = {};
+
+        if (reviewDataModel.model?.relationships) {
+          reviewFilterValue = {
             [productReviewRelation]: {
               [productIdProperty]: {
                 eq: {
@@ -5415,7 +5194,10 @@
                 },
               },
             },
-          },
+          };
+        }
+        const productReviewFilterOption = {
+          value: reviewFilterValue,
           label: 'Filter',
           key: 'filter',
           type: 'FILTER',
@@ -5465,9 +5247,11 @@
         newPrefab.structure[0].descendants[1].descendants[0].descendants[0].descendants[1].descendants[0].descendants[2].options[0].value = [
           enrichVarObj(reviewAuthor),
         ];
-
-        newPrefab.structure[0].descendants[1].descendants[0].descendants[0].descendants[1].descendants[0].options[1] = productReviewFilterOption;
-
+        debugger;
+        if (reviewDataModel.model?.relationships) {
+          newPrefab.structure[0].descendants[1].descendants[0].descendants[0].descendants[1].descendants[0].options[1] = productReviewFilterOption;
+        }
+        debugger;
         newPrefab.structure[0].options[2].value = {
           [idProperty.id]: {
             eq: {
@@ -5481,94 +5265,10 @@
       }
     };
 
-    const saveThisPage = () => {
-      if (validate()) {
-        const newPrefab = { ...prefab };
-        const idProperty = data.model.properties.find(
-          property => property.name === 'id',
-        );
-
-        console.log('idProperty:', idProperty);
-
-        newPrefab.structure[0].options[0].value = thisPageState.modelId;
-        newPrefab.interactions.push({
-          name: 'setCurrentRecord',
-          sourceEvent:
-            thisPageState.component.name === 'DataTable'
-              ? 'OnRowClick'
-              : 'OnItemClick',
-          targetOptionName: 'currentRecord',
-          parameters: [
-            {
-              id: [idProperty.id],
-              parameter: 'argument',
-            },
-          ],
-          sourceComponentId: thisPageState.component.id,
-          ref: {
-            targetComponentId: '#dataContainer',
-          },
-          type: 'Global',
-        });
-        save(newPrefab);
-      }
-    };
-
-    const saveLoggedInUser = () => {
-      if (validate()) {
-        const newPrefab = { ...prefab };
-
-        newPrefab.structure[0].options[0].value =
-          loggedInUserState.authenticationProfile.loginModel;
-
-        newPrefab.structure[0].options[3].value =
-          loggedInUserState.authenticationProfile.id;
-
-        save(newPrefab);
-      }
-    };
-
     return (
       <>
         <Header onClose={close} title="Configure product detail page" />
         <Content>
-          <Field
-            label="Where is the data coming from?"
-            info={
-              <Text size="small" color="grey700">
-                {buttonGroupValue === 'anotherPage' &&
-                  'Link from another page to this page, and pass the ID property of the model.'}
-                {buttonGroupValue === 'thisPage' &&
-                  'A component on this page is passing the data to this DataContainer.'}
-                {buttonGroupValue === 'loggedInUser' &&
-                  'Data from the logged in user can be used inside this DataContainer.'}
-              </Text>
-            }
-          >
-            <ButtonGroup
-              onChange={({ target: { value } }) => {
-                setButtonGroupValue(value);
-              }}
-              value={buttonGroupValue}
-              size="large"
-            >
-              <ButtonGroupButton
-                label="Another page"
-                value="anotherPage"
-                name="dataSourceSelect"
-              />
-              <ButtonGroupButton
-                label="This page"
-                value="thisPage"
-                name="dataSourceSelect"
-              />
-              <ButtonGroupButton
-                label="Logged in user"
-                value="loggedInUser"
-                name="dataSourceSelect"
-              />
-            </ButtonGroup>
-          </Field>
           <Box direction="row">
             <Box direction="column" basis="1/2">
               <Heading size="medium">Product Details</Heading>
@@ -5596,75 +5296,6 @@
                     }}
                     margin
                     value={anotherPageState.modelId}
-                  />
-                </Field>
-              )}
-              {buttonGroupValue === 'thisPage' && (
-                <Field
-                  label="Component"
-                  error={
-                    validationMessage && (
-                      <Text color="#e82600">{validationMessage}</Text>
-                    )
-                  }
-                  info={
-                    <Text size="small" color="grey700">
-                      Select a component that contains a collection of data, for
-                      example DataList or DataTable.
-                    </Text>
-                  }
-                >
-                  <ComponentSelector
-                    onChange={component => {
-                      const foundModelId = Object.values(
-                        component.options,
-                      ).reduce(
-                        (acc, option) =>
-                          option.type === 'MODEL' ? option.value : acc,
-                        null,
-                      );
-                      setThisPageState(prevState => ({
-                        ...prevState,
-                        modelId: foundModelId,
-                        component,
-                      }));
-                      setModelId(foundModelId);
-                    }}
-                    value={
-                      thisPageState.component ? thisPageState.component.id : ''
-                    }
-                    placeholder="No components available."
-                    allowedComponents={['DataTable', 'DataList']}
-                  />
-                </Field>
-              )}
-              {buttonGroupValue === 'loggedInUser' && (
-                <Field
-                  label="Authentication Profile"
-                  error={
-                    validationMessage && (
-                      <Text color="#e82600">{validationMessage}</Text>
-                    )
-                  }
-                  info={
-                    <Text size="small" color="grey700">
-                      Select the Authentication Profile of which you want to
-                      show the data of.
-                    </Text>
-                  }
-                >
-                  <AuthenticationProfileSelector
-                    onChange={(id, authProfileObject) => {
-                      setLoggedInUserState(prevState => ({
-                        ...prevState,
-                        authenticationProfile: authProfileObject,
-                      }));
-                    }}
-                    value={
-                      loggedInUserState.authenticationProfile
-                        ? loggedInUserState.authenticationProfile.id
-                        : ''
-                    }
                   />
                 </Field>
               )}
@@ -5806,35 +5437,10 @@
             save(newPrefab);
           }}
           onSave={() => {
-            // console.log('product model', data.model);
-            // console.log('reviewData model:', reviewDataModel.model);
-            // console.log(
-            //   'reviewData relation id:',
-            //   reviewDataModel.model.relationships[1].id,
-            // );
-            // console.log(productIdProperty);
-            // console.log('productReviewRelation: ', productReviewRelation);
-            // const reviewDataList = reduceStructure('#reviewDataList', prefabStructure)
-
-            // setProductReview(
-            //   reviewDataModel.model.relationships.find(
-            //     prop => prop.name === 'project',
-            //   ),
-            // );
-            // console.log('AAA: ', productReview);
             setValidationMessage('');
             switch (buttonGroupValue) {
               case 'anotherPage':
                 saveAnotherPage();
-                break;
-              case 'thisPage':
-                saveThisPage();
-                break;
-
-              case 'loggedInUser':
-                saveLoggedInUser();
-                break;
-              default:
                 break;
             }
           }}

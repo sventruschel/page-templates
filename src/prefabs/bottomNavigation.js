@@ -24,7 +24,7 @@
       ],
       descendants: [
         {
-          name: 'Button',
+          name: 'BottomNavigationAction',
           options: [
             {
               label: 'Toggle visibility',
@@ -39,7 +39,7 @@
               type: 'CUSTOM',
               label: 'variant',
               key: 'variant',
-              value: 'text',
+              value: 'contained',
               configuration: {
                 as: 'BUTTONGROUP',
                 dataType: 'string',
@@ -53,9 +53,9 @@
             },
             {
               type: 'VARIABLE',
-              label: 'Button text',
-              key: 'buttonText',
-              value: ['Button'],
+              label: 'Item text',
+              key: 'itemText',
+              value: ['Item'],
               configuration: {
                 condition: {
                   type: 'HIDE',
@@ -1460,7 +1460,7 @@
               type: 'CUSTOM',
               label: 'Icon position',
               key: 'iconPosition',
-              value: 'top',
+              value: 'start',
               configuration: {
                 as: 'BUTTONGROUP',
                 dataType: 'string',
@@ -1473,7 +1473,6 @@
                 allowedInput: [
                   { name: 'Start', value: 'start' },
                   { name: 'End', value: 'end' },
-                  { name: 'Top', value: 'top' },
                 ],
               },
             },
@@ -1626,7 +1625,7 @@
           descendants: [],
         },
         {
-          name: 'Button',
+          name: 'BottomNavigationAction',
           options: [
             {
               label: 'Toggle visibility',
@@ -1641,7 +1640,7 @@
               type: 'CUSTOM',
               label: 'variant',
               key: 'variant',
-              value: 'text',
+              value: 'contained',
               configuration: {
                 as: 'BUTTONGROUP',
                 dataType: 'string',
@@ -1655,9 +1654,9 @@
             },
             {
               type: 'VARIABLE',
-              label: 'Button text',
-              key: 'buttonText',
-              value: ['Button'],
+              label: 'Item text',
+              key: 'itemText',
+              value: ['Item'],
               configuration: {
                 condition: {
                   type: 'HIDE',
@@ -3062,7 +3061,7 @@
               type: 'CUSTOM',
               label: 'Icon position',
               key: 'iconPosition',
-              value: 'top',
+              value: 'start',
               configuration: {
                 as: 'BUTTONGROUP',
                 dataType: 'string',
@@ -3075,7 +3074,6 @@
                 allowedInput: [
                   { name: 'Start', value: 'start' },
                   { name: 'End', value: 'end' },
-                  { name: 'Top', value: 'top' },
                 ],
               },
             },
@@ -3228,7 +3226,7 @@
           descendants: [],
         },
         {
-          name: 'Button',
+          name: 'BottomNavigationAction',
           options: [
             {
               label: 'Toggle visibility',
@@ -3243,7 +3241,7 @@
               type: 'CUSTOM',
               label: 'variant',
               key: 'variant',
-              value: 'text',
+              value: 'contained',
               configuration: {
                 as: 'BUTTONGROUP',
                 dataType: 'string',
@@ -3257,9 +3255,9 @@
             },
             {
               type: 'VARIABLE',
-              label: 'Button text',
-              key: 'buttonText',
-              value: ['Button'],
+              label: 'Item text',
+              key: 'itemText',
+              value: ['Item'],
               configuration: {
                 condition: {
                   type: 'HIDE',
@@ -4664,7 +4662,7 @@
               type: 'CUSTOM',
               label: 'Icon position',
               key: 'iconPosition',
-              value: 'top',
+              value: 'start',
               configuration: {
                 as: 'BUTTONGROUP',
                 dataType: 'string',
@@ -4677,7 +4675,6 @@
                 allowedInput: [
                   { name: 'Start', value: 'start' },
                   { name: 'End', value: 'end' },
-                  { name: 'Top', value: 'top' },
                 ],
               },
             },
