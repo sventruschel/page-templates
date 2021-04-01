@@ -1516,26 +1516,6 @@
             },
           },
         },
-        {
-          value: false,
-          label: 'Styles',
-          key: 'styles',
-          type: 'TOGGLE',
-        },
-        {
-          type: 'COLOR',
-          label: 'Helper color',
-          key: 'helperColor',
-          value: 'Accent2',
-          configuration: {
-            condition: {
-              type: 'SHOW',
-              option: 'styles',
-              comparator: 'EQ',
-              value: true,
-            },
-          },
-        },
       ],
       descendants: [],
     },
