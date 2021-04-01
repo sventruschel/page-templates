@@ -13,6 +13,7 @@
       linkTo,
       linkToExternal,
       openLinkToExternal,
+      itemText,
     } = options;
     const {
       env,
@@ -27,6 +28,7 @@
     const hasExternalLink = linkToExternal && linkToExternal.id !== '';
     const linkToExternalVariable =
       (linkToExternal && useText(linkToExternal)) || '';
+    const { value, index } = parent;
 
     const generalProps = {
       tabindex: isDev && -1,
@@ -47,14 +49,17 @@
         {...generalProps}
         showLabel
         icon={icon !== 'None' && React.createElement(Icons[icon])}
-        label="Test"
+        label={itemText}
+        className={classes.bottomNavAction}
       />
     );
+
+    console.log('VALUE: ', value);
 
     const ButtonComponent = BasicButtonComponent;
 
     if (isDev) {
-      return <div className={classes.wrapper}>{ButtonComponent}</div>;
+      return <div>{ButtonComponent}</div>;
     }
     return ButtonComponent;
   })(),
@@ -64,7 +69,11 @@
     const getSpacing = (idx, device = 'Mobile') =>
       idx === '0' ? '0rem' : style.getSpacing(idx, device);
     return {
-      wrapper: {},
+      bottomNavAction: {
+        '& .MuiBottomNavigationAction-wrapper': {
+          color: ({ options: { textColor } }) => style.getColor(textColor),
+        },
+      },
     };
   },
 }))();

@@ -5,18 +5,33 @@
   orientation: 'HORIZONTAL',
   jsx: (() => {
     const { BottomNavigation } = window.MaterialUI.Core;
-    const { env } = B;
+    const { env, Children } = B;
     const isDev = env === 'dev';
+    const [value, setValue] = React.useState(0);
 
-    const AppBarComponent = (
+    // const handleChange = (event, newValue) => {
+    //   setValue(newValue);
+    //   console.log(newValue);
+    // };
+
+    const bottomNavComponent = (
       <div className={isDev ? classes.dev : classes.root}>
-        <BottomNavigation value="recents" showLabels>
-          {children}
+        <BottomNavigation
+          value={value}
+          showLabels
+          onChange={(event, newValue) => {
+            setValue(newValue);
+            console.log('JOEEEE');
+          }}
+        >
+          {React.Children.map(children, (child, index) => (
+            <Children>{React.cloneElement(child)}</Children>
+          ))}
         </BottomNavigation>
       </div>
     );
 
-    return isDev ? <div>{AppBarComponent}</div> : AppBarComponent;
+    return isDev ? <div>{bottomNavComponent}</div> : bottomNavComponent;
   })(),
   styles: B => t => {
     const { Styling } = B;

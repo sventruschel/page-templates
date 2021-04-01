@@ -1,7 +1,7 @@
 (() => ({
   name: 'BottomNavigationAction',
-  icon: 'ButtonIcon',
-  category: 'BUTTON',
+  icon: 'MenuIcon',
+  category: 'NAVIGATION',
   structure: [
     {
       name: 'BottomNavigationAction',
@@ -33,9 +33,9 @@
         },
         {
           type: 'VARIABLE',
-          label: 'Button text',
-          key: 'buttonText',
-          value: ['Button'],
+          label: 'Item text',
+          key: 'itemText',
+          value: ['Item'],
           configuration: {
             condition: {
               type: 'HIDE',
