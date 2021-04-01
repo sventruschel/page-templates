@@ -19,6 +19,7 @@
       margin,
       helperText,
       disableToolbar,
+      autoOk,
       hideLabel,
       customModelAttribute: customModelAttributeObj,
       use24HourClockDateTime,
@@ -111,7 +112,7 @@
 
         resultString = isValidDate(selectedDate)
           ? new Date(selectedDate).toISOString()
-          : new Date().toISOString();
+          : null;
         break;
       }
       case 'time': {
@@ -167,6 +168,7 @@
         }}
         ampm={!use24HourClock}
         keyboardIcon={type === 'time' ? <AccessTime /> : <Event />}
+        autoOk={autoOk}
       />
     );
 
