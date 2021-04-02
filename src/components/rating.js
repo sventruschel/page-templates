@@ -26,7 +26,6 @@
       validationValueMissing,
       error,
       helperText,
-      count,
     } = options;
 
     const {
@@ -77,7 +76,7 @@
       if (isDev) {
         setCurrentValue(useText(defaultValue));
       }
-    }, [isDev, defaultValue, count]);
+    }, [isDev, defaultValue]);
 
     const RatingComponent = (
       <div className={classes.root}>
@@ -210,10 +209,6 @@
       },
       formControl: {
         '& > legend': {
-          color: ({ options: { labelColor } }) => [
-            style.getColor(labelColor),
-            '!important',
-          ],
           '&.Mui-error': {
             color: ({ options: { errorColor } }) => [
               style.getColor(errorColor),
