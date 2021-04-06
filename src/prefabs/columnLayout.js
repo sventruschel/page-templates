@@ -55,13 +55,13 @@
               <Field
                 info={
                   <Text size="small" color="grey700">
-                    {`Click the Add rows button to add a new row to the page.
+                    {`Click the '+ Add row' button to add a new row to the page.
                     You can specify the amount of columns per row`}
                   </Text>
                 }
               >
                 <Button
-                  label="Add row"
+                  label="+ Add row"
                   disabled={!maxRows}
                   onClick={() => {
                     if (maxRows) {
