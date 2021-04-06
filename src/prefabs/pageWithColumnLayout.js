@@ -2,7 +2,7 @@
   name: 'Page With Column Layout',
   icon: 'GridIcon',
   description:
-    'With this page you can select the amount of rows and the number of columns for each row',
+    'With this page with appbar you can select the amount of rows and the number of columns for each row',
   // type: 'page',
   category: 'LAYOUT',
   beforeCreate: ({
@@ -1684,20 +1684,65 @@
     const stepper = {
       setStep: step => {
         switch (step) {
+          case 1:
+            return (
+              <>
+                <Field label="Appbar title">
+                  <TextInput
+                    placeholder="Placeholder..."
+                    value={appBarTitle}
+                    onChange={({ target: { value } }) => {
+                      setAppBarTitle(value);
+                    }}
+                  />
+                </Field>
+                <Field label="Add logout button">
+                  <CheckBox
+                    onChange={() => setUseLogoutButton(!useLogoutButton)}
+                    checked={useLogoutButton}
+                  />
+                </Field>
+                {useLogoutButton && (
+                  <Field
+                    label="Redirect after logout"
+                    error={
+                      showEndpointValidation && (
+                        <Text color="#e82600">
+                          Selecting a page to redirect to is required
+                        </Text>
+                      )
+                    }
+                  >
+                    <EndpointSelector
+                      value={redirectTo}
+                      size="large"
+                      onChange={value => {
+                        setShowEndpointValidation(isEmptyRedirect(value));
+                        setRedirectTo(value);
+                      }}
+                    />
+                  </Field>
+                )}
+              </>
+            );
+
           case 2:
             return (
               <Box direction="row">
                 <Box direction="column" basis="2/3">
                   <Field
                     info={
-                      <Text size="small" color="grey700">
-                        {`Click the Add row button to add a new row to the page.
-                      You can specify the amount of columns per row`}
-                      </Text>
+                      <>
+                        <Text size="small" color="grey700">
+                          Click the Add row button to add a new row to the page.
+                          <br />
+                          You can specify the amount of columns per row.
+                        </Text>
+                      </>
                     }
                   >
                     <Button
-                      label="Add row"
+                      label="+ Add row"
                       disabled={!maxRows}
                       onClick={() => {
                         if (maxRows) {
@@ -1817,49 +1862,6 @@
                   ))}
                 </Box>
               </Box>
-            );
-
-          case 1:
-            return (
-              <>
-                <Field label='Appbar title'>
-                  <TextInput
-                    placeholder="Placeholder..."
-                    value={appBarTitle}
-                    onChange={({ target: { value } }) => {
-                      setAppBarTitle(value);
-                    }}
-                  />
-                </Field>
-                <Field>
-                  <CheckBox
-                    label="Add logout button"
-                    onChange={() => setUseLogoutButton(!useLogoutButton)}
-                    checked={useLogoutButton}
-                  />
-                </Field>
-                {useLogoutButton && (
-                  <Field
-                    label="Redirect after logout"
-                    error={
-                      showEndpointValidation && (
-                        <Text color="#e82600">
-                          Selecting a page to redirect to is required
-                        </Text>
-                      )
-                    }
-                  >
-                    <EndpointSelector
-                      value={redirectTo}
-                      size="large"
-                      onChange={value => {
-                        setShowEndpointValidation(isEmptyRedirect(value));
-                        setRedirectTo(value);
-                      }}
-                    />
-                  </Field>
-                )}
-              </>
             );
 
           default:
@@ -2653,5 +2655,4 @@
       ],
     },
   ],
-  interactions: [],
 }))();
