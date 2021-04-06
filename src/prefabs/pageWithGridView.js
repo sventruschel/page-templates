@@ -2,7 +2,8 @@
   name: 'Page With Grid View',
   icon: 'GridIcon',
   // type: 'page',
-  description: 'This is a page containing a data grid with a custom search field',
+  description:
+    'This is a page containing a data grid with a custom search field',
   category: 'LAYOUT',
   beforeCreate: ({
     helpers: { useModelQuery },
