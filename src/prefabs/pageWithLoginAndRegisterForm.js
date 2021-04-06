@@ -11993,6 +11993,10 @@
     return (
       <>
         <Header onClose={close} title="Configure login and register form" />
+        {stepper.progressBar([
+          'Configure Login Form',
+          'Configure Register Form',
+        ])}
         <Content>{stepper.setStep(stepNumber)}</Content>
         {stepper.buttons()}
       </>
