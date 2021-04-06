@@ -1,8 +1,8 @@
 (() => ({
-  name: 'Page with grid view',
+  name: 'Page With Grid View',
   icon: 'GridIcon',
   // type: 'page',
-  description: 'Page with grid view',
+  description: 'This is a page containing a data grid with a custom search field',
   category: 'LAYOUT',
   beforeCreate: ({
     helpers: { useModelQuery },
