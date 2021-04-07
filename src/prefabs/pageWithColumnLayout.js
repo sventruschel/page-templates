@@ -1870,6 +1870,7 @@
       },
       onSave: () => {
         const newPrefab = { ...prefab };
+        debugger;
         rows.forEach(row => {
           const newRow = {
             name: 'Row',
@@ -2181,6 +2182,7 @@
       </>
     );
   },
+  interactions: [],
   structure: [
     {
       name: 'Row',

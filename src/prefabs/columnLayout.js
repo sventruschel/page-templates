@@ -420,6 +420,7 @@
       </>
     );
   },
+  interactions: [],
   structure: [
     {
       name: 'Row',
