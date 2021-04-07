@@ -2,7 +2,7 @@
   name: 'Page With Column Layout',
   icon: 'GridIcon',
   description:
-    'With this page you can select the amount of rows and the number of columns for each row',
+    'With this page with appbar you can select the amount of rows and the number of columns for each row',
   // type: 'page',
   category: 'LAYOUT',
   beforeCreate: ({
@@ -1684,20 +1684,66 @@
     const stepper = {
       setStep: step => {
         switch (step) {
+          case 1:
+            return (
+              <>
+                <Field label="Appbar title">
+                  <TextInput
+                    placeholder="Placeholder..."
+                    value={appBarTitle}
+                    onChange={({ target: { value } }) => {
+                      setAppBarTitle(value);
+                    }}
+                  />
+                </Field>
+                <Field label="Add logout button">
+                  <CheckBox
+                    onChange={() => setUseLogoutButton(!useLogoutButton)}
+                    checked={useLogoutButton}
+                  />
+                </Field>
+                {useLogoutButton && (
+                  <Field
+                    label="Redirect after logout"
+                    error={
+                      showEndpointValidation && (
+                        <Text color="#e82600">
+                          Selecting a redirect is required if you choose to add
+                          a logout button
+                        </Text>
+                      )
+                    }
+                  >
+                    <EndpointSelector
+                      value={redirectTo}
+                      size="large"
+                      onChange={value => {
+                        setShowEndpointValidation(isEmptyRedirect(value));
+                        setRedirectTo(value);
+                      }}
+                    />
+                  </Field>
+                )}
+              </>
+            );
+
           case 2:
             return (
               <Box direction="row">
                 <Box direction="column" basis="2/3">
                   <Field
                     info={
-                      <Text size="small" color="grey700">
-                        {`Click the Add row button to add a new row to the page.
-                      You can specify the amount of columns per row`}
-                      </Text>
+                      <>
+                        <Text size="small" color="grey700">
+                          Click the Add row button to add a new row to the page.
+                          <br />
+                          You can specify the amount of columns per row.
+                        </Text>
+                      </>
                     }
                   >
                     <Button
-                      label="Add row"
+                      label="+ Add row"
                       disabled={!maxRows}
                       onClick={() => {
                         if (maxRows) {
@@ -1817,49 +1863,6 @@
                   ))}
                 </Box>
               </Box>
-            );
-
-          case 1:
-            return (
-              <>
-                <Field label='Appbar title'>
-                  <TextInput
-                    placeholder="Placeholder..."
-                    value={appBarTitle}
-                    onChange={({ target: { value } }) => {
-                      setAppBarTitle(value);
-                    }}
-                  />
-                </Field>
-                <Field>
-                  <CheckBox
-                    label="Add logout button"
-                    onChange={() => setUseLogoutButton(!useLogoutButton)}
-                    checked={useLogoutButton}
-                  />
-                </Field>
-                {useLogoutButton && (
-                  <Field
-                    label="Redirect after logout"
-                    error={
-                      showEndpointValidation && (
-                        <Text color="#e82600">
-                          Selecting a page to redirect to is required
-                        </Text>
-                      )
-                    }
-                  >
-                    <EndpointSelector
-                      value={redirectTo}
-                      size="large"
-                      onChange={value => {
-                        setShowEndpointValidation(isEmptyRedirect(value));
-                        setRedirectTo(value);
-                      }}
-                    />
-                  </Field>
-                )}
-              </>
             );
 
           default:
@@ -2179,6 +2182,7 @@
       </>
     );
   },
+  interactions: [],
   structure: [
     {
       name: 'Row',
@@ -2224,29 +2228,129 @@
       ],
       descendants: [
         {
-          name: 'Row',
+          name: 'Column',
           options: [
             {
-              type: 'CUSTOM',
-              label: 'Width',
-              key: 'maxRowWidth',
-              value: 'Full',
+              label: 'Toggle visibility',
+              key: 'visible',
+              value: true,
+              type: 'TOGGLE',
               configuration: {
-                as: 'BUTTONGROUP',
+                as: 'VISIBILITY',
+              },
+            },
+            {
+              value: 'flexible',
+              label: 'Column width',
+              key: 'columnWidth',
+              type: 'CUSTOM',
+              configuration: {
+                as: 'DROPDOWN',
                 dataType: 'string',
                 allowedInput: [
-                  { name: 'S', value: 'S' },
-                  { name: 'M', value: 'M' },
-                  { name: 'L', value: 'L' },
-                  { name: 'XL', value: 'XL' },
-                  { name: 'Full', value: 'Full' },
+                  { name: 'Fit content', value: 'fitContent' },
+                  { name: 'Flexible', value: 'flexible' },
+                  { name: 'Hidden', value: 'hidden' },
+                  { name: '1', value: '1' },
+                  { name: '2', value: '2' },
+                  { name: '3', value: '3' },
+                  { name: '4', value: '4' },
+                  { name: '5', value: '5' },
+                  { name: '6', value: '6' },
+                  { name: '7', value: '7' },
+                  { name: '8', value: '8' },
+                  { name: '9', value: '9' },
+                  { name: '10', value: '10' },
+                  { name: '11', value: '11' },
+                  { name: '12', value: '12' },
+                ],
+              },
+            },
+            {
+              value: 'flexible',
+              label: 'Column width (tablet landscape)',
+              key: 'columnWidthTabletLandscape',
+              type: 'CUSTOM',
+              configuration: {
+                as: 'DROPDOWN',
+                dataType: 'string',
+                allowedInput: [
+                  { name: 'Fit content', value: 'fitContent' },
+                  { name: 'Flexible', value: 'flexible' },
+                  { name: 'Hidden', value: 'hidden' },
+                  { name: '1', value: '1' },
+                  { name: '2', value: '2' },
+                  { name: '3', value: '3' },
+                  { name: '4', value: '4' },
+                  { name: '5', value: '5' },
+                  { name: '6', value: '6' },
+                  { name: '7', value: '7' },
+                  { name: '8', value: '8' },
+                  { name: '9', value: '9' },
+                  { name: '10', value: '10' },
+                  { name: '11', value: '11' },
+                  { name: '12', value: '12' },
+                ],
+              },
+            },
+            {
+              value: 'flexible',
+              label: 'Column width (tablet portrait)',
+              key: 'columnWidthTabletPortrait',
+              type: 'CUSTOM',
+              configuration: {
+                as: 'DROPDOWN',
+                dataType: 'string',
+                allowedInput: [
+                  { name: 'Fit content', value: 'fitContent' },
+                  { name: 'Flexible', value: 'flexible' },
+                  { name: 'Hidden', value: 'hidden' },
+                  { name: '1', value: '1' },
+                  { name: '2', value: '2' },
+                  { name: '3', value: '3' },
+                  { name: '4', value: '4' },
+                  { name: '5', value: '5' },
+                  { name: '6', value: '6' },
+                  { name: '7', value: '7' },
+                  { name: '8', value: '8' },
+                  { name: '9', value: '9' },
+                  { name: '10', value: '10' },
+                  { name: '11', value: '11' },
+                  { name: '12', value: '12' },
+                ],
+              },
+            },
+            {
+              value: 'flexible',
+              label: 'Column width (mobile)',
+              key: 'columnWidthMobile',
+              type: 'CUSTOM',
+              configuration: {
+                as: 'DROPDOWN',
+                dataType: 'string',
+                allowedInput: [
+                  { name: 'Fit content', value: 'fitContent' },
+                  { name: 'Flexible', value: 'flexible' },
+                  { name: 'Hidden', value: 'hidden' },
+                  { name: '1', value: '1' },
+                  { name: '2', value: '2' },
+                  { name: '3', value: '3' },
+                  { name: '4', value: '4' },
+                  { name: '5', value: '5' },
+                  { name: '6', value: '6' },
+                  { name: '7', value: '7' },
+                  { name: '8', value: '8' },
+                  { name: '9', value: '9' },
+                  { name: '10', value: '10' },
+                  { name: '11', value: '11' },
+                  { name: '12', value: '12' },
                 ],
               },
             },
             {
               value: '',
               label: 'Height',
-              key: 'rowHeight',
+              key: 'columnHeight',
               type: 'TEXT',
               configuration: {
                 as: 'UNIT',
@@ -2259,9 +2363,47 @@
               type: 'COLOR',
             },
             {
+              type: 'CUSTOM',
+              label: 'Horizontal Alignment',
+              key: 'horizontalAlignment',
+              value: 'inherit',
+              configuration: {
+                as: 'BUTTONGROUP',
+                dataType: 'string',
+                allowedInput: [
+                  { name: 'None', value: 'inherit' },
+                  { name: 'Left', value: 'flex-start' },
+                  { name: 'Center', value: 'center' },
+                  { name: 'Right', value: 'flex-end' },
+                ],
+              },
+            },
+            {
+              type: 'CUSTOM',
+              label: 'Vertical Alignment',
+              key: 'verticalAlignment',
+              value: 'inherit',
+              configuration: {
+                as: 'BUTTONGROUP',
+                dataType: 'string',
+                allowedInput: [
+                  { name: 'None', value: 'inherit' },
+                  { name: 'Top', value: 'flex-start' },
+                  { name: 'Center', value: 'center' },
+                  { name: 'Bottom', value: 'flex-end' },
+                ],
+              },
+            },
+            {
               value: ['0rem', '0rem', '0rem', '0rem'],
               label: 'Outer space',
               key: 'outerSpacing',
+              type: 'SIZES',
+            },
+            {
+              value: ['0rem', '0rem', '0rem', '0rem'],
+              label: 'Inner space',
+              key: 'innerSpacing',
               type: 'SIZES',
             },
           ],
@@ -2653,5 +2795,4 @@
       ],
     },
   ],
-  interactions: [],
 }))();
