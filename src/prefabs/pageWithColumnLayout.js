@@ -1708,7 +1708,8 @@
                     error={
                       showEndpointValidation && (
                         <Text color="#e82600">
-                          Selecting a page to redirect to is required
+                          Selecting a redirect is required if you choose to add
+                          a logout button
                         </Text>
                       )
                     }
