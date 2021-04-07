@@ -1870,7 +1870,6 @@
       },
       onSave: () => {
         const newPrefab = { ...prefab };
-        debugger;
         rows.forEach(row => {
           const newRow = {
             name: 'Row',
