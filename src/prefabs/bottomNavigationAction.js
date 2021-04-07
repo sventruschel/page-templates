@@ -1,10 +1,10 @@
 (() => ({
-  name: 'Button',
-  icon: 'ButtonIcon',
-  category: 'BUTTON',
+  name: 'BottomNavigationAction',
+  icon: 'MenuIcon',
+  category: 'NAVIGATION',
   structure: [
     {
-      name: 'Button',
+      name: 'BottomNavigationAction',
       options: [
         {
           label: 'Toggle visibility',
@@ -33,9 +33,9 @@
         },
         {
           type: 'VARIABLE',
-          label: 'Button text',
-          key: 'buttonText',
-          value: ['Button'],
+          label: 'Item text',
+          key: 'itemText',
+          value: ['Item'],
           configuration: {
             condition: {
               type: 'HIDE',
@@ -171,7 +171,7 @@
         {
           label: 'Icon',
           key: 'icon',
-          value: 'None',
+          value: 'Add',
           type: 'CUSTOM',
           configuration: {
             as: 'DROPDOWN',
@@ -1453,7 +1453,6 @@
             allowedInput: [
               { name: 'Start', value: 'start' },
               { name: 'End', value: 'end' },
-              { name: 'Top', value: 'top' },
             ],
           },
         },

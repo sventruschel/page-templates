@@ -149,10 +149,14 @@
       <BtnComp
         {...compProps}
         startIcon={
-          !isIcon &&
-          icon !== 'None' &&
-          iconPosition === 'start' &&
-          React.createElement(Icons[icon])
+          (!isIcon &&
+            icon !== 'None' &&
+            iconPosition === 'start' &&
+            React.createElement(Icons[icon])) ||
+          (!isIcon &&
+            icon !== 'None' &&
+            iconPosition === 'top' &&
+            React.createElement(Icons[icon]))
         }
         endIcon={
           !isIcon &&
@@ -222,6 +226,18 @@
         },
       },
       root: {
+        '& .MuiButton-label': {
+          display: ({ options: { iconPosition } }) =>
+            iconPosition === 'top' ? 'flex' : 'inherit',
+          flexDirection: ({ options: { iconPosition } }) =>
+            iconPosition === 'top' ? 'column' : 'unset',
+          '& .MuiButton-startIcon': {
+            marginLeft: ({ options: { iconPosition } }) =>
+              iconPosition === 'top' ? '0px' : '-4px',
+            marginRight: ({ options: { iconPosition } }) =>
+              iconPosition === 'top' ? '0px' : '8px',
+          },
+        },
         color: ({ options: { background, disabled, textColor, variant } }) => [
           !disabled
             ? style.getColor(variant === 'icon' ? background : textColor)

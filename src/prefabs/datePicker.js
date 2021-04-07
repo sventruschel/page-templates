@@ -1,7 +1,8 @@
 (() => ({
-  name: 'DatePicker',
+  name: 'Date Picker',
   icon: 'DatePickerIcon',
   category: 'FORM',
+  keywords: ['Form', 'input', 'date', 'picker', 'datepicker'],
   structure: [
     {
       name: 'DateTimePicker',
@@ -34,6 +35,12 @@
           label: 'Disable Toolbar',
           key: 'disableToolbar',
           value: false,
+        },
+        {
+          value: true,
+          label: 'Auto close on select',
+          key: 'autoOk',
+          type: 'TOGGLE',
         },
         {
           label: 'Language',
