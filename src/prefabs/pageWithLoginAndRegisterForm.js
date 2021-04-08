@@ -41,7 +41,7 @@
       }));
     }
 
-    const isEmptyRedirect = value =>
+    const isEmpty = value =>
       !value || Object.keys(value).length === 0 || value.id === '';
 
     const stepper = {
@@ -93,14 +93,13 @@
                     value={redirectTo}
                     size="large"
                     onChange={value => {
-                      setShowEndpointValidation(isEmptyRedirect(value));
+                      setShowEndpointValidation(isEmpty(value));
                       setRedirectTo(value);
                     }}
                   />
                 </Field>
               </>
             );
-
           case 2:
             return (
               <>
@@ -108,9 +107,7 @@
                   label="Input fields in the register form"
                   error={
                     showPropertiesValidation && (
-                      <Text color="#e82600">
-                        Selecting atleast one property is required
-                      </Text>
+                      <Text color="#e82600">Select at least one property</Text>
                     )
                   }
                 >
@@ -158,7 +155,6 @@
                 </Field>
               </>
             );
-
           default:
             break;
         }
@@ -169,12 +165,12 @@
           return;
         }
 
-        if (isEmptyRedirect(redirectTo)) {
+        if (isEmpty(redirectTo)) {
           setShowEndpointValidation(true);
           return;
         }
 
-        if (isEmptyRedirect(registerProperties)) {
+        if (isEmpty(registerProperties)) {
           setShowPropertiesValidation(true);
           return;
         }
@@ -11958,7 +11954,7 @@
                   setShowAuthValidation(true);
                   return;
                 }
-                if (isEmptyRedirect(redirectTo)) {
+                if (isEmpty(redirectTo)) {
                   setShowEndpointValidation(true);
 
                   return;
@@ -12439,12 +12435,6 @@
               label: 'Inner space',
               key: 'innerSpacing',
               type: 'SIZES',
-            },
-            {
-              type: 'TOGGLE',
-              label: 'Allow overflow',
-              key: 'overflow',
-              value: false,
             },
           ],
           descendants: [
@@ -13025,12 +13015,6 @@
                           key: 'innerSpacing',
                           type: 'SIZES',
                         },
-                        {
-                          type: 'TOGGLE',
-                          label: 'Allow overflow',
-                          key: 'overflow',
-                          value: false,
-                        },
                       ],
                       descendants: [
                         {
@@ -13054,7 +13038,7 @@
                               },
                             },
                             {
-                              value: '10%',
+                              value: '',
                               label: 'Height',
                               key: 'rowHeight',
                               type: 'TEXT',
@@ -13256,22 +13240,16 @@
                                   },
                                 },
                                 {
-                                  value: ['0rem', 'XL', '0rem', 'XL'],
+                                  value: ['0rem', '0rem', '0rem', '0rem'],
                                   label: 'Outer space',
                                   key: 'outerSpacing',
                                   type: 'SIZES',
                                 },
                                 {
-                                  value: ['0rem', 'XL', '0rem', 'XL'],
+                                  value: ['XL', 'XL', 'XL', 'XL'],
                                   label: 'Inner space',
                                   key: 'innerSpacing',
                                   type: 'SIZES',
-                                },
-                                {
-                                  type: 'TOGGLE',
-                                  label: 'Allow overflow',
-                                  key: 'overflow',
-                                  value: false,
                                 },
                               ],
                               descendants: [
@@ -13376,7 +13354,7 @@
                                       },
                                     },
                                     {
-                                      value: ['S', 'S', 'S', 'S'],
+                                      value: ['XL', 'XL', 'XL', 'XL'],
                                       label: 'Outer space',
                                       key: 'outerSpacing',
                                       type: 'SIZES',
@@ -13409,7 +13387,7 @@
                               },
                             },
                             {
-                              value: '90%',
+                              value: '',
                               label: 'Height',
                               key: 'rowHeight',
                               type: 'TEXT',
@@ -13424,7 +13402,7 @@
                               type: 'COLOR',
                             },
                             {
-                              value: ['0rem', '0rem', '0rem', '0rem'],
+                              value: ['XL', '0rem', '0rem', '0rem'],
                               label: 'Outer space',
                               key: 'outerSpacing',
                               type: 'SIZES',
@@ -13621,12 +13599,6 @@
                                   label: 'Inner space',
                                   key: 'innerSpacing',
                                   type: 'SIZES',
-                                },
-                                {
-                                  type: 'TOGGLE',
-                                  label: 'Allow overflow',
-                                  key: 'overflow',
-                                  value: false,
                                 },
                               ],
                               descendants: [
@@ -15250,7 +15222,7 @@
                                               name: 'Box',
                                               options: [
                                                 {
-                                                  value: 'center',
+                                                  value: 'flex-end',
                                                   label: 'Alignment',
                                                   key: 'alignment',
                                                   type: 'CUSTOM',
