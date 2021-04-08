@@ -2592,6 +2592,18 @@
           },
         },
         {
+          value: ['0rem', '0rem', '0rem', '0rem'],
+          label: 'Outer space',
+          key: 'outerSpacing',
+          type: 'SIZES',
+        },
+        {
+          value: false,
+          label: 'Styles',
+          key: 'styles1',
+          type: 'TOGGLE',
+        },
+        {
           type: 'COLOR',
           label: 'Empty color',
           key: 'emptyColor',
@@ -2648,6 +2660,26 @@
             condition: {
               type: 'SHOW',
               option: 'advancedSettings',
+              comparator: 'EQ',
+              value: true,
+            },
+          },
+        },
+        {
+          value: false,
+          label: 'Styles',
+          key: 'styles2',
+          type: 'TOGGLE',
+        },
+        {
+          type: 'COLOR',
+          label: 'Helper color',
+          key: 'helperColor1',
+          value: 'Accent2',
+          configuration: {
+            condition: {
+              type: 'SHOW',
+              option: 'styles',
               comparator: 'EQ',
               value: true,
             },
