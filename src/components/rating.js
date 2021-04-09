@@ -5,10 +5,7 @@
   orientation: 'VERTICAL',
   jsx: (() => {
     const { Icons } = window.MaterialUI;
-    const {
-      FormControl: MUIFormControl,
-      FormHelperText,
-    } = window.MaterialUI.Core;
+    const { FormControl, FormHelperText } = window.MaterialUI.Core;
     const { Rating } = window.MaterialUI.Lab;
     const { env, getCustomModelAttribute, useText } = B;
     const isDev = env === 'dev';
@@ -64,9 +61,8 @@
       handleValidation();
     };
 
-    const handleChange = (_event, val) => {
-      const newValue = val || '';
-      setCurrentValue(newValue);
+    const handleChange = (_, newValue) => {
+      setCurrentValue(newValue || '');
       if (afterFirstInvalidation) {
         handleValidation();
       }
@@ -75,13 +71,13 @@
     useEffect(() => {
       if (isDev) {
         setCurrentValue(useText(defaultValue));
+        setHelper(useText(helperText));
       }
-    }, [isDev, defaultValue]);
+    }, [isDev, defaultValue, helperText]);
 
     const RatingComponent = (
       <div className={classes.root}>
-        <MUIFormControl
-          classes={{ root: classes.formControl }}
+        <FormControl
           required={required}
           component="fieldset"
           error={errorState}
@@ -95,7 +91,7 @@
             size={size === 'custom' ? customSize : size}
             onChange={handleChange}
             disabled={disabled}
-            readOnly={isDev || readonly}
+            readOnly={readonly}
             emptyIcon={IconComponent}
             icon={IconComponent}
             onBlur={validationHandler}
@@ -114,7 +110,7 @@
             required={required}
             value={value}
           />
-        </MUIFormControl>
+        </FormControl>
       </div>
     );
 
@@ -132,7 +128,9 @@
 
     return {
       wrapper: {
-        display: 'inline-block',
+        '& > *': {
+          pointerEvents: 'none',
+        },
       },
       root: {
         display: 'inline-block',
@@ -206,20 +204,6 @@
         padding: 0,
         border: 'none',
         pointerEvents: 'none',
-      },
-      formControl: {
-        '& > legend': {
-          '&.Mui-error': {
-            color: ({ options: { errorColor } }) => [
-              style.getColor(errorColor),
-              '!important',
-            ],
-          },
-          '&.Mui-disabled': {
-            pointerEvents: 'none',
-            opacity: '0.7',
-          },
-        },
       },
     };
   },
