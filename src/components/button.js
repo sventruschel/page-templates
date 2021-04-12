@@ -51,10 +51,12 @@
     const isIcon = variant === 'icon';
     const buttonContent = useText(buttonText);
     const tooltipText = useText(tooltipContent);
+    const [, setOptions] = useOptions();
 
     const [isVisible, setIsVisible] = useState(visible);
     const [isLoading, setIsLoading] = useState(false);
     const [isOpen, setIsOpen] = useState(hasVisibleTooltip);
+    const [isDisabled, setIsDisabled] = useState(disabled);
 
     const camelToSnakeCase = str =>
       str[0].toLowerCase() +
@@ -96,10 +98,19 @@
       setIsOpen(hasVisibleTooltip);
     }, [visible, hasVisibleTooltip]);
 
+    useEffect(
+      () =>
+        setOptions({
+          disabled: isDisabled,
+        }),
+      [isDisabled],
+    );
+
     B.defineFunction('Show', () => setIsVisible(true));
     B.defineFunction('Hide', () => setIsVisible(false));
     B.defineFunction('Show/Hide', () => setIsVisible(s => !s));
     B.defineFunction('Toggle loading state', () => setIsLoading(s => !s));
+    B.defineFunction('Disable', () => setIsDisabled(s => !s));
 
     useEffect(() => {
       if (loading) {
