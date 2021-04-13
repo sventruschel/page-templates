@@ -1,7 +1,7 @@
 (() => ({
   name: 'Page With Master Detail View',
   icon: 'DataTable',
-  type: 'page',
+  // type: 'page',
   description:
     'This is a page containing a master detail view with edit and delete functionality',
   category: 'LAYOUT',
@@ -1386,8 +1386,14 @@
       },
     ];
 
-    const columnOptions = innerSpace => {
+    const columnOptions = (innerSpace, columnWidth) => {
       const innerSpaceOption = innerSpace || ['M', 'M', 'M', 'M'];
+      const columnWidthOptions = columnWidth || [
+        'flexible',
+        'flexible',
+        'flexible',
+        'flexible',
+      ];
       const columnOption = [
         {
           label: 'Toggle visibility',
@@ -1399,7 +1405,7 @@
           },
         },
         {
-          value: 'flexible',
+          value: columnWidthOptions[0],
           label: 'Column width',
           key: 'columnWidth',
           type: 'CUSTOM',
@@ -1435,7 +1441,7 @@
           },
         },
         {
-          value: 'flexible',
+          value: columnWidthOptions[1],
           label: 'Column width (tablet landscape)',
           key: 'columnWidthTabletLandscape',
           type: 'CUSTOM',
@@ -1471,7 +1477,7 @@
           },
         },
         {
-          value: 'flexible',
+          value: columnWidthOptions[2],
           label: 'Column width (tablet portrait)',
           key: 'columnWidthTabletPortrait',
           type: 'CUSTOM',
@@ -1507,7 +1513,7 @@
           },
         },
         {
-          value: 'flexible',
+          value: columnWidthOptions[3],
           label: 'Column width (mobile)',
           key: 'columnWidthMobile',
           type: 'CUSTOM',
@@ -9087,17 +9093,18 @@
                               descendants: [
                                 {
                                   name: 'Column',
-                                  options: columnOptions([
-                                    'M',
-                                    'M',
-                                    'M',
-                                    '0rem',
-                                  ]),
+                                  options: columnOptions(
+                                    ['M', 'M', 'M', '0rem'],
+                                    ['6', '6', '6', '12'],
+                                  ),
                                   descendants: [],
                                 },
                                 {
                                   name: 'Column',
-                                  options: columnOptions(),
+                                  options: columnOptions(
+                                    ['M', 'M', 'M', 'M'],
+                                    ['6', '6', '6', '12'],
+                                  ),
                                   descendants: [],
                                 },
                               ],
@@ -10706,7 +10713,7 @@
                                   type: 'COLOR',
                                   label: 'Text color',
                                   key: 'textColor',
-                                  value: 'White',
+                                  value: 'Dark',
                                   configuration: {
                                     condition: {
                                       type: 'HIDE',
@@ -11375,8 +11382,8 @@
         newPrefab.variables = variables;
 
         const editFormProperties = inheritProperties
-          ? editProperties
-          : properties;
+          ? properties
+          : editProperties;
 
         const descendantsArray = makeDescendantsArray(
           editFormProperties,
