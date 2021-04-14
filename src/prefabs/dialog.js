@@ -46,6 +46,12 @@
           value: false,
         },
         {
+          type: 'TOGGLE',
+          label: 'Disable backdrop click',
+          key: 'disableClick',
+          value: false,
+        },
+        {
           value: 'sm',
           label: 'Width',
           key: 'width',
@@ -129,6 +135,12 @@
                   value: 'elevation',
                 },
               },
+            },
+            {
+              value: ['0rem', '0rem', '0rem', '0rem'],
+              label: 'Outer space',
+              key: 'outerSpacing',
+              type: 'SIZES',
             },
           ],
           descendants: [
