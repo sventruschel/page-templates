@@ -1,6 +1,7 @@
 (() => ({
   name: 'Page With CRUD Data Table 1',
   description: 'This is a page which contains a datatable with CRUD dialogs',
+  // type: 'page',
   icon: 'DataTable',
   category: 'DATA',
   beforeCreate: ({
@@ -47,7 +48,7 @@
       skip: !modelId,
     });
 
-    const reduceStructure = (refValue, structure) =>
+    const getDescendantByRef = (refValue, structure) =>
       structure.reduce((acc, component) => {
         if (acc) return acc;
         if (
@@ -57,7 +58,7 @@
         ) {
           return component;
         }
-        return reduceStructure(refValue, component.descendants);
+        return getDescendantByRef(refValue, component.descendants);
       }, null);
 
     const iconConfiguration = {
@@ -1349,7 +1350,16 @@
         sourceEvent: 'Click',
         ref: {
           targetComponentId: '#createForm',
-          sourceComponentId: '#submitBtn',
+          sourceComponentId: '#submitBtnCreate',
+        },
+        type: 'Custom',
+      },
+      {
+        name: 'Submit',
+        sourceEvent: 'Click',
+        ref: {
+          targetComponentId: '#editForm',
+          sourceComponentId: '#submitBtnEdit',
         },
         type: 'Custom',
       },
@@ -1359,6 +1369,15 @@
         ref: {
           targetComponentId: '#dataTable',
           sourceComponentId: '#createForm',
+        },
+        type: 'Custom',
+      },
+      {
+        name: 'Refetch',
+        sourceEvent: 'onActionSuccess',
+        ref: {
+          targetComponentId: '#dataTable',
+          sourceComponentId: '#editForm',
         },
         type: 'Custom',
       },
@@ -1375,7 +1394,25 @@
         name: 'Toggle loading state',
         sourceEvent: 'onSubmit',
         ref: {
-          targetComponentId: '#submitBtn',
+          targetComponentId: '#submitBtnCreate',
+          sourceComponentId: '#createForm',
+        },
+        type: 'Custom',
+      },
+      {
+        name: 'Toggle loading state',
+        sourceEvent: 'onSubmit',
+        ref: {
+          targetComponentId: '#submitBtnEdit',
+          sourceComponentId: '#editForm',
+        },
+        type: 'Custom',
+      },
+      {
+        name: 'Toggle loading state',
+        sourceEvent: 'onActionSuccess',
+        ref: {
+          targetComponentId: '#submitBtnCreate',
           sourceComponentId: '#createForm',
         },
         type: 'Custom',
@@ -1384,7 +1421,16 @@
         name: 'Toggle loading state',
         sourceEvent: 'onActionSuccess',
         ref: {
-          targetComponentId: '#submitBtn',
+          targetComponentId: '#submitBtnEdit',
+          sourceComponentId: '#editForm',
+        },
+        type: 'Custom',
+      },
+      {
+        name: 'Toggle loading state',
+        sourceEvent: 'onActionError',
+        ref: {
+          targetComponentId: '#submitBtnCreate',
           sourceComponentId: '#createForm',
         },
         type: 'Custom',
@@ -1393,8 +1439,8 @@
         name: 'Toggle loading state',
         sourceEvent: 'onActionError',
         ref: {
-          targetComponentId: '#submitBtn',
-          sourceComponentId: '#createForm',
+          targetComponentId: '#submitBtnEdit',
+          sourceComponentId: '#editForm',
         },
         type: 'Custom',
       },
@@ -2864,144 +2910,144 @@
                   },
                 ],
                 descendants: [
-                  // {
-                  //   name: 'Text',
-                  //   options: [
-                  //     {
-                  //       type: 'VARIABLE',
-                  //       label: 'Content',
-                  //       key: 'content',
-                  //       value: ['All records'],
-                  //       configuration: {
-                  //         as: 'MULTILINE',
-                  //       },
-                  //     },
-                  //     {
-                  //       type: 'TOGGLE',
-                  //       label: 'Display Rich Text',
-                  //       key: 'useInnerHtml',
-                  //       value: false,
-                  //     },
-                  //     {
-                  //       value: 'Title3',
-                  //       label: 'Type',
-                  //       key: 'type',
-                  //       type: 'FONT',
-                  //     },
-                  //     {
-                  //       type: 'CUSTOM',
-                  //       label: 'Text Alignment',
-                  //       key: 'textAlignment',
-                  //       value: 'left',
-                  //       configuration: {
-                  //         as: 'BUTTONGROUP',
-                  //         dataType: 'string',
-                  //         allowedInput: [
-                  //           { name: 'Left', value: 'left' },
-                  //           { name: 'Center', value: 'center' },
-                  //           { name: 'Right', value: 'right' },
-                  //         ],
-                  //       },
-                  //     },
-                  //     {
-                  //       value: ['0rem', '0rem', '0rem', '0rem'],
-                  //       label: 'Outer space',
-                  //       key: 'outerSpacing',
-                  //       type: 'SIZES',
-                  //     },
-                  //     {
-                  //       type: 'CUSTOM',
-                  //       label: 'Link to',
-                  //       key: 'linkType',
-                  //       value: 'internal',
-                  //       configuration: {
-                  //         as: 'BUTTONGROUP',
-                  //         dataType: 'string',
-                  //         allowedInput: [
-                  //           { name: 'Internal page', value: 'internal' },
-                  //           { name: 'External page', value: 'external' },
-                  //         ],
-                  //       },
-                  //     },
-                  //     {
-                  //       value: '',
-                  //       label: 'Page',
-                  //       key: 'linkTo',
-                  //       type: 'ENDPOINT',
-                  //       configuration: {
-                  //         condition: {
-                  //           type: 'SHOW',
-                  //           option: 'linkType',
-                  //           comparator: 'EQ',
-                  //           value: 'internal',
-                  //         },
-                  //       },
-                  //     },
-                  //     {
-                  //       value: [''],
-                  //       label: 'URL',
-                  //       key: 'linkToExternal',
-                  //       type: 'VARIABLE',
-                  //       configuration: {
-                  //         placeholder: 'Starts with https:// or http://',
-                  //         condition: {
-                  //           type: 'SHOW',
-                  //           option: 'linkType',
-                  //           comparator: 'EQ',
-                  //           value: 'external',
-                  //         },
-                  //       },
-                  //     },
-                  //     {
-                  //       value: false,
-                  //       label: 'Styles',
-                  //       key: 'styles',
-                  //       type: 'TOGGLE',
-                  //     },
-                  //     {
-                  //       type: 'COLOR',
-                  //       label: 'Text color',
-                  //       key: 'textColor',
-                  //       value: 'Black',
-                  //       configuration: {
-                  //         condition: {
-                  //           type: 'SHOW',
-                  //           option: 'styles',
-                  //           comparator: 'EQ',
-                  //           value: true,
-                  //         },
-                  //       },
-                  //     },
-                  //     {
-                  //       type: 'CUSTOM',
-                  //       label: 'Font weight',
-                  //       key: 'fontWeight',
-                  //       value: '400',
-                  //       configuration: {
-                  //         as: 'DROPDOWN',
-                  //         dataType: 'string',
-                  //         allowedInput: [
-                  //           { name: '100', value: '100' },
-                  //           { name: '200', value: '200' },
-                  //           { name: '300', value: '300' },
-                  //           { name: '400', value: '400' },
-                  //           { name: '500', value: '500' },
-                  //           { name: '600', value: '600' },
-                  //           { name: '700', value: '700' },
-                  //           { name: '800', value: '800' },
-                  //           { name: '900', value: '900' },
-                  //         ],
-                  //         condition: {
-                  //           type: 'SHOW',
-                  //           option: 'styles',
-                  //           comparator: 'EQ',
-                  //           value: true,
-                  //         },
-                  //       },
-                  //     },
-                  //   ],
-                  //   descendants: [],
-                  // },
+                  {
+                    name: 'Text',
+                    options: [
+                      {
+                        type: 'VARIABLE',
+                        label: 'Content',
+                        key: 'content',
+                        value: ['All records'],
+                        configuration: {
+                          as: 'MULTILINE',
+                        },
+                      },
+                      {
+                        type: 'TOGGLE',
+                        label: 'Display Rich Text',
+                        key: 'useInnerHtml',
+                        value: false,
+                      },
+                      {
+                        value: 'Title3',
+                        label: 'Type',
+                        key: 'type',
+                        type: 'FONT',
+                      },
+                      {
+                        type: 'CUSTOM',
+                        label: 'Text Alignment',
+                        key: 'textAlignment',
+                        value: 'left',
+                        configuration: {
+                          as: 'BUTTONGROUP',
+                          dataType: 'string',
+                          allowedInput: [
+                            { name: 'Left', value: 'left' },
+                            { name: 'Center', value: 'center' },
+                            { name: 'Right', value: 'right' },
+                          ],
+                        },
+                      },
+                      {
+                        value: ['0rem', '0rem', '0rem', '0rem'],
+                        label: 'Outer space',
+                        key: 'outerSpacing',
+                        type: 'SIZES',
+                      },
+                      {
+                        type: 'CUSTOM',
+                        label: 'Link to',
+                        key: 'linkType',
+                        value: 'internal',
+                        configuration: {
+                          as: 'BUTTONGROUP',
+                          dataType: 'string',
+                          allowedInput: [
+                            { name: 'Internal page', value: 'internal' },
+                            { name: 'External page', value: 'external' },
+                          ],
+                        },
+                      },
+                      {
+                        value: '',
+                        label: 'Page',
+                        key: 'linkTo',
+                        type: 'ENDPOINT',
+                        configuration: {
+                          condition: {
+                            type: 'SHOW',
+                            option: 'linkType',
+                            comparator: 'EQ',
+                            value: 'internal',
+                          },
+                        },
+                      },
+                      {
+                        value: [''],
+                        label: 'URL',
+                        key: 'linkToExternal',
+                        type: 'VARIABLE',
+                        configuration: {
+                          placeholder: 'Starts with https:// or http://',
+                          condition: {
+                            type: 'SHOW',
+                            option: 'linkType',
+                            comparator: 'EQ',
+                            value: 'external',
+                          },
+                        },
+                      },
+                      {
+                        value: false,
+                        label: 'Styles',
+                        key: 'styles',
+                        type: 'TOGGLE',
+                      },
+                      {
+                        type: 'COLOR',
+                        label: 'Text color',
+                        key: 'textColor',
+                        value: 'Black',
+                        configuration: {
+                          condition: {
+                            type: 'SHOW',
+                            option: 'styles',
+                            comparator: 'EQ',
+                            value: true,
+                          },
+                        },
+                      },
+                      {
+                        type: 'CUSTOM',
+                        label: 'Font weight',
+                        key: 'fontWeight',
+                        value: '400',
+                        configuration: {
+                          as: 'DROPDOWN',
+                          dataType: 'string',
+                          allowedInput: [
+                            { name: '100', value: '100' },
+                            { name: '200', value: '200' },
+                            { name: '300', value: '300' },
+                            { name: '400', value: '400' },
+                            { name: '500', value: '500' },
+                            { name: '600', value: '600' },
+                            { name: '700', value: '700' },
+                            { name: '800', value: '800' },
+                            { name: '900', value: '900' },
+                          ],
+                          condition: {
+                            type: 'SHOW',
+                            option: 'styles',
+                            comparator: 'EQ',
+                            value: true,
+                          },
+                        },
+                      },
+                    ],
+                    descendants: [],
+                  },
                   {
                     name: 'Button',
                     ref: {
@@ -5256,7 +5302,7 @@
                                   {
                                     name: 'Button',
                                     ref: {
-                                      id: '#submitBtn',
+                                      id: '#submitBtnCreate',
                                     },
                                     options: [
                                       {
@@ -8748,7 +8794,7 @@
                                   {
                                     name: 'Button',
                                     ref: {
-                                      id: '#submitBtnxxx',
+                                      id: '#submitBtnEdit',
                                     },
                                     options: [
                                       {
@@ -11767,7 +11813,7 @@
             
             newPrefab.variables[2].options.modelId = modelId;
             
-            const dataTable = reduceStructure('#dataTable', prefabStructure);
+            const dataTable = getDescendantByRef('#dataTable', prefabStructure);
             dataTable.options[0].value = modelId;
             newPrefab.variables[1].options.modelId = modelId;
 
@@ -11980,14 +12026,14 @@
 
             dataTable.descendants.push(editDataTableColumn);
 
-            function makeDescendantsArray(propertiesInput) {
+            function makeDescendantsArray(propertiesInput, prefix) {
               const descendants = propertiesInput.map(property => {
                 switch (property.kind) {
                   case 'INTEGER': {
                     return {
                       name: 'TextField',
                       ref: {
-                        id: `#input_${property.id[0]}`,
+                        id: `#${prefix}input_${property.id[0]}`,
                       },
                       options: [
                         {
@@ -12001,7 +12047,7 @@
                             ],
                             propertyIds: property.id,
                             ref: {
-                              id: `#attribute_${property.id[0]}`,
+                              id: `#${prefix}attribute_${property.id[0]}`,
                             },
                           },
                           label: 'Label',
@@ -12398,7 +12444,7 @@
                     return {
                       name: 'TextField',
                       ref: {
-                        id: `#input_${property.id[0]}`,
+                        id: `#${prefix}input_${property.id[0]}`,
                       },
                       options: [
                         {
@@ -12825,7 +12871,7 @@
                     return {
                       name: 'TextField',
                       ref: {
-                        id: `#input_${property.id[0]}`,
+                        id: `#${prefix}_input_${property.id[0]}`,
                       },
                       options: [
                         {
@@ -13236,7 +13282,7 @@
                     return {
                       name: 'TextField',
                       ref: {
-                        id: `#input_${property.id[0]}`,
+                        id: `#${prefix}_input_${property.id[0]}`,
                       },
                       options: [
                         {
@@ -13654,7 +13700,7 @@
                     return {
                       name: 'TextField',
                       ref: {
-                        id: `#input_${property.id[0]}`,
+                        id: `#${prefix}input_${property.id[0]}`,
                       },
                       options: [
                         {
@@ -14065,7 +14111,7 @@
                     return {
                       name: 'TextField',
                       ref: {
-                        id: `#input_${property.id[0]}`,
+                        id: `#${prefix}input_${property.id[0]}`,
                       },
                       options: [
                         {
@@ -14478,7 +14524,7 @@
                     return {
                       name: 'DateTimePicker',
                       ref: {
-                        id: `#input_${property.id[0]}`,
+                        id: `#${prefix}input_${property.id[0]}`,
                       },
                       options: [
                         {
@@ -14805,7 +14851,7 @@
                     return {
                       name: 'DateTimePicker',
                       ref: {
-                        id: `#input_${property.id[0]}`,
+                        id: `#${prefix}input_${property.id[0]}`,
                       },
                       options: [
                         {
@@ -15169,7 +15215,7 @@
                     return {
                       name: 'DateTimePicker',
                       ref: {
-                        id: `#input_${property.id[0]}`,
+                        id: `#${prefix}input_${property.id[0]}`,
                       },
                       options: [
                         {
@@ -15502,7 +15548,7 @@
                     return {
                       name: 'FileUpload',
                       ref: {
-                        id: `#input_${property.id[0]}`,
+                        id: `#${prefix}input_${property.id[0]}`,
                       },
                       options: [
                         {
@@ -15781,7 +15827,7 @@
                     return {
                       name: 'FileUpload',
                       ref: {
-                        id: `#input_${property.id[0]}`,
+                        id: `#${prefix}input_${property.id[0]}`,
                       },
                       options: [
                         {
@@ -16116,7 +16162,7 @@
                     return {
                       name: 'Checkbox',
                       ref: {
-                        id: `#input_${property.id[0]}`,
+                        id: `#${prefix}input_${property.id[0]}`,
                       },
                       options: [
                         {
@@ -16306,7 +16352,7 @@
                     return {
                       name: 'Select',
                       ref: {
-                        id: `#input_${property.id[0]}`,
+                        id: `#${prefix}input_${property.id[0]}`,
                       },
                       options: [
                         {
@@ -16740,7 +16786,7 @@
                     return {
                       name: 'TextField',
                       ref: {
-                        id: `#input_${property.id[0]}`,
+                        id: `#${prefix}_input_${property.id[0]}`,
                       },
                       options: [
                         {
@@ -17153,12 +17199,13 @@
               return descendants;
             }
 
+
             newPrefab.actions[0].events[0].options.modelId = modelId;
 
-            const createForm = reduceStructure('#createForm', prefabStructure);
+            const createForm = getDescendantByRef('#createForm', prefabStructure);
 
             const createFormInputsArray = makeDescendantsArray(
-              createFormProperties,
+              createFormProperties, 'create'
             ).filter(item => item !== undefined);
             createForm.descendants = [...createFormInputsArray];
             newPrefab.actions[0].events[0].options.assign = createFormProperties.map(
@@ -17173,12 +17220,11 @@
               }),
             );
 
-           
 
-            const editForm = reduceStructure('#editForm', prefabStructure);
+            const editForm = getDescendantByRef('#editForm', prefabStructure);
 
             const editFormInputsArray = makeDescendantsArray(
-              createFormProperties,
+              createFormProperties, 'edit'
             ).filter(item => item !== undefined); 
             editForm.descendants = [...editFormInputsArray];
             newPrefab.actions[1].events[0].options.assign = createFormProperties.map(
@@ -17193,17 +17239,17 @@
               }),
             );
 
-            createFormProperties.forEach(property => {
-              interactions.push({
-                name: 'Clear',
-                sourceEvent: 'onActionSuccess',
-                ref: {
-                  targetComponentId: `#input_${property.id[0]}`,
-                  sourceComponentId: '#createForm',
-                },
-                type: 'Custom',
-              });
-            });
+            // createFormProperties.forEach(property => {
+            //   interactions.push({
+            //     name: 'Clear',
+            //     sourceEvent: 'onActionSuccess',
+            //     ref: {
+            //       targetComponentId: `#input_${property.id[0]}`,
+            //       sourceComponentId: '#createForm',
+            //     },
+            //     type: 'Custom',
+            //   });
+            // });
 
             newPrefab.interactions = interactions;
 
@@ -17213,26 +17259,49 @@
             editForm.options[0].value.modelId = modelId;
             editForm.options[1].value = modelId;
 
-            reduceStructure(
+            getDescendantByRef(
               '#createDialogTitle',
               prefabStructure,
             ).options[0].value = [`Create new ${data.model.label}`];
-            reduceStructure(
+            getDescendantByRef(
               '#editDialogTitle',
               prefabStructure,
             ).options[0].value = [`Edit ${data.model.label}`];
-            reduceStructure('#createBtn', prefabStructure).options[2].value = [
+            getDescendantByRef('#createBtn', prefabStructure).options[2].value = [
               `New ${data.model.label}`,
             ];
-            reduceStructure('#editBtn', prefabStructure).options[2].value = [
+            getDescendantByRef('#editBtn', prefabStructure).options[2].value = [
               `Edit ${data.model.label}`,
             ];
-            reduceStructure(
+            getDescendantByRef(
               '#successAlert',
               prefabStructure,
             ).options[1].value = [
               `New ${data.model.label} created successfully`,
             ];
+
+            const idProperty = data.model.properties.find(
+              property => property.name === 'id',
+            );
+
+            console.log(idProperty)
+
+            newPrefab.interactions.push({
+              name: 'setCurrentRecord',
+              sourceEvent: 'Click',
+              targetOptionName: 'currentRecord',
+              parameters: [
+                {
+                  id: [idProperty.id],
+                  parameter: 'argument',
+                },
+              ],
+              ref: {
+                sourceComponentId: '#editBtn',
+                targetComponentId: '#editForm',
+              },
+              type: 'Global',
+            });
 
             newPrefab.structure[0].descendants[0].descendants = prefabStructure;
             save(newPrefab);
