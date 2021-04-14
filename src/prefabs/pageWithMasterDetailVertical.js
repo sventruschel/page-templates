@@ -2663,7 +2663,7 @@
                             type: 'VARIABLE',
                             label: 'Title',
                             key: 'title',
-                            value: [''],
+                            value: [`${data.model.name}s`],
                           },
                           {
                             value: 'Title4',
@@ -3080,6 +3080,171 @@
                                   {
                                     name: 'Column',
                                     options: columnOptions(
+                                      ['M', 'M', '0rem', 'M'],
+                                      ['12', '12', '12', '12'],
+                                    ),
+                                    descendants: [
+                                      {
+                                        name: 'Text',
+                                        options: [
+                                          {
+                                            type: 'VARIABLE',
+                                            label: 'Content',
+                                            key: 'content',
+                                            value: ['Details'],
+                                            configuration: {
+                                              as: 'MULTILINE',
+                                            },
+                                          },
+                                          {
+                                            type: 'TOGGLE',
+                                            label: 'Display Rich Text',
+                                            key: 'useInnerHtml',
+                                            value: false,
+                                          },
+                                          {
+                                            value: 'Title4',
+                                            label: 'Type',
+                                            key: 'type',
+                                            type: 'FONT',
+                                          },
+                                          {
+                                            type: 'CUSTOM',
+                                            label: 'Text Alignment',
+                                            key: 'textAlignment',
+                                            value: 'left',
+                                            configuration: {
+                                              as: 'BUTTONGROUP',
+                                              dataType: 'string',
+                                              allowedInput: [
+                                                { name: 'Left', value: 'left' },
+                                                {
+                                                  name: 'Center',
+                                                  value: 'center',
+                                                },
+                                                {
+                                                  name: 'Right',
+                                                  value: 'right',
+                                                },
+                                              ],
+                                            },
+                                          },
+                                          {
+                                            value: [
+                                              '0rem',
+                                              '0rem',
+                                              '0rem',
+                                              '0rem',
+                                            ],
+                                            label: 'Outer space',
+                                            key: 'outerSpacing',
+                                            type: 'SIZES',
+                                          },
+                                          {
+                                            type: 'CUSTOM',
+                                            label: 'Link to',
+                                            key: 'linkType',
+                                            value: 'internal',
+                                            configuration: {
+                                              as: 'BUTTONGROUP',
+                                              dataType: 'string',
+                                              allowedInput: [
+                                                {
+                                                  name: 'Internal page',
+                                                  value: 'internal',
+                                                },
+                                                {
+                                                  name: 'External page',
+                                                  value: 'external',
+                                                },
+                                              ],
+                                            },
+                                          },
+                                          {
+                                            value: '',
+                                            label: 'Page',
+                                            key: 'linkTo',
+                                            type: 'ENDPOINT',
+                                            configuration: {
+                                              condition: {
+                                                type: 'SHOW',
+                                                option: 'linkType',
+                                                comparator: 'EQ',
+                                                value: 'internal',
+                                              },
+                                            },
+                                          },
+                                          {
+                                            value: [''],
+                                            label: 'URL',
+                                            key: 'linkToExternal',
+                                            type: 'VARIABLE',
+                                            configuration: {
+                                              placeholder:
+                                                'Starts with https:// or http://',
+                                              condition: {
+                                                type: 'SHOW',
+                                                option: 'linkType',
+                                                comparator: 'EQ',
+                                                value: 'external',
+                                              },
+                                            },
+                                          },
+                                          {
+                                            value: false,
+                                            label: 'Styles',
+                                            key: 'styles',
+                                            type: 'TOGGLE',
+                                          },
+                                          {
+                                            type: 'COLOR',
+                                            label: 'Text color',
+                                            key: 'textColor',
+                                            value: 'Black',
+                                            configuration: {
+                                              condition: {
+                                                type: 'SHOW',
+                                                option: 'styles',
+                                                comparator: 'EQ',
+                                                value: true,
+                                              },
+                                            },
+                                          },
+                                          {
+                                            type: 'CUSTOM',
+                                            label: 'Font weight',
+                                            key: 'fontWeight',
+                                            value: '400',
+                                            configuration: {
+                                              as: 'DROPDOWN',
+                                              dataType: 'string',
+                                              allowedInput: [
+                                                { name: '100', value: '100' },
+                                                { name: '200', value: '200' },
+                                                { name: '300', value: '300' },
+                                                { name: '400', value: '400' },
+                                                { name: '500', value: '500' },
+                                                { name: '600', value: '600' },
+                                                { name: '700', value: '700' },
+                                                { name: '800', value: '800' },
+                                                { name: '900', value: '900' },
+                                              ],
+                                              condition: {
+                                                type: 'SHOW',
+                                                option: 'styles',
+                                                comparator: 'EQ',
+                                                value: true,
+                                              },
+                                            },
+                                          },
+                                        ],
+                                        descendants: [],
+                                      },
+                                    ],
+                                  },
+                                  {
+                                    name: 'Column',
+                                    options: columnOptions(
                                       ['M', 'M', 'M', 'M'],
                                       ['6', '6', '6', '12'],
                                     ),
@@ -3131,7 +3296,7 @@
                 type: 'TOGGLE',
                 label: 'Sortable',
                 key: 'sortable',
-                value: false,
+                value: true,
               },
               {
                 type: 'VARIABLE',
@@ -3140,7 +3305,7 @@
                 value: [''],
               },
               {
-                value: 'Body1',
+                value: 'Title6',
                 label: 'Header Type',
                 key: 'type',
                 type: 'FONT',
@@ -3328,7 +3493,7 @@
                         type: 'VARIABLE',
                         label: 'Content',
                         key: 'content',
-                        value: [`${detail.label}:`],
+                        value: [`${detail.label}`],
                         configuration: {
                           as: 'MULTILINE',
                         },
@@ -3340,7 +3505,7 @@
                         value: false,
                       },
                       {
-                        value: 'Body1',
+                        value: 'Title6',
                         label: 'Type',
                         key: 'type',
                         type: 'FONT',
@@ -3439,7 +3604,7 @@
                         type: 'CUSTOM',
                         label: 'Font weight',
                         key: 'fontWeight',
-                        value: '800',
+                        value: '500',
                         configuration: {
                           as: 'DROPDOWN',
                           dataType: 'string',
@@ -3727,9 +3892,9 @@
         detailProperties.forEach((detail, detailIndex) => {
           const isOdd = num => num % 2;
           if (isOdd(detailIndex)) {
-            newDetail(1, detail);
+            newDetail(2, detail);
           } else {
-            newDetail(0, detail);
+            newDetail(1, detail);
           }
         });
 
