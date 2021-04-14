@@ -1454,6 +1454,7 @@
               { name: 'Start', value: 'start' },
               { name: 'End', value: 'end' },
               { name: 'Top', value: 'top' },
+              { name: 'Bottom', value: 'bottom' },
             ],
           },
         },
