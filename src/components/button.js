@@ -163,13 +163,13 @@
         startIcon={
           !isIcon &&
           icon !== 'None' &&
-          (iconPosition === 'start' || iconPosition === 'top') &&
+          (iconPosition === 'left' || iconPosition === 'top') &&
           React.createElement(Icons[icon])
         }
         endIcon={
           !isIcon &&
           icon !== 'None' &&
-          (iconPosition === 'end' || iconPosition === 'bottom') &&
+          (iconPosition === 'right' || iconPosition === 'bottom') &&
           React.createElement(Icons[icon])
         }
         onClick={event => {
