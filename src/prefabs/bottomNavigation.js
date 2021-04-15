@@ -7,9 +7,15 @@
       name: 'BottomNavigation',
       options: [
         {
+          label: 'Selected nav index',
+          key: 'defaultValue',
+          value: '1',
+          type: 'NUMBER',
+        },
+        {
           label: 'Background color',
           key: 'backgroundColor',
-          value: 'Primary',
+          value: 'Accent1',
           type: 'COLOR',
         },
         {
@@ -20,6 +26,12 @@
           configuration: {
             as: 'UNIT',
           },
+        },
+        {
+          label: 'Active color',
+          key: 'activeColor',
+          value: 'Primary',
+          type: 'COLOR',
         },
       ],
       descendants: [

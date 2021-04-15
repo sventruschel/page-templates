@@ -1,34 +1,53 @@
 (() => ({
   name: 'BottomNavigationAction',
-  type: 'CONTENT_COMPONENT',
+  type: 'NAV_COMPONENT',
   allowedTypes: [],
   orientation: 'VERTICAL',
   jsx: (() => {
     const { BottomNavigationAction } = window.MaterialUI.Core;
-    const { Icons } = window.MaterialUI;
 
     const {
+      label,
       icon,
       linkType,
       linkTo,
       linkToExternal,
       openLinkToExternal,
-      itemText,
     } = options;
-    const {
-      env,
-      getModel,
-      getIdProperty,
-      Link: BLink,
-      useProperty,
-      useText,
-    } = B;
+    const { env, Link: BLink, useText } = B;
     const isDev = env === 'dev';
     const hasLink = linkTo && linkTo.id !== '';
     const hasExternalLink = linkToExternal && linkToExternal.id !== '';
     const linkToExternalVariable =
       (linkToExternal && useText(linkToExternal)) || '';
-    const { value, index } = parent;
+    const { value, navData, setNavData, setSelectedNav, index } = parent;
+
+    const doSetNav = () => {
+      setSelectedNav(index);
+    };
+
+    B.defineFunction('SelectNav', doSetNav);
+
+    const labelChanged = () => {
+      const currentLabel = navData[`label${index}`]
+        ? useText(navData[`label${index}`])
+        : '';
+      return currentLabel !== useText(label);
+    };
+
+    const iconChanged = () => navData[`icon${index}`] !== icon;
+
+    const hasChange = () => labelChanged() || iconChanged();
+
+    useEffect(() => {
+      if (setNavData && hasChange()) {
+        setNavData({
+          ...navData,
+          [`label${index}`]: label,
+          [`icon${index}`]: icon,
+        });
+      }
+    }, [index, setNavData, navData, label, icon]);
 
     const generalProps = {
       tabindex: isDev && -1,
@@ -47,28 +66,48 @@
     const BasicButtonComponent = (
       <BottomNavigationAction
         {...generalProps}
-        showLabel
-        icon={icon !== 'None' && React.createElement(Icons[icon])}
-        label={itemText}
+        // showLabel
+        // icon={icon !== 'None' && React.createElement(Icons[icon])}
+        // label={label}
         className={classes.bottomNavAction}
       />
     );
 
     console.log('VALUE: ', value);
 
-    const ButtonComponent = BasicButtonComponent;
-
-    if (isDev) {
-      return <div>{ButtonComponent}</div>;
-    }
-    return ButtonComponent;
+    return isDev ? (
+      <div className={classes.wrapper}>{BasicButtonComponent}</div>
+    ) : (
+      { BasicButtonComponent }
+    );
   })(),
   styles: B => t => {
-    const { mediaMinWidth, Styling } = B;
+    const { Styling, env } = B;
+    const isDev = env === 'dev';
     const style = new Styling(t);
-    const getSpacing = (idx, device = 'Mobile') =>
-      idx === '0' ? '0rem' : style.getSpacing(idx, device);
     return {
+      wrapper: {
+        height: config => {
+          const {
+            options: { height },
+            parent: { index, value },
+          } = config;
+
+          return index === value ? height : 0;
+        },
+        width: config => {
+          const {
+            options: { width },
+            parent: { index, value },
+          } = config;
+
+          return index === value ? width : 0;
+        },
+      },
+      root: {
+        height: ({ options: { height } }) => (isDev ? '100%' : height),
+        width: ({ options: { width } }) => (isDev ? '100%' : width),
+      },
       bottomNavAction: {
         '& .MuiBottomNavigationAction-wrapper': {
           color: ({ options: { textColor } }) => style.getColor(textColor),

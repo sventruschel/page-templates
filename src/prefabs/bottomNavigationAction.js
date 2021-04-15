@@ -33,8 +33,8 @@
         },
         {
           type: 'VARIABLE',
-          label: 'Item text',
-          key: 'itemText',
+          label: 'Item label',
+          key: 'label',
           value: ['Item'],
           configuration: {
             condition: {
