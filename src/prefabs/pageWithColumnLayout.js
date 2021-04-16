@@ -25,7 +25,7 @@
     prefab,
     save,
   }) => {
-    const [rows, setRows] = React.useState([{ index: 1, columns: '2' }]);
+    const [rows, setRows] = React.useState([{ index: 1, columns: 2 }]);
     const [stepNumber, setStepNumber] = React.useState(1);
     const [appBarTitle, setAppBarTitle] = React.useState('Appbar');
     const [useLogoutButton, setUseLogoutButton] = React.useState(true);
@@ -53,6 +53,19 @@
       }
       return elements;
     };
+
+    const getDescendantByRef = (refValue, structure) =>
+      structure.reduce((acc, component) => {
+        if (acc) return acc;
+        if (
+          // eslint-disable-next-line no-prototype-builtins
+          component.hasOwnProperty('ref') &&
+          Object.values(component.ref).indexOf(refValue) > -1
+        ) {
+          return component;
+        }
+        return getDescendantByRef(refValue, component.descendants);
+      }, null);
 
     const isEmptyRedirect = value =>
       !value || Object.keys(value).length === 0 || value.id === '';
@@ -1683,191 +1696,181 @@
 
     const stepper = {
       setStep: step => {
-        switch (step) {
-          case 1:
-            return (
-              <>
-                <Field label="Appbar title">
-                  <TextInput
-                    placeholder="Placeholder..."
-                    value={appBarTitle}
-                    onChange={({ target: { value } }) => {
-                      setAppBarTitle(value);
+        if (step === 1) {
+          return (
+            <>
+              <Field label="Appbar title">
+                <TextInput
+                  placeholder="Placeholder..."
+                  value={appBarTitle}
+                  onChange={({ target: { value } }) => {
+                    setAppBarTitle(value);
+                  }}
+                />
+              </Field>
+              <Field label="Add logout button">
+                <CheckBox
+                  onChange={() => setUseLogoutButton(!useLogoutButton)}
+                  checked={useLogoutButton}
+                />
+              </Field>
+              {useLogoutButton && (
+                <Field
+                  label="Redirect after logout"
+                  error={
+                    showEndpointValidation && (
+                      <Text color="#e82600">
+                        Selecting a redirect is required if you choose to add a
+                        logout button
+                      </Text>
+                    )
+                  }
+                >
+                  <EndpointSelector
+                    value={redirectTo}
+                    size="large"
+                    onChange={value => {
+                      setShowEndpointValidation(isEmptyRedirect(value));
+                      setRedirectTo(value);
                     }}
                   />
                 </Field>
-                <Field label="Add logout button">
-                  <CheckBox
-                    onChange={() => setUseLogoutButton(!useLogoutButton)}
-                    checked={useLogoutButton}
-                  />
-                </Field>
-                {useLogoutButton && (
-                  <Field
-                    label="Redirect after logout"
-                    error={
-                      showEndpointValidation && (
-                        <Text color="#e82600">
-                          Selecting a redirect is required if you choose to add
-                          a logout button
-                        </Text>
-                      )
-                    }
-                  >
-                    <EndpointSelector
-                      value={redirectTo}
-                      size="large"
-                      onChange={value => {
-                        setShowEndpointValidation(isEmptyRedirect(value));
-                        setRedirectTo(value);
-                      }}
-                    />
-                  </Field>
-                )}
-              </>
-            );
-
-          case 2:
-            return (
-              <Box direction="row">
-                <Box direction="column" basis="2/3">
-                  <Field
-                    info={
-                      <>
-                        <Text size="small" color="grey700">
-                          Click the Add row button to add a new row to the page.
-                          <br />
-                          You can specify the amount of columns per row.
-                        </Text>
-                      </>
-                    }
-                  >
-                    <Button
-                      label="+ Add row"
-                      disabled={!maxRows}
-                      onClick={() => {
-                        if (maxRows) {
-                          setRows([
-                            ...rows,
-                            { index: rows.length + 1, columns: '1' },
-                          ]);
-                        }
-                      }}
-                    />
-                  </Field>
-                  {rows.map(row => (
-                    <Field>
-                      <Box direction="row">
-                        <Box
-                          direction="column"
-                          basis="auto"
-                          alignSelf="center"
-                          pad={{ right: '15px' }}
-                        >
-                          <Text>Row {row.index}</Text>
-                        </Box>
-                        <Box direction="column" basis="auto">
-                          <ButtonGroup
-                            onChange={({ target: { value } }) => {
-                              const index = rows.findIndex(
-                                currentRow => currentRow.index === row.index,
-                              );
-                              const updatedRows = rows;
-                              updatedRows[index].columns = value;
-                              setRows([...updatedRows]);
-                            }}
-                            value={row.columns.toString()}
-                          >
-                            <ButtonGroupButton
-                              label="1"
-                              value="1"
-                              name={`options-${row.index}`}
-                            />
-                            <ButtonGroupButton
-                              label="2"
-                              value="2"
-                              name={`options-${row.index}`}
-                            />
-                            <ButtonGroupButton
-                              label="3"
-                              value="3"
-                              name={`options-${row.index}`}
-                            />
-                            <ButtonGroupButton
-                              label="4"
-                              value="4"
-                              name={`options-${row.index}`}
-                            />
-                            <ButtonGroupButton
-                              label="5"
-                              value="5"
-                              name={`options-${row.index}`}
-                            />
-                            <ButtonGroupButton
-                              label="6"
-                              value="6"
-                              name={`options-${row.index}`}
-                            />
-                          </ButtonGroup>
-                        </Box>
-                        <Box
-                          direction="column"
-                          basis="auto"
-                          pad={{ left: '5px' }}
-                        >
-                          <DeleteButton
-                            label="X"
-                            value={row.index}
-                            disabled={!(rows.length > 1)}
-                            onClick={event => {
-                              const newRows = [...rows];
-                              const index = newRows.findIndex(
-                                currentRow =>
-                                  currentRow.index ===
-                                  parseInt(event.target.value, 10),
-                              );
-                              if (index !== -1) {
-                                newRows.splice(index, 1);
-
-                                newRows.map((correctRow, rowIndex) => {
-                                  const newRow = correctRow;
-                                  newRow.index = rowIndex + 1;
-                                  return { ...newRow };
-                                });
-                                setRows([...newRows]);
-                              }
-                            }}
-                          />
-                        </Box>
-                      </Box>
-                    </Field>
-                  ))}
-                </Box>
-                <Box direction="column" basis="1/3" margin={{ top: '11%' }}>
-                  <Text color="#666d85">Preview:</Text>
-                  {rows.map(row => (
-                    <Box
-                      border={{
-                        color: '#AFB5C8',
-                        size: 'xsmall',
-                        style: 'dashed',
-                        side: 'all',
-                      }}
-                      direction="row"
-                      height="100%"
-                      background="#FFFFFF"
-                      justify="center"
-                    >
-                      {createElements(row.columns)}
-                    </Box>
-                  ))}
-                </Box>
-              </Box>
-            );
-
-          default:
-            break;
+              )}
+            </>
+          );
         }
+        return (
+          <Box direction="row">
+            <Box direction="column" basis="2/3">
+              <Field
+                info={
+                  <>
+                    <Text size="small" color="grey700">
+                      Click the Add row button to add a new row to the page.
+                      <br />
+                      You can specify the amount of columns per row.
+                    </Text>
+                  </>
+                }
+              >
+                <Button
+                  label="+ Add row"
+                  disabled={!maxRows}
+                  onClick={() => {
+                    if (maxRows) {
+                      setRows([
+                        ...rows,
+                        { index: rows.length + 1, columns: '1' },
+                      ]);
+                    }
+                  }}
+                />
+              </Field>
+              {rows.map(row => (
+                <Field>
+                  <Box direction="row">
+                    <Box
+                      direction="column"
+                      basis="auto"
+                      alignSelf="center"
+                      pad={{ right: '15px' }}
+                    >
+                      <Text>Row {row.index}</Text>
+                    </Box>
+                    <Box direction="column" basis="auto">
+                      <ButtonGroup
+                        onChange={({ target: { value } }) => {
+                          const index = rows.findIndex(
+                            currentRow => currentRow.index === row.index,
+                          );
+                          const updatedRows = rows;
+                          updatedRows[index].columns = value;
+                          setRows([...updatedRows]);
+                        }}
+                        value={row.columns.toString()}
+                      >
+                        <ButtonGroupButton
+                          label="1"
+                          value="1"
+                          name={`options-${row.index}`}
+                        />
+                        <ButtonGroupButton
+                          label="2"
+                          value="2"
+                          name={`options-${row.index}`}
+                        />
+                        <ButtonGroupButton
+                          label="3"
+                          value="3"
+                          name={`options-${row.index}`}
+                        />
+                        <ButtonGroupButton
+                          label="4"
+                          value="4"
+                          name={`options-${row.index}`}
+                        />
+                        <ButtonGroupButton
+                          label="5"
+                          value="5"
+                          name={`options-${row.index}`}
+                        />
+                        <ButtonGroupButton
+                          label="6"
+                          value="6"
+                          name={`options-${row.index}`}
+                        />
+                      </ButtonGroup>
+                    </Box>
+                    <Box direction="column" basis="auto" pad={{ left: '5px' }}>
+                      <DeleteButton
+                        label="X"
+                        value={row.index}
+                        disabled={!(rows.length > 1)}
+                        onClick={event => {
+                          const newRows = [...rows];
+                          const index = newRows.findIndex(
+                            currentRow =>
+                              currentRow.index ===
+                              parseInt(event.target.value, 10),
+                          );
+                          if (index !== -1) {
+                            newRows.splice(index, 1);
+
+                            newRows.map((correctRow, rowIndex) => {
+                              const newRow = correctRow;
+                              newRow.index = rowIndex + 1;
+                              return { ...newRow };
+                            });
+                            setRows([...newRows]);
+                          }
+                        }}
+                      />
+                    </Box>
+                  </Box>
+                </Field>
+              ))}
+            </Box>
+            <Box direction="column" basis="1/3" margin={{ top: '11%' }}>
+              <Text color="#666d85">Preview:</Text>
+              {rows.map(row => (
+                <Box
+                  border={{
+                    color: '#AFB5C8',
+                    size: 'xsmall',
+                    style: 'dashed',
+                    side: 'all',
+                  }}
+                  direction="row"
+                  height="100%"
+                  background="#FFFFFF"
+                  justify="center"
+                >
+                  {createElements(row.columns)}
+                </Box>
+              ))}
+            </Box>
+          </Box>
+        );
       },
       onSave: () => {
         const newPrefab = { ...prefab };
@@ -2101,12 +2104,15 @@
               descendants: [],
             });
           }
-          newPrefab.structure[0].descendants[0].descendants.push(newRow);
-        });
-        if (useLogoutButton) {
-          newPrefab.structure[0].descendants[0].descendants[0].descendants[0].descendants.push(
-            logoutButton,
+          const rootColumn = getDescendantByRef(
+            '#rootColumn',
+            newPrefab.structure,
           );
+          rootColumn.descendants.push(newRow);
+        });
+        const appBar = getDescendantByRef('#appBar', newPrefab.structure);
+        if (useLogoutButton) {
+          appBar.descendants.push(logoutButton);
           newPrefab.interactions.push(logoutInteraction);
           newPrefab.interactions[0].parameters = [
             {
@@ -2117,7 +2123,7 @@
             },
           ];
         }
-        newPrefab.structure[0].descendants[0].descendants[0].descendants[0].options[4].value[0] = appBarTitle;
+        appBar.options[4].value[0] = appBarTitle;
         save(newPrefab);
       },
       buttons: () => (
@@ -2229,6 +2235,9 @@
       descendants: [
         {
           name: 'Column',
+          ref: {
+            id: '#rootColumn',
+          },
           options: [
             {
               label: 'Toggle visibility',
@@ -2409,386 +2418,206 @@
           ],
           descendants: [
             {
-              name: 'Column',
+              name: 'AppBar',
+              ref: {
+                id: '#appBar',
+              },
               options: [
                 {
-                  label: 'Toggle visibility',
-                  key: 'visible',
-                  value: true,
-                  type: 'TOGGLE',
-                  configuration: {
-                    as: 'VISIBILITY',
-                  },
+                  label: 'Background color',
+                  key: 'backgroundColor',
+                  value: 'Primary',
+                  type: 'COLOR',
                 },
                 {
-                  value: '12',
-                  label: 'Column width',
-                  key: 'columnWidth',
-                  type: 'CUSTOM',
-                  configuration: {
-                    as: 'DROPDOWN',
-                    dataType: 'string',
-                    allowedInput: [
-                      { name: 'Fit content', value: 'fitContent' },
-                      { name: 'Flexible', value: 'flexible' },
-                      { name: 'Hidden', value: 'hidden' },
-                      { name: '1', value: '1' },
-                      { name: '2', value: '2' },
-                      { name: '3', value: '3' },
-                      { name: '4', value: '4' },
-                      { name: '5', value: '5' },
-                      { name: '6', value: '6' },
-                      { name: '7', value: '7' },
-                      { name: '8', value: '8' },
-                      { name: '9', value: '9' },
-                      { name: '10', value: '10' },
-                      { name: '11', value: '11' },
-                      { name: '12', value: '12' },
-                    ],
-                  },
+                  label: 'Text color',
+                  key: 'color',
+                  value: 'White',
+                  type: 'COLOR',
                 },
                 {
-                  value: '12',
-                  label: 'Column width (tablet landscape)',
-                  key: 'columnWidthTabletLandscape',
-                  type: 'CUSTOM',
-                  configuration: {
-                    as: 'DROPDOWN',
-                    dataType: 'string',
-                    allowedInput: [
-                      { name: 'Fit content', value: 'fitContent' },
-                      { name: 'Flexible', value: 'flexible' },
-                      { name: 'Hidden', value: 'hidden' },
-                      { name: '1', value: '1' },
-                      { name: '2', value: '2' },
-                      { name: '3', value: '3' },
-                      { name: '4', value: '4' },
-                      { name: '5', value: '5' },
-                      { name: '6', value: '6' },
-                      { name: '7', value: '7' },
-                      { name: '8', value: '8' },
-                      { name: '9', value: '9' },
-                      { name: '10', value: '10' },
-                      { name: '11', value: '11' },
-                      { name: '12', value: '12' },
-                    ],
-                  },
-                },
-                {
-                  value: '12',
-                  label: 'Column width (tablet portrait)',
-                  key: 'columnWidthTabletPortrait',
-                  type: 'CUSTOM',
-                  configuration: {
-                    as: 'DROPDOWN',
-                    dataType: 'string',
-                    allowedInput: [
-                      { name: 'Fit content', value: 'fitContent' },
-                      { name: 'Flexible', value: 'flexible' },
-                      { name: 'Hidden', value: 'hidden' },
-                      { name: '1', value: '1' },
-                      { name: '2', value: '2' },
-                      { name: '3', value: '3' },
-                      { name: '4', value: '4' },
-                      { name: '5', value: '5' },
-                      { name: '6', value: '6' },
-                      { name: '7', value: '7' },
-                      { name: '8', value: '8' },
-                      { name: '9', value: '9' },
-                      { name: '10', value: '10' },
-                      { name: '11', value: '11' },
-                      { name: '12', value: '12' },
-                    ],
-                  },
-                },
-                {
-                  value: '12',
-                  label: 'Column width (mobile)',
-                  key: 'columnWidthMobile',
-                  type: 'CUSTOM',
-                  configuration: {
-                    as: 'DROPDOWN',
-                    dataType: 'string',
-                    allowedInput: [
-                      { name: 'Fit content', value: 'fitContent' },
-                      { name: 'Flexible', value: 'flexible' },
-                      { name: 'Hidden', value: 'hidden' },
-                      { name: '1', value: '1' },
-                      { name: '2', value: '2' },
-                      { name: '3', value: '3' },
-                      { name: '4', value: '4' },
-                      { name: '5', value: '5' },
-                      { name: '6', value: '6' },
-                      { name: '7', value: '7' },
-                      { name: '8', value: '8' },
-                      { name: '9', value: '9' },
-                      { name: '10', value: '10' },
-                      { name: '11', value: '11' },
-                      { name: '12', value: '12' },
-                    ],
-                  },
-                },
-                {
-                  value: '',
+                  type: 'SIZE',
                   label: 'Height',
-                  key: 'columnHeight',
-                  type: 'TEXT',
+                  key: 'height',
+                  value: '60px',
                   configuration: {
                     as: 'UNIT',
                   },
                 },
                 {
-                  value: 'transparent',
-                  label: 'Background color',
-                  key: 'backgroundColor',
-                  type: 'COLOR',
-                },
-                {
+                  label: 'Position',
+                  key: 'position',
+                  value: 'static',
                   type: 'CUSTOM',
-                  label: 'Horizontal Alignment',
-                  key: 'horizontalAlignment',
-                  value: 'inherit',
                   configuration: {
-                    as: 'BUTTONGROUP',
+                    as: 'DROPDOWN',
                     dataType: 'string',
                     allowedInput: [
-                      { name: 'None', value: 'inherit' },
-                      { name: 'Left', value: 'flex-start' },
-                      { name: 'Center', value: 'center' },
-                      { name: 'Right', value: 'flex-end' },
-                    ],
-                  },
-                },
-                {
-                  type: 'CUSTOM',
-                  label: 'Vertical Alignment',
-                  key: 'verticalAlignment',
-                  value: 'inherit',
-                  configuration: {
-                    as: 'BUTTONGROUP',
-                    dataType: 'string',
-                    allowedInput: [
-                      { name: 'None', value: 'inherit' },
-                      { name: 'Top', value: 'flex-start' },
-                      { name: 'Center', value: 'center' },
-                      { name: 'Bottom', value: 'flex-end' },
-                    ],
-                  },
-                },
-                {
-                  value: ['0rem', '0rem', '0rem', '0rem'],
-                  label: 'Outer space',
-                  key: 'outerSpacing',
-                  type: 'SIZES',
-                },
-                {
-                  value: ['0rem', '0rem', '0rem', '0rem'],
-                  label: 'Inner space',
-                  key: 'innerSpacing',
-                  type: 'SIZES',
-                },
-              ],
-              descendants: [
-                {
-                  name: 'AppBar',
-                  options: [
-                    {
-                      label: 'Background color',
-                      key: 'backgroundColor',
-                      value: 'Primary',
-                      type: 'COLOR',
-                    },
-                    {
-                      label: 'Text color',
-                      key: 'color',
-                      value: 'White',
-                      type: 'COLOR',
-                    },
-                    {
-                      type: 'SIZE',
-                      label: 'Height',
-                      key: 'height',
-                      value: '60px',
-                      configuration: {
-                        as: 'UNIT',
+                      {
+                        name: 'Fixed',
+                        value: 'fixed',
                       },
-                    },
-                    {
-                      label: 'Position',
-                      key: 'position',
-                      value: 'static',
-                      type: 'CUSTOM',
-                      configuration: {
-                        as: 'DROPDOWN',
-                        dataType: 'string',
-                        allowedInput: [
-                          {
-                            name: 'Fixed',
-                            value: 'fixed',
-                          },
-                          {
-                            name: 'Absolute',
-                            value: 'absolute',
-                          },
-                          {
-                            name: 'Sticky',
-                            value: 'sticky',
-                          },
+                      {
+                        name: 'Absolute',
+                        value: 'absolute',
+                      },
+                      {
+                        name: 'Sticky',
+                        value: 'sticky',
+                      },
 
-                          {
-                            name: 'Static',
-                            value: 'static',
-                          },
-                          {
-                            name: 'Relative',
-                            value: 'relative',
-                          },
-                        ],
+                      {
+                        name: 'Static',
+                        value: 'static',
                       },
-                    },
-                    {
-                      label: 'Title',
-                      key: 'title',
-                      value: ['App Bar'],
-                      type: 'VARIABLE',
-                    },
-                    {
-                      label: 'Logo',
-                      key: 'logoSource',
-                      value: [],
-                      type: 'VARIABLE',
-                    },
-                    {
-                      type: 'SIZE',
-                      label: 'Logo Width',
-                      key: 'logoWidth',
-                      value: '150px',
-                      configuration: {
-                        as: 'UNIT',
+                      {
+                        name: 'Relative',
+                        value: 'relative',
                       },
-                    },
-                    {
-                      label: 'Align items',
-                      key: 'alignItems',
-                      value: 'right',
-                      type: 'CUSTOM',
-                      configuration: {
-                        as: 'BUTTONGROUP',
-                        dataType: 'string',
-                        allowedInput: [
-                          {
-                            name: 'Left',
-                            value: 'left',
-                          },
-                          {
-                            name: 'Right',
-                            value: 'right',
-                          },
-                        ],
+                    ],
+                  },
+                },
+                {
+                  label: 'Title',
+                  key: 'title',
+                  value: ['App Bar'],
+                  type: 'VARIABLE',
+                },
+                {
+                  label: 'Logo',
+                  key: 'logoSource',
+                  value: [],
+                  type: 'VARIABLE',
+                },
+                {
+                  type: 'SIZE',
+                  label: 'Logo Width',
+                  key: 'logoWidth',
+                  value: '150px',
+                  configuration: {
+                    as: 'UNIT',
+                  },
+                },
+                {
+                  label: 'Align items',
+                  key: 'alignItems',
+                  value: 'right',
+                  type: 'CUSTOM',
+                  configuration: {
+                    as: 'BUTTONGROUP',
+                    dataType: 'string',
+                    allowedInput: [
+                      {
+                        name: 'Left',
+                        value: 'left',
                       },
-                    },
-                    {
-                      label: 'Page',
-                      key: 'endpoint',
-                      value: '',
-                      type: 'ENDPOINT',
-                    },
-                    {
-                      label: 'Variant',
-                      key: 'appBarVariant',
+                      {
+                        name: 'Right',
+                        value: 'right',
+                      },
+                    ],
+                  },
+                },
+                {
+                  label: 'Page',
+                  key: 'endpoint',
+                  value: '',
+                  type: 'ENDPOINT',
+                },
+                {
+                  label: 'Variant',
+                  key: 'appBarVariant',
+                  value: 'elevation',
+                  type: 'CUSTOM',
+                  configuration: {
+                    as: 'BUTTONGROUP',
+                    dataType: 'string',
+                    allowedInput: [
+                      {
+                        name: 'Flat',
+                        value: 'flat',
+                      },
+                      {
+                        name: 'Elevation',
+                        value: 'elevation',
+                      },
+                      {
+                        name: 'Outlined',
+                        value: 'outlined',
+                      },
+                    ],
+                  },
+                },
+                {
+                  label: 'Elevation',
+                  key: 'elevation',
+                  value: '1',
+                  type: 'CUSTOM',
+                  configuration: {
+                    as: 'DROPDOWN',
+                    dataType: 'string',
+                    allowedInput: [
+                      { name: '1', value: '1' },
+                      { name: '2', value: '2' },
+                      { name: '3', value: '3' },
+                      { name: '4', value: '4' },
+                      { name: '5', value: '5' },
+                      { name: '6', value: '6' },
+                      { name: '7', value: '7' },
+                      { name: '8', value: '8' },
+                      { name: '9', value: '9' },
+                      { name: '10', value: '10' },
+                      { name: '11', value: '11' },
+                      { name: '12', value: '12' },
+                      { name: '13', value: '13' },
+                      { name: '14', value: '14' },
+                      { name: '15', value: '15' },
+                      { name: '16', value: '16' },
+                      { name: '17', value: '17' },
+                      { name: '18', value: '18' },
+                      { name: '19', value: '19' },
+                      { name: '20', value: '20' },
+                      { name: '21', value: '21' },
+                      { name: '22', value: '22' },
+                      { name: '23', value: '23' },
+                      { name: '24', value: '24' },
+                    ],
+                    condition: {
+                      type: 'SHOW',
+                      option: 'appBarVariant',
+                      comparator: 'EQ',
                       value: 'elevation',
-                      type: 'CUSTOM',
-                      configuration: {
-                        as: 'BUTTONGROUP',
-                        dataType: 'string',
-                        allowedInput: [
-                          {
-                            name: 'Flat',
-                            value: 'flat',
-                          },
-                          {
-                            name: 'Elevation',
-                            value: 'elevation',
-                          },
-                          {
-                            name: 'Outlined',
-                            value: 'outlined',
-                          },
-                        ],
+                    },
+                  },
+                },
+                {
+                  label: 'Square',
+                  key: 'square',
+                  value: true,
+                  type: 'TOGGLE',
+                },
+                {
+                  label: 'Size',
+                  key: 'toolbarVariant',
+                  value: 'regular',
+                  type: 'CUSTOM',
+                  configuration: {
+                    as: 'DROPDOWN',
+                    dataType: 'string',
+                    allowedInput: [
+                      {
+                        name: 'Regular',
+                        value: 'regular',
                       },
-                    },
-                    {
-                      label: 'Elevation',
-                      key: 'elevation',
-                      value: '1',
-                      type: 'CUSTOM',
-                      configuration: {
-                        as: 'DROPDOWN',
-                        dataType: 'string',
-                        allowedInput: [
-                          { name: '1', value: '1' },
-                          { name: '2', value: '2' },
-                          { name: '3', value: '3' },
-                          { name: '4', value: '4' },
-                          { name: '5', value: '5' },
-                          { name: '6', value: '6' },
-                          { name: '7', value: '7' },
-                          { name: '8', value: '8' },
-                          { name: '9', value: '9' },
-                          { name: '10', value: '10' },
-                          { name: '11', value: '11' },
-                          { name: '12', value: '12' },
-                          { name: '13', value: '13' },
-                          { name: '14', value: '14' },
-                          { name: '15', value: '15' },
-                          { name: '16', value: '16' },
-                          { name: '17', value: '17' },
-                          { name: '18', value: '18' },
-                          { name: '19', value: '19' },
-                          { name: '20', value: '20' },
-                          { name: '21', value: '21' },
-                          { name: '22', value: '22' },
-                          { name: '23', value: '23' },
-                          { name: '24', value: '24' },
-                        ],
-                        condition: {
-                          type: 'SHOW',
-                          option: 'appBarVariant',
-                          comparator: 'EQ',
-                          value: 'elevation',
-                        },
+                      {
+                        name: 'Dense',
+                        value: 'dense',
                       },
-                    },
-                    {
-                      label: 'Square',
-                      key: 'square',
-                      value: true,
-                      type: 'TOGGLE',
-                    },
-                    {
-                      label: 'Size',
-                      key: 'toolbarVariant',
-                      value: 'regular',
-                      type: 'CUSTOM',
-                      configuration: {
-                        as: 'DROPDOWN',
-                        dataType: 'string',
-                        allowedInput: [
-                          {
-                            name: 'Regular',
-                            value: 'regular',
-                          },
-                          {
-                            name: 'Dense',
-                            value: 'dense',
-                          },
-                        ],
-                      },
-                    },
-                  ],
-                  descendants: [],
+                    ],
+                  },
                 },
               ],
+              descendants: [],
             },
           ],
         },
