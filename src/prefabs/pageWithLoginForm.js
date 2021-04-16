@@ -1,8 +1,8 @@
 (() => ({
   name: 'Login Form - Sidebar',
   icon: 'LoginFormIcon',
-  type: 'page',
   description: 'Page with login form and side image',
+  type: 'page',
   category: 'FORM',
   beforeCreate: ({
     prefab,
@@ -6481,12 +6481,13 @@
                                     },
                                     {
                                       value: [
-                                        'https://via.placeholder.com/550x100/?text=[Insert logo here]',
+                                        'https://assets.bettyblocks.com/f95733c870a2471fa89e7716cac0556f_assets/files/logo-placeholder',
                                       ],
                                       label: 'Source',
                                       key: 'imageSource',
                                       type: 'VARIABLE',
                                       configuration: {
+                                        as: 'MULTILINE',
                                         condition: {
                                           type: 'SHOW',
                                           option: 'type',
@@ -6496,11 +6497,61 @@
                                       },
                                     },
                                     {
+                                      type: 'CUSTOM',
+                                      label: 'Link to',
+                                      key: 'linkType',
+                                      value: 'internal',
+                                      configuration: {
+                                        as: 'BUTTONGROUP',
+                                        dataType: 'string',
+                                        allowedInput: [
+                                          { name: 'Internal page', value: 'internal' },
+                                          { name: 'External page', value: 'external' },
+                                        ],
+                                        condition: {
+                                          type: 'SHOW',
+                                          option: 'type',
+                                          comparator: 'EQ',
+                                          value: 'img',
+                                        },
+                                      },
+                                    },
+                                    {
+                                      value: '',
+                                      label: 'Page',
+                                      key: 'linkTo',
+                                      type: 'ENDPOINT',
+                                      configuration: {
+                                        condition: {
+                                          type: 'SHOW',
+                                          option: 'linkType',
+                                          comparator: 'EQ',
+                                          value: 'internal',
+                                        },
+                                      },
+                                    },
+                                    {
+                                      value: [''],
+                                      label: 'URL',
+                                      key: 'linkToExternal',
+                                      type: 'VARIABLE',
+                                      configuration: {
+                                        placeholder: 'Starts with https:// or http://',
+                                        condition: {
+                                          type: 'SHOW',
+                                          option: 'linkType',
+                                          comparator: 'EQ',
+                                          value: 'external',
+                                        },
+                                      },
+                                    },
+                                    {
                                       value: [],
                                       label: 'Source',
                                       key: 'videoSource',
                                       type: 'VARIABLE',
                                       configuration: {
+                                        as: 'MULTILINE',
                                         condition: {
                                           type: 'SHOW',
                                           option: 'type',
@@ -6515,6 +6566,7 @@
                                       key: 'iframeSource',
                                       type: 'VARIABLE',
                                       configuration: {
+                                        as: 'MULTILINE',
                                         condition: {
                                           type: 'SHOW',
                                           option: 'type',
@@ -6547,7 +6599,7 @@
                                       type: 'SIZE',
                                       label: 'Width',
                                       key: 'width',
-                                      value: '',
+                                      value: '100%',
                                       configuration: {
                                         as: 'UNIT',
                                       },
@@ -6556,13 +6608,13 @@
                                       type: 'SIZE',
                                       label: 'Height',
                                       key: 'height',
-                                      value: '60px',
+                                      value: '',
                                       configuration: {
                                         as: 'UNIT',
                                       },
                                     },
                                     {
-                                      value: ['S', 'S', 'S', 'S'],
+                                      value: ['0rem', '0rem', 'M', '0rem'],
                                       label: 'Outer space',
                                       key: 'outerSpacing',
                                       type: 'SIZES',
