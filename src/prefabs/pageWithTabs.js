@@ -742,174 +742,162 @@
 
     const stepper = {
       setStep: step => {
-        let activeStep;
-        switch (step) {
-          case 1:
-            activeStep = (
-              <>
-                <Field label="Appbar title">
-                  <TextInput
-                    placeholder="Placeholder..."
-                    value={appBarTitle}
-                    onChange={({ target: { value } }) => {
-                      setAppBarTitle(value);
-                    }}
-                  />
+        if (step === 1) {
+          return (
+            <>
+              <Field label="Appbar title">
+                <TextInput
+                  placeholder="Placeholder..."
+                  value={appBarTitle}
+                  onChange={({ target: { value } }) => {
+                    setAppBarTitle(value);
+                  }}
+                />
+              </Field>
+            </>
+          );
+        }
+        return (
+          <Box direction="row">
+            <Box direction="column" basis="60%">
+              <Field
+                info={
+                  <>
+                    <Text size="small" color="grey700">
+                      Click the <b>+ Add tab</b> button to add a new tab to the
+                      page.
+                      <br />
+                      You can also specify the title for each tab.
+                    </Text>
+                  </>
+                }
+              >
+                <Button
+                  label="+ Add tab"
+                  disabled={!maxTabs}
+                  onClick={() => {
+                    if (maxTabs) {
+                      const index = tabs.length + 1;
+                      setTabs([
+                        ...tabs,
+                        {
+                          index,
+                          title: `TAB ${index}`,
+                        },
+                      ]);
+                    }
+                  }}
+                />
+              </Field>
+              {tabs.map(tab => (
+                <Field>
+                  <Box direction="row">
+                    <Box
+                      direction="column"
+                      basis="auto"
+                      alignSelf="center"
+                      pad={{ right: '15px' }}
+                    >
+                      <Text>Tab {tab.index}</Text>
+                    </Box>
+                    <Box direction="column" basis="auto">
+                      <TextInput
+                        placeholder="Placeholder..."
+                        value={tab.title.toString()}
+                        onChange={({ target: { value } }) => {
+                          const index = tabs.findIndex(
+                            currentTab => currentTab.index === tab.index,
+                          );
+                          const updatedTabs = tabs;
+                          updatedTabs[index].title = value;
+                          setTabs([...updatedTabs]);
+                        }}
+                      />
+                    </Box>
+                    <Box direction="column" basis="auto" pad={{ left: '5px' }}>
+                      <DeleteButton
+                        label="X"
+                        value={tab.index}
+                        disabled={!(tabs.length > 1)}
+                        onClick={event => {
+                          const newTabs = [...tabs];
+                          const index = newTabs.findIndex(
+                            currentTab =>
+                              currentTab.index ===
+                              parseInt(event.target.value, 10),
+                          );
+                          if (index !== -1) {
+                            newTabs.splice(index, 1);
+
+                            newTabs.map((correctTab, tabIndex) => {
+                              const newTab = correctTab;
+                              newTab.index = tabIndex + 1;
+                              return { ...newTab };
+                            });
+                            setTabs([...newTabs]);
+                          }
+                        }}
+                      />
+                    </Box>
+                  </Box>
                 </Field>
-              </>
-            );
-            break;
-          case 2:
-            activeStep = (
-              <Box direction="row">
-                <Box direction="column" basis="60%">
-                  <Field
-                    info={
-                      <>
-                        <Text size="small" color="grey700">
-                          Click the <b>+ Add tab</b> button to add a new tab to
-                          the page.
-                          <br />
-                          You can also specify the title for each tab.
-                        </Text>
-                      </>
+              ))}
+            </Box>
+            <Box direction="column" basis="40%" margin={{ top: '11%' }}>
+              <Text color="#666d85">Preview:</Text>
+              <Box direction="row" background="#4050B5">
+                {tabs.map(tab => (
+                  <Box
+                    height="30px"
+                    justify="center"
+                    align="center"
+                    pad="5px 10px"
+                    margin={
+                      tab.index === 1
+                        ? {
+                            top: '1px',
+                          }
+                        : ''
+                    }
+                    border={
+                      tab.index === 1
+                        ? {
+                            color: '#8BC34A',
+                            size: 'small',
+                            style: 'solid',
+                            side: 'bottom',
+                          }
+                        : ''
                     }
                   >
-                    <Button
-                      label="+ Add tab"
-                      disabled={!maxTabs}
-                      onClick={() => {
-                        if (maxTabs) {
-                          const index = tabs.length + 1;
-                          setTabs([
-                            ...tabs,
-                            {
-                              index,
-                              title: `TAB ${index}`,
-                            },
-                          ]);
-                        }
-                      }}
-                    />
-                  </Field>
-                  {tabs.map(tab => (
-                    <Field>
-                      <Box direction="row">
-                        <Box
-                          direction="column"
-                          basis="auto"
-                          alignSelf="center"
-                          pad={{ right: '15px' }}
-                        >
-                          <Text>Tab {tab.index}</Text>
-                        </Box>
-                        <Box direction="column" basis="auto">
-                          <TextInput
-                            placeholder="Placeholder..."
-                            value={tab.title.toString()}
-                            onChange={({ target: { value } }) => {
-                              const index = tabs.findIndex(
-                                currentTab => currentTab.index === tab.index,
-                              );
-                              const updatedTabs = tabs;
-                              updatedTabs[index].title = value;
-                              setTabs([...updatedTabs]);
-                            }}
-                          />
-                        </Box>
-                        <Box
-                          direction="column"
-                          basis="auto"
-                          pad={{ left: '5px' }}
-                        >
-                          <DeleteButton
-                            label="X"
-                            value={tab.index}
-                            disabled={!(tabs.length > 1)}
-                            onClick={event => {
-                              const newTabs = [...tabs];
-                              const index = newTabs.findIndex(
-                                currentTab =>
-                                  currentTab.index ===
-                                  parseInt(event.target.value, 10),
-                              );
-                              if (index !== -1) {
-                                newTabs.splice(index, 1);
-
-                                newTabs.map((correctTab, tabIndex) => {
-                                  const newTab = correctTab;
-                                  newTab.index = tabIndex + 1;
-                                  return { ...newTab };
-                                });
-                                setTabs([...newTabs]);
-                              }
-                            }}
-                          />
-                        </Box>
-                      </Box>
-                    </Field>
-                  ))}
-                </Box>
-                <Box direction="column" basis="40%" margin={{ top: '11%' }}>
-                  <Text color="#666d85">Preview:</Text>
-                  <Box direction="row" background="#4050B5">
-                    {tabs.map(tab => (
-                      <Box
-                        height="30px"
-                        justify="center"
-                        align="center"
-                        pad="5px 10px"
-                        margin={
-                          tab.index === 1
-                            ? {
-                                top: '1px',
-                              }
-                            : ''
-                        }
-                        border={
-                          tab.index === 1
-                            ? {
-                                color: '#8BC34A',
-                                size: 'small',
-                                style: 'solid',
-                                side: 'bottom',
-                              }
-                            : ''
-                        }
-                      >
-                        <Text
-                          truncate="true"
-                          size="0.575rem"
-                          color="#FFFFFF"
-                          weight="500"
-                        >
-                          {tab.title}
-                        </Text>
-                      </Box>
-                    ))}
+                    <Text
+                      truncate="true"
+                      size="0.575rem"
+                      color="#FFFFFF"
+                      weight="500"
+                    >
+                      {tab.title}
+                    </Text>
                   </Box>
-                  <Box
-                    background="#F0F1F5"
-                    height="50px"
-                    align="center"
-                    justify="center"
-                    border={{
-                      color: '#AFB5C8',
-                      size: 'xsmall',
-                      style: 'dashed',
-                      side: 'all',
-                    }}
-                  >
-                    <Text size="0.5rem">TAB</Text>
-                  </Box>
-                </Box>
+                ))}
               </Box>
-            );
-            break;
-          default:
-            break;
-        }
-        return activeStep;
+              <Box
+                background="#F0F1F5"
+                height="50px"
+                align="center"
+                justify="center"
+                border={{
+                  color: '#AFB5C8',
+                  size: 'xsmall',
+                  style: 'dashed',
+                  side: 'all',
+                }}
+              >
+                <Text size="0.5rem">TAB</Text>
+              </Box>
+            </Box>
+          </Box>
+        );
       },
       onSave: () => {
         const newPrefab = { ...prefab };
