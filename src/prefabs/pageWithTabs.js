@@ -16,7 +16,6 @@
       Text,
       DeleteButton,
       TextInput,
-      CheckBox,
     },
     prefab,
     save,
@@ -26,6 +25,720 @@
     const [appBarTitle, setAppBarTitle] = React.useState('Appbar');
 
     const maxTabs = tabs.length < 5;
+
+    const getDescendantByRef = (refValue, structure) =>
+      structure.reduce((acc, component) => {
+        if (acc) return acc;
+        if (
+          // eslint-disable-next-line no-prototype-builtins
+          component.hasOwnProperty('ref') &&
+          Object.values(component.ref).indexOf(refValue) > -1
+        ) {
+          return component;
+        }
+        return getDescendantByRef(refValue, component.descendants);
+      }, null);
+
+    const prefabStructure = [
+      {
+        name: 'Column',
+        options: [
+          {
+            label: 'Toggle visibility',
+            key: 'visible',
+            value: true,
+            type: 'TOGGLE',
+            configuration: {
+              as: 'VISIBILITY',
+            },
+          },
+          {
+            value: 'flexible',
+            label: 'Column width',
+            key: 'columnWidth',
+            type: 'CUSTOM',
+            configuration: {
+              as: 'DROPDOWN',
+              dataType: 'string',
+              allowedInput: [
+                { name: 'Fit content', value: 'fitContent' },
+                { name: 'Flexible', value: 'flexible' },
+                { name: 'Hidden', value: 'hidden' },
+                { name: '1', value: '1' },
+                { name: '2', value: '2' },
+                { name: '3', value: '3' },
+                { name: '4', value: '4' },
+                { name: '5', value: '5' },
+                { name: '6', value: '6' },
+                { name: '7', value: '7' },
+                { name: '8', value: '8' },
+                { name: '9', value: '9' },
+                { name: '10', value: '10' },
+                { name: '11', value: '11' },
+                { name: '12', value: '12' },
+              ],
+            },
+          },
+          {
+            value: 'flexible',
+            label: 'Column width (tablet landscape)',
+            key: 'columnWidthTabletLandscape',
+            type: 'CUSTOM',
+            configuration: {
+              as: 'DROPDOWN',
+              dataType: 'string',
+              allowedInput: [
+                { name: 'Fit content', value: 'fitContent' },
+                { name: 'Flexible', value: 'flexible' },
+                { name: 'Hidden', value: 'hidden' },
+                { name: '1', value: '1' },
+                { name: '2', value: '2' },
+                { name: '3', value: '3' },
+                { name: '4', value: '4' },
+                { name: '5', value: '5' },
+                { name: '6', value: '6' },
+                { name: '7', value: '7' },
+                { name: '8', value: '8' },
+                { name: '9', value: '9' },
+                { name: '10', value: '10' },
+                { name: '11', value: '11' },
+                { name: '12', value: '12' },
+              ],
+            },
+          },
+          {
+            value: 'flexible',
+            label: 'Column width (tablet portrait)',
+            key: 'columnWidthTabletPortrait',
+            type: 'CUSTOM',
+            configuration: {
+              as: 'DROPDOWN',
+              dataType: 'string',
+              allowedInput: [
+                { name: 'Fit content', value: 'fitContent' },
+                { name: 'Flexible', value: 'flexible' },
+                { name: 'Hidden', value: 'hidden' },
+                { name: '1', value: '1' },
+                { name: '2', value: '2' },
+                { name: '3', value: '3' },
+                { name: '4', value: '4' },
+                { name: '5', value: '5' },
+                { name: '6', value: '6' },
+                { name: '7', value: '7' },
+                { name: '8', value: '8' },
+                { name: '9', value: '9' },
+                { name: '10', value: '10' },
+                { name: '11', value: '11' },
+                { name: '12', value: '12' },
+              ],
+            },
+          },
+          {
+            value: 'flexible',
+            label: 'Column width (mobile)',
+            key: 'columnWidthMobile',
+            type: 'CUSTOM',
+            configuration: {
+              as: 'DROPDOWN',
+              dataType: 'string',
+              allowedInput: [
+                { name: 'Fit content', value: 'fitContent' },
+                { name: 'Flexible', value: 'flexible' },
+                { name: 'Hidden', value: 'hidden' },
+                { name: '1', value: '1' },
+                { name: '2', value: '2' },
+                { name: '3', value: '3' },
+                { name: '4', value: '4' },
+                { name: '5', value: '5' },
+                { name: '6', value: '6' },
+                { name: '7', value: '7' },
+                { name: '8', value: '8' },
+                { name: '9', value: '9' },
+                { name: '10', value: '10' },
+                { name: '11', value: '11' },
+                { name: '12', value: '12' },
+              ],
+            },
+          },
+          {
+            value: '',
+            label: 'Height',
+            key: 'columnHeight',
+            type: 'TEXT',
+            configuration: {
+              as: 'UNIT',
+            },
+          },
+          {
+            value: 'transparent',
+            label: 'Background color',
+            key: 'backgroundColor',
+            type: 'COLOR',
+          },
+          {
+            type: 'CUSTOM',
+            label: 'Horizontal Alignment',
+            key: 'horizontalAlignment',
+            value: 'inherit',
+            configuration: {
+              as: 'BUTTONGROUP',
+              dataType: 'string',
+              allowedInput: [
+                { name: 'None', value: 'inherit' },
+                { name: 'Left', value: 'flex-start' },
+                { name: 'Center', value: 'center' },
+                { name: 'Right', value: 'flex-end' },
+              ],
+            },
+          },
+          {
+            type: 'CUSTOM',
+            label: 'Vertical Alignment',
+            key: 'verticalAlignment',
+            value: 'inherit',
+            configuration: {
+              as: 'BUTTONGROUP',
+              dataType: 'string',
+              allowedInput: [
+                { name: 'None', value: 'inherit' },
+                { name: 'Top', value: 'flex-start' },
+                { name: 'Center', value: 'center' },
+                { name: 'Bottom', value: 'flex-end' },
+              ],
+            },
+          },
+          {
+            value: ['0rem', '0rem', '0rem', '0rem'],
+            label: 'Outer space',
+            key: 'outerSpacing',
+            type: 'SIZES',
+          },
+          {
+            value: ['0rem', '0rem', '0rem', '0rem'],
+            label: 'Inner space',
+            key: 'innerSpacing',
+            type: 'SIZES',
+          },
+        ],
+        descendants: [
+          {
+            name: 'AppBar',
+            ref: {
+              id: '#appBar',
+            },
+            options: [
+              {
+                label: 'Background color',
+                key: 'backgroundColor',
+                value: 'Primary',
+                type: 'COLOR',
+              },
+              {
+                label: 'Text color',
+                key: 'color',
+                value: 'White',
+                type: 'COLOR',
+              },
+              {
+                type: 'SIZE',
+                label: 'Height',
+                key: 'height',
+                value: '60px',
+                configuration: {
+                  as: 'UNIT',
+                },
+              },
+              {
+                label: 'Position',
+                key: 'position',
+                value: 'static',
+                type: 'CUSTOM',
+                configuration: {
+                  as: 'DROPDOWN',
+                  dataType: 'string',
+                  allowedInput: [
+                    {
+                      name: 'Fixed',
+                      value: 'fixed',
+                    },
+                    {
+                      name: 'Absolute',
+                      value: 'absolute',
+                    },
+                    {
+                      name: 'Sticky',
+                      value: 'sticky',
+                    },
+
+                    {
+                      name: 'Static',
+                      value: 'static',
+                    },
+                    {
+                      name: 'Relative',
+                      value: 'relative',
+                    },
+                  ],
+                },
+              },
+              {
+                label: 'Title',
+                key: 'title',
+                value: ['App Bar'],
+                type: 'VARIABLE',
+              },
+              {
+                label: 'Logo',
+                key: 'logoSource',
+                value: [],
+                type: 'VARIABLE',
+              },
+              {
+                type: 'SIZE',
+                label: 'Logo Width',
+                key: 'logoWidth',
+                value: '150px',
+                configuration: {
+                  as: 'UNIT',
+                },
+              },
+              {
+                label: 'Align items',
+                key: 'alignItems',
+                value: 'right',
+                type: 'CUSTOM',
+                configuration: {
+                  as: 'BUTTONGROUP',
+                  dataType: 'string',
+                  allowedInput: [
+                    {
+                      name: 'Left',
+                      value: 'left',
+                    },
+                    {
+                      name: 'Right',
+                      value: 'right',
+                    },
+                  ],
+                },
+              },
+              {
+                label: 'Page',
+                key: 'endpoint',
+                value: '',
+                type: 'ENDPOINT',
+              },
+              {
+                label: 'Variant',
+                key: 'appBarVariant',
+                value: 'elevation',
+                type: 'CUSTOM',
+                configuration: {
+                  as: 'BUTTONGROUP',
+                  dataType: 'string',
+                  allowedInput: [
+                    {
+                      name: 'Flat',
+                      value: 'flat',
+                    },
+                    {
+                      name: 'Elevation',
+                      value: 'elevation',
+                    },
+                    {
+                      name: 'Outlined',
+                      value: 'outlined',
+                    },
+                  ],
+                },
+              },
+              {
+                label: 'Elevation',
+                key: 'elevation',
+                value: '1',
+                type: 'CUSTOM',
+                configuration: {
+                  as: 'DROPDOWN',
+                  dataType: 'string',
+                  allowedInput: [
+                    { name: '1', value: '1' },
+                    { name: '2', value: '2' },
+                    { name: '3', value: '3' },
+                    { name: '4', value: '4' },
+                    { name: '5', value: '5' },
+                    { name: '6', value: '6' },
+                    { name: '7', value: '7' },
+                    { name: '8', value: '8' },
+                    { name: '9', value: '9' },
+                    { name: '10', value: '10' },
+                    { name: '11', value: '11' },
+                    { name: '12', value: '12' },
+                    { name: '13', value: '13' },
+                    { name: '14', value: '14' },
+                    { name: '15', value: '15' },
+                    { name: '16', value: '16' },
+                    { name: '17', value: '17' },
+                    { name: '18', value: '18' },
+                    { name: '19', value: '19' },
+                    { name: '20', value: '20' },
+                    { name: '21', value: '21' },
+                    { name: '22', value: '22' },
+                    { name: '23', value: '23' },
+                    { name: '24', value: '24' },
+                  ],
+                  condition: {
+                    type: 'SHOW',
+                    option: 'appBarVariant',
+                    comparator: 'EQ',
+                    value: 'elevation',
+                  },
+                },
+              },
+              {
+                label: 'Square',
+                key: 'square',
+                value: true,
+                type: 'TOGGLE',
+              },
+              {
+                label: 'Size',
+                key: 'toolbarVariant',
+                value: 'regular',
+                type: 'CUSTOM',
+                configuration: {
+                  as: 'DROPDOWN',
+                  dataType: 'string',
+                  allowedInput: [
+                    {
+                      name: 'Regular',
+                      value: 'regular',
+                    },
+                    {
+                      name: 'Dense',
+                      value: 'dense',
+                    },
+                  ],
+                },
+              },
+            ],
+            descendants: [],
+          },
+          {
+            name: 'Column',
+            options: [
+              {
+                label: 'Toggle visibility',
+                key: 'visible',
+                value: true,
+                type: 'TOGGLE',
+                configuration: {
+                  as: 'VISIBILITY',
+                },
+              },
+              {
+                value: '12',
+                label: 'Column width',
+                key: 'columnWidth',
+                type: 'CUSTOM',
+                configuration: {
+                  as: 'DROPDOWN',
+                  dataType: 'string',
+                  allowedInput: [
+                    { name: 'Fit content', value: 'fitContent' },
+                    { name: 'Flexible', value: 'flexible' },
+                    { name: 'Hidden', value: 'hidden' },
+                    { name: '1', value: '1' },
+                    { name: '2', value: '2' },
+                    { name: '3', value: '3' },
+                    { name: '4', value: '4' },
+                    { name: '5', value: '5' },
+                    { name: '6', value: '6' },
+                    { name: '7', value: '7' },
+                    { name: '8', value: '8' },
+                    { name: '9', value: '9' },
+                    { name: '10', value: '10' },
+                    { name: '11', value: '11' },
+                    { name: '12', value: '12' },
+                  ],
+                },
+              },
+              {
+                value: '12',
+                label: 'Column width (tablet landscape)',
+                key: 'columnWidthTabletLandscape',
+                type: 'CUSTOM',
+                configuration: {
+                  as: 'DROPDOWN',
+                  dataType: 'string',
+                  allowedInput: [
+                    { name: 'Fit content', value: 'fitContent' },
+                    { name: 'Flexible', value: 'flexible' },
+                    { name: 'Hidden', value: 'hidden' },
+                    { name: '1', value: '1' },
+                    { name: '2', value: '2' },
+                    { name: '3', value: '3' },
+                    { name: '4', value: '4' },
+                    { name: '5', value: '5' },
+                    { name: '6', value: '6' },
+                    { name: '7', value: '7' },
+                    { name: '8', value: '8' },
+                    { name: '9', value: '9' },
+                    { name: '10', value: '10' },
+                    { name: '11', value: '11' },
+                    { name: '12', value: '12' },
+                  ],
+                },
+              },
+              {
+                value: '12',
+                label: 'Column width (tablet portrait)',
+                key: 'columnWidthTabletPortrait',
+                type: 'CUSTOM',
+                configuration: {
+                  as: 'DROPDOWN',
+                  dataType: 'string',
+                  allowedInput: [
+                    { name: 'Fit content', value: 'fitContent' },
+                    { name: 'Flexible', value: 'flexible' },
+                    { name: 'Hidden', value: 'hidden' },
+                    { name: '1', value: '1' },
+                    { name: '2', value: '2' },
+                    { name: '3', value: '3' },
+                    { name: '4', value: '4' },
+                    { name: '5', value: '5' },
+                    { name: '6', value: '6' },
+                    { name: '7', value: '7' },
+                    { name: '8', value: '8' },
+                    { name: '9', value: '9' },
+                    { name: '10', value: '10' },
+                    { name: '11', value: '11' },
+                    { name: '12', value: '12' },
+                  ],
+                },
+              },
+              {
+                value: '12',
+                label: 'Column width (mobile)',
+                key: 'columnWidthMobile',
+                type: 'CUSTOM',
+                configuration: {
+                  as: 'DROPDOWN',
+                  dataType: 'string',
+                  allowedInput: [
+                    { name: 'Fit content', value: 'fitContent' },
+                    { name: 'Flexible', value: 'flexible' },
+                    { name: 'Hidden', value: 'hidden' },
+                    { name: '1', value: '1' },
+                    { name: '2', value: '2' },
+                    { name: '3', value: '3' },
+                    { name: '4', value: '4' },
+                    { name: '5', value: '5' },
+                    { name: '6', value: '6' },
+                    { name: '7', value: '7' },
+                    { name: '8', value: '8' },
+                    { name: '9', value: '9' },
+                    { name: '10', value: '10' },
+                    { name: '11', value: '11' },
+                    { name: '12', value: '12' },
+                  ],
+                },
+              },
+              {
+                value: '',
+                label: 'Height',
+                key: 'columnHeight',
+                type: 'TEXT',
+                configuration: {
+                  as: 'UNIT',
+                },
+              },
+              {
+                value: 'transparent',
+                label: 'Background color',
+                key: 'backgroundColor',
+                type: 'COLOR',
+              },
+              {
+                type: 'CUSTOM',
+                label: 'Horizontal Alignment',
+                key: 'horizontalAlignment',
+                value: 'inherit',
+                configuration: {
+                  as: 'BUTTONGROUP',
+                  dataType: 'string',
+                  allowedInput: [
+                    { name: 'None', value: 'inherit' },
+                    { name: 'Left', value: 'flex-start' },
+                    { name: 'Center', value: 'center' },
+                    { name: 'Right', value: 'flex-end' },
+                  ],
+                },
+              },
+              {
+                type: 'CUSTOM',
+                label: 'Vertical Alignment',
+                key: 'verticalAlignment',
+                value: 'inherit',
+                configuration: {
+                  as: 'BUTTONGROUP',
+                  dataType: 'string',
+                  allowedInput: [
+                    { name: 'None', value: 'inherit' },
+                    { name: 'Top', value: 'flex-start' },
+                    { name: 'Center', value: 'center' },
+                    { name: 'Bottom', value: 'flex-end' },
+                  ],
+                },
+              },
+              {
+                value: ['XL', '0rem', '0rem', '0rem'],
+                label: 'Outer space',
+                key: 'outerSpacing',
+                type: 'SIZES',
+              },
+              {
+                value: ['M', 'M', 'M', 'M'],
+                label: 'Inner space',
+                key: 'innerSpacing',
+                type: 'SIZES',
+              },
+            ],
+            descendants: [
+              {
+                name: 'Tabs',
+                ref: {
+                  id: '#tabs',
+                },
+                options: [
+                  {
+                    label: 'Selected tab index',
+                    key: 'defaultValue',
+                    value: '1',
+                    type: 'NUMBER',
+                  },
+                  {
+                    label: 'Show all tabs',
+                    key: 'showAllTabs',
+                    value: false,
+                    type: 'TOGGLE',
+                  },
+                  {
+                    type: 'SIZE',
+                    label: 'Height',
+                    key: 'height',
+                    value: '',
+                    configuration: {
+                      as: 'UNIT',
+                    },
+                  },
+                  {
+                    type: 'SIZE',
+                    label: 'Width',
+                    key: 'width',
+                    value: '',
+                    configuration: {
+                      as: 'UNIT',
+                    },
+                  },
+                  {
+                    value: 'top',
+                    label: 'Alignment',
+                    key: 'alignment',
+                    type: 'CUSTOM',
+                    configuration: {
+                      as: 'BUTTONGROUP',
+                      dataType: 'string',
+                      allowedInput: [
+                        { name: 'Left', value: 'left' },
+                        { name: 'Top', value: 'top' },
+                        { name: 'Right', value: 'right' },
+                        { name: 'Bottom', value: 'bottom' },
+                      ],
+                    },
+                  },
+                  {
+                    label: 'Variant',
+                    key: 'variant',
+                    value: 'standard',
+                    type: 'CUSTOM',
+                    configuration: {
+                      as: 'BUTTONGROUP',
+                      dataType: 'string',
+                      allowedInput: [
+                        { name: 'Standard', value: 'standard' },
+                        { name: 'Scrollable', value: 'scrollable' },
+                        { name: 'Full width', value: 'fullWidth' },
+                      ],
+                    },
+                  },
+                  {
+                    label: 'Scrollbuttons',
+                    key: 'scrollButtons',
+                    value: 'auto',
+                    type: 'CUSTOM',
+                    configuration: {
+                      as: 'BUTTONGROUP',
+                      dataType: 'string',
+                      allowedInput: [
+                        { name: 'Auto', value: 'auto' },
+                        { name: 'Desktop', value: 'desktop' },
+                        { name: 'Always', value: 'on' },
+                        { name: 'Never', value: 'off' },
+                      ],
+                      condition: {
+                        type: 'SHOW',
+                        option: 'variant',
+                        comparator: 'EQ',
+                        value: 'scrollable',
+                      },
+                    },
+                  },
+                  {
+                    type: 'TOGGLE',
+                    label: 'Centered',
+                    key: 'centered',
+                    value: false,
+                    configuration: {
+                      condition: {
+                        type: 'SHOW',
+                        option: 'orientation',
+                        comparator: 'EQ',
+                        value: 'horizontal',
+                      },
+                    },
+                  },
+                  {
+                    label: 'Bar color',
+                    key: 'appBarColor',
+                    value: 'Primary',
+                    type: 'COLOR',
+                  },
+                  {
+                    label: 'Text color',
+                    key: 'textColor',
+                    value: 'White',
+                    type: 'COLOR',
+                  },
+                  {
+                    label: 'Indicator color',
+                    key: 'indicatorColor',
+                    value: 'Success',
+                    type: 'COLOR',
+                  },
+                  {
+                    label: 'Hide visual tabs',
+                    key: 'hideTabs',
+                    value: false,
+                    type: 'TOGGLE',
+                  },
+                ],
+                descendants: [],
+              },
+            ],
+          },
+        ],
+      },
+    ];
 
     const stepper = {
       setStep: step => {
@@ -54,10 +767,10 @@
                     info={
                       <>
                         <Text size="small" color="grey700">
-                          Click the + Add tab button to add a new tab to the
-                          page.
+                          Click the <b>+ Add tab</b> button to add a new tab to
+                          the page.
                           <br />
-                          You can also specify the title of each tab.
+                          You can also specify the title for each tab.
                         </Text>
                       </>
                     }
@@ -139,45 +852,47 @@
                 </Box>
                 <Box direction="column" basis="40%" margin={{ top: '11%' }}>
                   <Text color="#666d85">Preview:</Text>
-                  <Box
-                    direction="row"
-                    border={{
-                      color: 'border',
-                      size: 'medium',
-                      style: 'solid',
-                      side: 'all',
-                    }}
-                  >
+                  <Box direction="row" background="#4050B5">
                     {tabs.map(tab => (
                       <Box
-                        direction="row"
-                        height="100%"
-                        background="#FFFFFF"
+                        height="30px"
                         justify="center"
+                        align="center"
+                        pad="5px 10px"
+                        margin={
+                          tab.index === 1
+                            ? {
+                                top: '1px',
+                              }
+                            : ''
+                        }
                         border={
                           tab.index === 1
                             ? {
-                                color: 'border',
-                                size: 'medium',
+                                color: '#8BC34A',
+                                size: 'small',
                                 style: 'solid',
                                 side: 'bottom',
                               }
-                            : {
-                                color: 'border',
-                                size: 'medium',
-                                style: 'solid',
-                                side: 'all',
-                              }
+                            : ''
                         }
                       >
-                        <Text truncate="true">{tab.title}</Text>
+                        <Text
+                          truncate="true"
+                          size="0.575rem"
+                          color="#FFFFFF"
+                          weight="500"
+                        >
+                          {tab.title}
+                        </Text>
                       </Box>
                     ))}
                   </Box>
                   <Box
-                    fill="true"
                     background="#F0F1F5"
-                    height="100px"
+                    height="50px"
+                    align="center"
+                    justify="center"
                     border={{
                       color: '#AFB5C8',
                       size: 'xsmall',
@@ -185,7 +900,7 @@
                       side: 'all',
                     }}
                   >
-                    <Text>Tab</Text>
+                    <Text size="0.5rem">TAB</Text>
                   </Box>
                 </Box>
               </Box>
@@ -198,6 +913,7 @@
       },
       onSave: () => {
         const newPrefab = { ...prefab };
+        const tabsPrefab = getDescendantByRef('#tabs', prefabStructure);
         tabs.forEach(tab => {
           const newTab = {
             name: 'Tab',
@@ -1527,10 +2243,11 @@
             ],
             descendants: [],
           };
-
-          newPrefab.structure[0].descendants[0].descendants.push(newTab);
+          tabsPrefab.descendants.push(newTab);
         });
-        newPrefab.structure[0].descendants[0].descendants[0].descendants[0].options[4].value[0] = appBarTitle;
+        const appBar = getDescendantByRef('#appBar', prefabStructure);
+        appBar.options[4].value[0] = appBarTitle;
+        newPrefab.structure[0].descendants = prefabStructure;
         save(newPrefab);
       },
       buttons: () => (
@@ -1635,573 +2352,7 @@
           type: 'SIZES',
         },
       ],
-      descendants: [
-        {
-          name: 'Column',
-          options: [
-            {
-              label: 'Toggle visibility',
-              key: 'visible',
-              value: true,
-              type: 'TOGGLE',
-              configuration: {
-                as: 'VISIBILITY',
-              },
-            },
-            {
-              value: 'flexible',
-              label: 'Column width',
-              key: 'columnWidth',
-              type: 'CUSTOM',
-              configuration: {
-                as: 'DROPDOWN',
-                dataType: 'string',
-                allowedInput: [
-                  { name: 'Fit content', value: 'fitContent' },
-                  { name: 'Flexible', value: 'flexible' },
-                  { name: 'Hidden', value: 'hidden' },
-                  { name: '1', value: '1' },
-                  { name: '2', value: '2' },
-                  { name: '3', value: '3' },
-                  { name: '4', value: '4' },
-                  { name: '5', value: '5' },
-                  { name: '6', value: '6' },
-                  { name: '7', value: '7' },
-                  { name: '8', value: '8' },
-                  { name: '9', value: '9' },
-                  { name: '10', value: '10' },
-                  { name: '11', value: '11' },
-                  { name: '12', value: '12' },
-                ],
-              },
-            },
-            {
-              value: 'flexible',
-              label: 'Column width (tablet landscape)',
-              key: 'columnWidthTabletLandscape',
-              type: 'CUSTOM',
-              configuration: {
-                as: 'DROPDOWN',
-                dataType: 'string',
-                allowedInput: [
-                  { name: 'Fit content', value: 'fitContent' },
-                  { name: 'Flexible', value: 'flexible' },
-                  { name: 'Hidden', value: 'hidden' },
-                  { name: '1', value: '1' },
-                  { name: '2', value: '2' },
-                  { name: '3', value: '3' },
-                  { name: '4', value: '4' },
-                  { name: '5', value: '5' },
-                  { name: '6', value: '6' },
-                  { name: '7', value: '7' },
-                  { name: '8', value: '8' },
-                  { name: '9', value: '9' },
-                  { name: '10', value: '10' },
-                  { name: '11', value: '11' },
-                  { name: '12', value: '12' },
-                ],
-              },
-            },
-            {
-              value: 'flexible',
-              label: 'Column width (tablet portrait)',
-              key: 'columnWidthTabletPortrait',
-              type: 'CUSTOM',
-              configuration: {
-                as: 'DROPDOWN',
-                dataType: 'string',
-                allowedInput: [
-                  { name: 'Fit content', value: 'fitContent' },
-                  { name: 'Flexible', value: 'flexible' },
-                  { name: 'Hidden', value: 'hidden' },
-                  { name: '1', value: '1' },
-                  { name: '2', value: '2' },
-                  { name: '3', value: '3' },
-                  { name: '4', value: '4' },
-                  { name: '5', value: '5' },
-                  { name: '6', value: '6' },
-                  { name: '7', value: '7' },
-                  { name: '8', value: '8' },
-                  { name: '9', value: '9' },
-                  { name: '10', value: '10' },
-                  { name: '11', value: '11' },
-                  { name: '12', value: '12' },
-                ],
-              },
-            },
-            {
-              value: 'flexible',
-              label: 'Column width (mobile)',
-              key: 'columnWidthMobile',
-              type: 'CUSTOM',
-              configuration: {
-                as: 'DROPDOWN',
-                dataType: 'string',
-                allowedInput: [
-                  { name: 'Fit content', value: 'fitContent' },
-                  { name: 'Flexible', value: 'flexible' },
-                  { name: 'Hidden', value: 'hidden' },
-                  { name: '1', value: '1' },
-                  { name: '2', value: '2' },
-                  { name: '3', value: '3' },
-                  { name: '4', value: '4' },
-                  { name: '5', value: '5' },
-                  { name: '6', value: '6' },
-                  { name: '7', value: '7' },
-                  { name: '8', value: '8' },
-                  { name: '9', value: '9' },
-                  { name: '10', value: '10' },
-                  { name: '11', value: '11' },
-                  { name: '12', value: '12' },
-                ],
-              },
-            },
-            {
-              value: '',
-              label: 'Height',
-              key: 'columnHeight',
-              type: 'TEXT',
-              configuration: {
-                as: 'UNIT',
-              },
-            },
-            {
-              value: 'transparent',
-              label: 'Background color',
-              key: 'backgroundColor',
-              type: 'COLOR',
-            },
-            {
-              type: 'CUSTOM',
-              label: 'Horizontal Alignment',
-              key: 'horizontalAlignment',
-              value: 'inherit',
-              configuration: {
-                as: 'BUTTONGROUP',
-                dataType: 'string',
-                allowedInput: [
-                  { name: 'None', value: 'inherit' },
-                  { name: 'Left', value: 'flex-start' },
-                  { name: 'Center', value: 'center' },
-                  { name: 'Right', value: 'flex-end' },
-                ],
-              },
-            },
-            {
-              type: 'CUSTOM',
-              label: 'Vertical Alignment',
-              key: 'verticalAlignment',
-              value: 'inherit',
-              configuration: {
-                as: 'BUTTONGROUP',
-                dataType: 'string',
-                allowedInput: [
-                  { name: 'None', value: 'inherit' },
-                  { name: 'Top', value: 'flex-start' },
-                  { name: 'Center', value: 'center' },
-                  { name: 'Bottom', value: 'flex-end' },
-                ],
-              },
-            },
-            {
-              value: ['0rem', '0rem', '0rem', '0rem'],
-              label: 'Outer space',
-              key: 'outerSpacing',
-              type: 'SIZES',
-            },
-            {
-              value: ['0rem', '0rem', '0rem', '0rem'],
-              label: 'Inner space',
-              key: 'innerSpacing',
-              type: 'SIZES',
-            },
-          ],
-          descendants: [
-            {
-              name: 'Column',
-              options: [
-                {
-                  label: 'Toggle visibility',
-                  key: 'visible',
-                  value: true,
-                  type: 'TOGGLE',
-                  configuration: {
-                    as: 'VISIBILITY',
-                  },
-                },
-                {
-                  value: '12',
-                  label: 'Column width',
-                  key: 'columnWidth',
-                  type: 'CUSTOM',
-                  configuration: {
-                    as: 'DROPDOWN',
-                    dataType: 'string',
-                    allowedInput: [
-                      { name: 'Fit content', value: 'fitContent' },
-                      { name: 'Flexible', value: 'flexible' },
-                      { name: 'Hidden', value: 'hidden' },
-                      { name: '1', value: '1' },
-                      { name: '2', value: '2' },
-                      { name: '3', value: '3' },
-                      { name: '4', value: '4' },
-                      { name: '5', value: '5' },
-                      { name: '6', value: '6' },
-                      { name: '7', value: '7' },
-                      { name: '8', value: '8' },
-                      { name: '9', value: '9' },
-                      { name: '10', value: '10' },
-                      { name: '11', value: '11' },
-                      { name: '12', value: '12' },
-                    ],
-                  },
-                },
-                {
-                  value: '12',
-                  label: 'Column width (tablet landscape)',
-                  key: 'columnWidthTabletLandscape',
-                  type: 'CUSTOM',
-                  configuration: {
-                    as: 'DROPDOWN',
-                    dataType: 'string',
-                    allowedInput: [
-                      { name: 'Fit content', value: 'fitContent' },
-                      { name: 'Flexible', value: 'flexible' },
-                      { name: 'Hidden', value: 'hidden' },
-                      { name: '1', value: '1' },
-                      { name: '2', value: '2' },
-                      { name: '3', value: '3' },
-                      { name: '4', value: '4' },
-                      { name: '5', value: '5' },
-                      { name: '6', value: '6' },
-                      { name: '7', value: '7' },
-                      { name: '8', value: '8' },
-                      { name: '9', value: '9' },
-                      { name: '10', value: '10' },
-                      { name: '11', value: '11' },
-                      { name: '12', value: '12' },
-                    ],
-                  },
-                },
-                {
-                  value: '12',
-                  label: 'Column width (tablet portrait)',
-                  key: 'columnWidthTabletPortrait',
-                  type: 'CUSTOM',
-                  configuration: {
-                    as: 'DROPDOWN',
-                    dataType: 'string',
-                    allowedInput: [
-                      { name: 'Fit content', value: 'fitContent' },
-                      { name: 'Flexible', value: 'flexible' },
-                      { name: 'Hidden', value: 'hidden' },
-                      { name: '1', value: '1' },
-                      { name: '2', value: '2' },
-                      { name: '3', value: '3' },
-                      { name: '4', value: '4' },
-                      { name: '5', value: '5' },
-                      { name: '6', value: '6' },
-                      { name: '7', value: '7' },
-                      { name: '8', value: '8' },
-                      { name: '9', value: '9' },
-                      { name: '10', value: '10' },
-                      { name: '11', value: '11' },
-                      { name: '12', value: '12' },
-                    ],
-                  },
-                },
-                {
-                  value: '12',
-                  label: 'Column width (mobile)',
-                  key: 'columnWidthMobile',
-                  type: 'CUSTOM',
-                  configuration: {
-                    as: 'DROPDOWN',
-                    dataType: 'string',
-                    allowedInput: [
-                      { name: 'Fit content', value: 'fitContent' },
-                      { name: 'Flexible', value: 'flexible' },
-                      { name: 'Hidden', value: 'hidden' },
-                      { name: '1', value: '1' },
-                      { name: '2', value: '2' },
-                      { name: '3', value: '3' },
-                      { name: '4', value: '4' },
-                      { name: '5', value: '5' },
-                      { name: '6', value: '6' },
-                      { name: '7', value: '7' },
-                      { name: '8', value: '8' },
-                      { name: '9', value: '9' },
-                      { name: '10', value: '10' },
-                      { name: '11', value: '11' },
-                      { name: '12', value: '12' },
-                    ],
-                  },
-                },
-                {
-                  value: '',
-                  label: 'Height',
-                  key: 'columnHeight',
-                  type: 'TEXT',
-                  configuration: {
-                    as: 'UNIT',
-                  },
-                },
-                {
-                  value: 'transparent',
-                  label: 'Background color',
-                  key: 'backgroundColor',
-                  type: 'COLOR',
-                },
-                {
-                  type: 'CUSTOM',
-                  label: 'Horizontal Alignment',
-                  key: 'horizontalAlignment',
-                  value: 'inherit',
-                  configuration: {
-                    as: 'BUTTONGROUP',
-                    dataType: 'string',
-                    allowedInput: [
-                      { name: 'None', value: 'inherit' },
-                      { name: 'Left', value: 'flex-start' },
-                      { name: 'Center', value: 'center' },
-                      { name: 'Right', value: 'flex-end' },
-                    ],
-                  },
-                },
-                {
-                  type: 'CUSTOM',
-                  label: 'Vertical Alignment',
-                  key: 'verticalAlignment',
-                  value: 'inherit',
-                  configuration: {
-                    as: 'BUTTONGROUP',
-                    dataType: 'string',
-                    allowedInput: [
-                      { name: 'None', value: 'inherit' },
-                      { name: 'Top', value: 'flex-start' },
-                      { name: 'Center', value: 'center' },
-                      { name: 'Bottom', value: 'flex-end' },
-                    ],
-                  },
-                },
-                {
-                  value: ['0rem', '0rem', '0rem', '0rem'],
-                  label: 'Outer space',
-                  key: 'outerSpacing',
-                  type: 'SIZES',
-                },
-                {
-                  value: ['0rem', '0rem', '0rem', '0rem'],
-                  label: 'Inner space',
-                  key: 'innerSpacing',
-                  type: 'SIZES',
-                },
-              ],
-              descendants: [
-                {
-                  name: 'AppBar',
-                  options: [
-                    {
-                      label: 'Background color',
-                      key: 'backgroundColor',
-                      value: 'Primary',
-                      type: 'COLOR',
-                    },
-                    {
-                      label: 'Text color',
-                      key: 'color',
-                      value: 'White',
-                      type: 'COLOR',
-                    },
-                    {
-                      type: 'SIZE',
-                      label: 'Height',
-                      key: 'height',
-                      value: '60px',
-                      configuration: {
-                        as: 'UNIT',
-                      },
-                    },
-                    {
-                      label: 'Position',
-                      key: 'position',
-                      value: 'static',
-                      type: 'CUSTOM',
-                      configuration: {
-                        as: 'DROPDOWN',
-                        dataType: 'string',
-                        allowedInput: [
-                          {
-                            name: 'Fixed',
-                            value: 'fixed',
-                          },
-                          {
-                            name: 'Absolute',
-                            value: 'absolute',
-                          },
-                          {
-                            name: 'Sticky',
-                            value: 'sticky',
-                          },
-
-                          {
-                            name: 'Static',
-                            value: 'static',
-                          },
-                          {
-                            name: 'Relative',
-                            value: 'relative',
-                          },
-                        ],
-                      },
-                    },
-                    {
-                      label: 'Title',
-                      key: 'title',
-                      value: ['App Bar'],
-                      type: 'VARIABLE',
-                    },
-                    {
-                      label: 'Logo',
-                      key: 'logoSource',
-                      value: [],
-                      type: 'VARIABLE',
-                    },
-                    {
-                      type: 'SIZE',
-                      label: 'Logo Width',
-                      key: 'logoWidth',
-                      value: '150px',
-                      configuration: {
-                        as: 'UNIT',
-                      },
-                    },
-                    {
-                      label: 'Align items',
-                      key: 'alignItems',
-                      value: 'right',
-                      type: 'CUSTOM',
-                      configuration: {
-                        as: 'BUTTONGROUP',
-                        dataType: 'string',
-                        allowedInput: [
-                          {
-                            name: 'Left',
-                            value: 'left',
-                          },
-                          {
-                            name: 'Right',
-                            value: 'right',
-                          },
-                        ],
-                      },
-                    },
-                    {
-                      label: 'Page',
-                      key: 'endpoint',
-                      value: '',
-                      type: 'ENDPOINT',
-                    },
-                    {
-                      label: 'Variant',
-                      key: 'appBarVariant',
-                      value: 'elevation',
-                      type: 'CUSTOM',
-                      configuration: {
-                        as: 'BUTTONGROUP',
-                        dataType: 'string',
-                        allowedInput: [
-                          {
-                            name: 'Flat',
-                            value: 'flat',
-                          },
-                          {
-                            name: 'Elevation',
-                            value: 'elevation',
-                          },
-                          {
-                            name: 'Outlined',
-                            value: 'outlined',
-                          },
-                        ],
-                      },
-                    },
-                    {
-                      label: 'Elevation',
-                      key: 'elevation',
-                      value: '1',
-                      type: 'CUSTOM',
-                      configuration: {
-                        as: 'DROPDOWN',
-                        dataType: 'string',
-                        allowedInput: [
-                          { name: '1', value: '1' },
-                          { name: '2', value: '2' },
-                          { name: '3', value: '3' },
-                          { name: '4', value: '4' },
-                          { name: '5', value: '5' },
-                          { name: '6', value: '6' },
-                          { name: '7', value: '7' },
-                          { name: '8', value: '8' },
-                          { name: '9', value: '9' },
-                          { name: '10', value: '10' },
-                          { name: '11', value: '11' },
-                          { name: '12', value: '12' },
-                          { name: '13', value: '13' },
-                          { name: '14', value: '14' },
-                          { name: '15', value: '15' },
-                          { name: '16', value: '16' },
-                          { name: '17', value: '17' },
-                          { name: '18', value: '18' },
-                          { name: '19', value: '19' },
-                          { name: '20', value: '20' },
-                          { name: '21', value: '21' },
-                          { name: '22', value: '22' },
-                          { name: '23', value: '23' },
-                          { name: '24', value: '24' },
-                        ],
-                        condition: {
-                          type: 'SHOW',
-                          option: 'appBarVariant',
-                          comparator: 'EQ',
-                          value: 'elevation',
-                        },
-                      },
-                    },
-                    {
-                      label: 'Square',
-                      key: 'square',
-                      value: true,
-                      type: 'TOGGLE',
-                    },
-                    {
-                      label: 'Size',
-                      key: 'toolbarVariant',
-                      value: 'regular',
-                      type: 'CUSTOM',
-                      configuration: {
-                        as: 'DROPDOWN',
-                        dataType: 'string',
-                        allowedInput: [
-                          {
-                            name: 'Regular',
-                            value: 'regular',
-                          },
-                          {
-                            name: 'Dense',
-                            value: 'dense',
-                          },
-                        ],
-                      },
-                    },
-                  ],
-                  descendants: [],
-                },
-              ],
-            },
-          ],
-        },
-      ],
+      descendants: [],
     },
   ],
 }))();
