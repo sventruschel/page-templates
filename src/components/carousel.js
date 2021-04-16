@@ -141,7 +141,7 @@
           <Children
             stepLabelData={stepLabelData}
             setStepLabelData={setStepLabelData}
-            active={index === activeStep || allImages}
+            active={index === activeStep || (isDev && allImages)}
             isFirstRender={numRendersRef.current === 1}
           >
             {React.cloneElement(child)}
