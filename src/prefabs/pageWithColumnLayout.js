@@ -3,7 +3,7 @@
   icon: 'GridIcon',
   description:
     'With this page with appbar you can select the amount of rows and the number of columns for each row',
-  // type: 'page',
+  type: 'page',
   category: 'LAYOUT',
   beforeCreate: ({
     close,
@@ -2166,16 +2166,19 @@
           </Box>
         </Box>
       ),
-      progressBar: titles => (
-        <Box
-          justify="center"
-          margin={{ bottom: '2rem', left: '2rem', top: '-1rem' }}
-        >
-          <Text size="medium" weight="bold">{`Step: ${stepNumber} / ${
-            stepper.stepAmount
-          } - ${titles[stepNumber - 1]}`}</Text>
-        </Box>
-      ),
+      progressBar: titles => {
+        const titlesArray = titles;
+        return (
+          <Box
+            justify="center"
+            margin={{ bottom: '2rem', left: '2rem', top: '-1rem' }}
+          >
+            <Text size="medium" weight="bold">{`Step: ${stepNumber} / ${
+              stepper.stepAmount
+            } - ${titlesArray[stepNumber - 1]}`}</Text>
+          </Box>
+        );
+      },
       stepAmount: 2,
     };
 
