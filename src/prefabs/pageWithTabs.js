@@ -1,7 +1,7 @@
 (() => ({
   name: 'Page With Tabs Layout',
   icon: 'TabsIcon',
-  description: 'This is a page containing tabs',
+  description: 'This is a page containing an app bar and configurable tabs',
   // type: 'page',
   category: 'LAYOUT',
   beforeCreate: ({
@@ -843,7 +843,12 @@
                 </Field>
               ))}
             </Box>
-            <Box direction="column" basis="40%" margin={{ top: '11%' }}>
+            <Box
+              direction="column"
+              basis="40%"
+              width={{ max: '230px' }}
+              margin={{ top: '11%' }}
+            >
               <Text color="#666d85">Preview:</Text>
               <Box direction="row" background="#4050B5">
                 {tabs.map(tab => (
@@ -852,6 +857,9 @@
                     justify="center"
                     align="center"
                     pad="5px 10px"
+                    fill="true"
+                    width={{ max: '70px' }}
+                    overflow="hidden"
                     margin={
                       tab.index === 1
                         ? {
@@ -871,7 +879,7 @@
                     }
                   >
                     <Text
-                      truncate="true"
+                      textAlign="center"
                       size="0.575rem"
                       color="#FFFFFF"
                       weight="500"
