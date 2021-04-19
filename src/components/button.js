@@ -149,15 +149,19 @@
       <BtnComp
         {...compProps}
         startIcon={
-          !isIcon &&
-          icon !== 'None' &&
-          (iconPosition === 'start' || iconPosition === 'top') &&
-          React.createElement(Icons[icon])
+          (!isIcon &&
+            icon !== 'None' &&
+            iconPosition === 'start' &&
+            React.createElement(Icons[icon])) ||
+          (!isIcon &&
+            icon !== 'None' &&
+            iconPosition === 'top' &&
+            React.createElement(Icons[icon]))
         }
         endIcon={
           !isIcon &&
           icon !== 'None' &&
-          (iconPosition === 'end' || iconPosition === 'bottom') &&
+          iconPosition === 'end' &&
           React.createElement(Icons[icon])
         }
         onClick={event => {
@@ -224,24 +228,14 @@
       root: {
         '& .MuiButton-label': {
           display: ({ options: { iconPosition } }) =>
-            iconPosition === 'top' || iconPosition === 'bottom'
-              ? 'flex'
-              : 'inherit',
+            iconPosition === 'top' ? 'flex' : 'inherit',
           flexDirection: ({ options: { iconPosition } }) =>
-            iconPosition === 'top' || iconPosition === 'bottom'
-              ? 'column'
-              : 'unset',
+            iconPosition === 'top' ? 'column' : 'unset',
           '& .MuiButton-startIcon': {
             marginLeft: ({ options: { iconPosition } }) =>
               iconPosition === 'top' ? '0px' : '-4px',
             marginRight: ({ options: { iconPosition } }) =>
               iconPosition === 'top' ? '0px' : '8px',
-          },
-          '& .MuiButton-endIcon': {
-            marginLeft: ({ options: { iconPosition } }) =>
-              iconPosition === 'bottom' ? '0px' : '8px',
-            marginRight: ({ options: { iconPosition } }) =>
-              iconPosition === 'bottom' ? '0px' : '-4px',
           },
         },
         color: ({ options: { background, disabled, textColor, variant } }) => [
