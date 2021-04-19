@@ -1441,7 +1441,7 @@
           type: 'CUSTOM',
           label: 'Icon position',
           key: 'iconPosition',
-          value: 'left',
+          value: 'start',
           configuration: {
             as: 'BUTTONGROUP',
             dataType: 'string',
@@ -1452,9 +1452,9 @@
               value: 'icon',
             },
             allowedInput: [
-              { name: 'Left', value: 'left' },
+              { name: 'Start', value: 'start' },
+              { name: 'End', value: 'end' },
               { name: 'Top', value: 'top' },
-              { name: 'Right', value: 'right' },
               { name: 'Bottom', value: 'bottom' },
             ],
           },
