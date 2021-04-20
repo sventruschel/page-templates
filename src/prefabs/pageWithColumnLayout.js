@@ -1746,7 +1746,8 @@
                 info={
                   <>
                     <Text size="small" color="grey700">
-                      Click the Add row button to add a new row to the page.
+                      Click the <b>+ Add row</b> button to add a new row to the
+                      page.
                       <br />
                       You can specify the amount of columns per row.
                     </Text>
