@@ -2,7 +2,7 @@
   name: 'Page With Column Layout',
   icon: 'GridIcon',
   description:
-    'With this page with app bar you can configure the complete layout of your page by selecting the amount of rows and the number of columns for each row',
+    'Configure the complete layout of your page by selecting the amount of rows and columns',
   type: 'page',
   category: 'LAYOUT',
   beforeCreate: ({
