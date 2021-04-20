@@ -2,6 +2,7 @@
   name: 'Page With Create Data Table',
   description: 'This is a page which contains a datatable with create dialog',
   icon: 'DataTable',
+  type: 'page',
   category: 'DATA',
   beforeCreate: ({
     helpers: { useModelQuery, camelToSnakeCase },
