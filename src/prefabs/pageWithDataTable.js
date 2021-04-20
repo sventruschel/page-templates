@@ -2,6 +2,7 @@
   name: 'Page With Data Table',
   description: 'This is a page which contains a datatable',
   icon: 'DataTable',
+  type: 'page',
   category: 'DATA',
   beforeCreate: ({
     helpers: { useModelQuery },
@@ -57,8 +58,6 @@
 
     const isEmptyRedirect = value =>
       !value || Object.keys(value).length === 0 || value.id === '';
-
-
 
     function serializeParameters(obj) {
       return Object.entries(obj).map(([name, entry]) => ({
@@ -2704,6 +2703,55 @@
                               option: 'type',
                               comparator: 'EQ',
                               value: 'img',
+                            },
+                          },
+                        },
+                        {
+                          type: 'CUSTOM',
+                          label: 'Link to',
+                          key: 'linkType',
+                          value: 'internal',
+                          configuration: {
+                            as: 'BUTTONGROUP',
+                            dataType: 'string',
+                            allowedInput: [
+                              { name: 'Internal page', value: 'internal' },
+                              { name: 'External page', value: 'external' },
+                            ],
+                            condition: {
+                              type: 'SHOW',
+                              option: 'type',
+                              comparator: 'EQ',
+                              value: 'img',
+                            },
+                          },
+                        },
+                        {
+                          value: '',
+                          label: 'Page',
+                          key: 'linkTo',
+                          type: 'ENDPOINT',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'linkType',
+                              comparator: 'EQ',
+                              value: 'internal',
+                            },
+                          },
+                        },
+                        {
+                          value: [''],
+                          label: 'URL',
+                          key: 'linkToExternal',
+                          type: 'VARIABLE',
+                          configuration: {
+                            placeholder: 'Starts with https:// or http://',
+                            condition: {
+                              type: 'SHOW',
+                              option: 'linkType',
+                              comparator: 'EQ',
+                              value: 'external',
                             },
                           },
                         },
