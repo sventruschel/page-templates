@@ -1,8 +1,6 @@
 (() => ({
   name: 'Column Layout',
   icon: 'GridIcon',
-  description:
-    'With this component you can select the amount of rows and the number of columns for each row',
   category: 'LAYOUT',
   beforeCreate: ({
     close,
@@ -21,7 +19,7 @@
     prefab,
     save,
   }) => {
-    const [rows, setRows] = React.useState([{ index: 1, columns: '2' }]);
+    const [rows, setRows] = React.useState([{ index: 1, columns: 2 }]);
 
     const createElements = n => {
       const elements = [];
@@ -55,8 +53,10 @@
               <Field
                 info={
                   <Text size="small" color="grey700">
-                    {`Click the '+ Add row' button to add a new row to the page.
-                    You can specify the amount of columns per row`}
+                    Click the <b>+ Add row</b> button to add a new row to the
+                    page.
+                    <br />
+                    You can specify the amount of columns per row
                   </Text>
                 }
               >
@@ -67,7 +67,7 @@
                     if (maxRows) {
                       setRows([
                         ...rows,
-                        { index: rows.length + 1, columns: '1' },
+                        { index: rows.length + 1, columns: 1 },
                       ]);
                     }
                   }}
@@ -91,7 +91,7 @@
                             currentRow => currentRow.index === row.index,
                           );
                           const updatedRows = rows;
-                          updatedRows[index].columns = value;
+                          updatedRows[index].columns = parseInt(value, 10);
                           setRows([...updatedRows]);
                         }}
                         value={row.columns.toString()}
@@ -177,6 +177,11 @@
               ))}
             </Box>
           </Box>
+          <Text color="#666d85" size="small">
+            Note: On smaller screens the preview may differ from what you see on
+            the canvas.
+            <br /> It should be the same when you build the page
+          </Text>
         </Content>
         <Footer
           onClose={close}
@@ -229,6 +234,32 @@
               };
 
               for (let index = 0; index < row.columns; index += 1) {
+                let widthArray = [];
+                switch (row.columns) {
+                  case 2:
+                    widthArray = ['6', '6', '12', '12'];
+                    break;
+                  case 3:
+                    widthArray = ['4', '4', '12', '12'];
+                    break;
+                  case 4:
+                    widthArray = ['6', '6', '12', '12'];
+                    break;
+                  case 5:
+                    widthArray = ['flexible', 'flexible', '6', '12'];
+                    break;
+                  case 6:
+                    widthArray = ['2', '2', '6', '6'];
+                    break;
+                  default:
+                    widthArray = [
+                      'flexible',
+                      'flexible',
+                      'flexible',
+                      'flexible',
+                    ];
+                    break;
+                }
                 newRow.descendants.push({
                   name: 'Column',
                   options: [
@@ -242,7 +273,7 @@
                       },
                     },
                     {
-                      value: 'flexible',
+                      value: widthArray[0],
                       label: 'Column width',
                       key: 'columnWidth',
                       type: 'CUSTOM',
@@ -269,7 +300,7 @@
                       },
                     },
                     {
-                      value: 'flexible',
+                      value: widthArray[1],
                       label: 'Column width (tablet landscape)',
                       key: 'columnWidthTabletLandscape',
                       type: 'CUSTOM',
@@ -296,7 +327,7 @@
                       },
                     },
                     {
-                      value: 'flexible',
+                      value: widthArray[2],
                       label: 'Column width (tablet portrait)',
                       key: 'columnWidthTabletPortrait',
                       type: 'CUSTOM',
@@ -323,7 +354,7 @@
                       },
                     },
                     {
-                      value: 'flexible',
+                      value: widthArray[3],
                       label: 'Column width (mobile)',
                       key: 'columnWidthMobile',
                       type: 'CUSTOM',
