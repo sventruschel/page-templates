@@ -1,8 +1,6 @@
 (() => ({
   name: 'Column Layout',
   icon: 'GridIcon',
-  description:
-    'With this component you can select the amount of rows and the number of columns for each row',
   category: 'LAYOUT',
   beforeCreate: ({
     close,
@@ -55,8 +53,10 @@
               <Field
                 info={
                   <Text size="small" color="grey700">
-                    {`Click the '+ Add row' button to add a new row to the page.
-                    You can specify the amount of columns per row`}
+                    Click the <b>+ Add row</b> button to add a new row to the
+                    page.
+                    <br />
+                    You can specify the amount of columns per row.
                   </Text>
                 }
               >
