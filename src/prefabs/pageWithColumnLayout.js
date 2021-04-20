@@ -1876,11 +1876,14 @@
                 ))}
               </Box>
             </Box>
-            <Text color="#666d85" size="small">
-              Note: On smaller screens the preview may differ from what you see
-              on the canvas.
-              <br /> It should be the same when you build the page
-            </Text>
+            <Box pad={{ top: '2rem' }}>
+              <Text color="#666d85" size="small">
+                Note: On smaller screens the preview may differ from what you
+                see on the canvas.
+                <br />
+                It should be the same when you build the page.
+              </Text>
+            </Box>
           </>
         );
       },
@@ -1942,7 +1945,7 @@
                 widthArray = ['4', '4', '12', '12'];
                 break;
               case 4:
-                widthArray = ['6', '6', '12', '12'];
+                widthArray = ['3', '6', '6', '12'];
                 break;
               case 5:
                 widthArray = ['flexible', 'flexible', '6', '12'];
