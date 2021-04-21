@@ -1,8 +1,8 @@
 (() => ({
   name: 'Page With Data Table',
-  description: 'This is a page which contains a datatable',
   icon: 'DataTable',
   type: 'page',
+  description: 'This page contains an app bar and a data table',
   category: 'DATA',
   beforeCreate: ({
     helpers: { useModelQuery },
@@ -33,10 +33,10 @@
     const [stepNumber, setStepNumber] = React.useState(1);
     const [appBarTitle, setAppBarTitle] = React.useState('Appbar');
     const [useLogoutButton, setUseLogoutButton] = React.useState(true);
+    const [redirectTo, setRedirectTo] = React.useState({});
     const [showEndpointValidation, setShowEndpointValidation] = React.useState(
       false,
     );
-    const [redirectTo, setRedirectTo] = React.useState({});
 
     const { data } = useModelQuery({
       variables: { id: modelId },
