@@ -1,7 +1,7 @@
 (() => ({
   name: 'Page With Grid View',
   icon: 'GridIcon',
-  // type: 'page',
+  type: 'page',
   description:
     'This is a page containing a data grid with a custom search field',
   category: 'LAYOUT',
@@ -5510,7 +5510,7 @@
               <Field
                 info={
                   <Text size="small" color="grey700">
-                    This is how each grid item will look like on the canvas.
+                    This is what each grid item will look like on the canvas
                   </Text>
                 }
               >
