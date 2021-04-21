@@ -1,7 +1,7 @@
 (() => ({
   name: 'Page With Master Detail View',
   icon: 'DataTable',
-  // type: 'page',
+  type: 'page',
   description:
     'This is a page containing a master detail view with edit and delete functionality',
   category: 'LAYOUT',
@@ -35,7 +35,7 @@
       skip: !modelId,
     });
 
-    const reduceStructure = (refValue, structure) =>
+    const getDescendantByRef = (refValue, structure) =>
       structure.reduce((acc, component) => {
         if (acc) return acc;
         if (
@@ -45,7 +45,7 @@
         ) {
           return component;
         }
-        return reduceStructure(refValue, component.descendants);
+        return getDescendantByRef(refValue, component.descendants);
       }, null);
 
     const iconConfiguration = {
@@ -1724,32 +1724,74 @@
 
     const stepper = {
       setStep: step => {
-        let activeStep;
-        switch (step) {
-          case 1:
-            activeStep = (
-              <>
-                <Field label="Add a delete button">
-                  <CheckBox
-                    onChange={() => {
-                      setAddDelete(!addDelete);
-                    }}
-                    checked={addDelete}
-                  />
-                </Field>
-                <Field label="Model">
-                  <ModelSelector
-                    onChange={value => {
-                      setModelId(value);
-                    }}
-                    value={modelId}
-                  />
-                </Field>
-                <Field label="Columns in the data table">
+        if (step === 1) {
+          return (
+            <>
+              <Field label="Add a delete button">
+                <CheckBox
+                  onChange={() => {
+                    setAddDelete(!addDelete);
+                  }}
+                  checked={addDelete}
+                />
+              </Field>
+              <Field label="Model">
+                <ModelSelector
+                  onChange={value => {
+                    setModelId(value);
+                  }}
+                  value={modelId}
+                />
+              </Field>
+              <Field label="Columns in the data table">
+                <PropertiesSelector
+                  modelId={modelId}
+                  value={properties}
+                  disabledKinds={[
+                    'HAS_AND_BELONGS_TO_MANY',
+                    'HAS_MANY',
+                    'MULTI_FILE',
+                    'AUTO_INCREMENT',
+                    'COUNT',
+                    'MULTI_IMAGE',
+                    'PDF',
+                    'SIGNED_PDF',
+                    'SUM',
+                  ]}
+                  onChange={value => {
+                    setProperties(value);
+                  }}
+                />
+              </Field>
+            </>
+          );
+        }
+        return (
+          <>
+            <Field label="Details dialog">
+              <PropertiesSelector
+                modelId={modelId}
+                value={details}
+                onChange={value => {
+                  setDetails(value);
+                }}
+              />
+            </Field>
+            <Field label="Use the same properties in the edit form">
+              <Box pad={{ bottom: 'medium' }}>
+                <CheckBox
+                  checked={inheritProperties}
+                  onChange={() => setInheritProperties(!inheritProperties)}
+                />
+              </Box>
+              {!inheritProperties && (
+                <Field label="Input fields in the edit form">
                   <PropertiesSelector
                     modelId={modelId}
-                    value={properties}
+                    value={editProperties}
+                    disabledNames={['created_at', 'updated_at', 'id']}
                     disabledKinds={[
+                      'BELONGS_TO',
                       'HAS_AND_BELONGS_TO_MANY',
                       'HAS_MANY',
                       'MULTI_FILE',
@@ -1757,84 +1799,34 @@
                       'COUNT',
                       'MULTI_IMAGE',
                       'PDF',
+                      'RICH_TEXT',
                       'SIGNED_PDF',
                       'SUM',
+                      'BOOLEAN_EXPRESSION',
+                      'DATE_EXPRESSION',
+                      'DATE_TIME_EXPRESSION',
+                      'DECIMAL_EXPRESSION',
+                      'INTEGER_EXPRESSION',
+                      'MINUTES_EXPRESSION',
+                      'PRICE_EXPRESSION',
+                      'STRING_EXPRESSION',
+                      'TEXT_EXPRESSION',
+                      'MINUTES',
+                      'ZIPCODE',
                     ]}
                     onChange={value => {
-                      setProperties(value);
+                      setEditProperties(value);
                     }}
                   />
                 </Field>
-              </>
-            );
-            break;
-          case 2:
-            activeStep = (
-              <>
-                <Field label="Details dialog">
-                  <PropertiesSelector
-                    modelId={modelId}
-                    value={details}
-                    onChange={value => {
-                      setDetails(value);
-                    }}
-                  />
-                </Field>
-                <Field label="Use the same properties in the edit form">
-                  <Box pad={{ bottom: 'medium' }}>
-                    <CheckBox
-                      checked={inheritProperties}
-                      onChange={() => setInheritProperties(!inheritProperties)}
-                    />
-                  </Box>
-                  {!inheritProperties && (
-                    <Field label="Input fields in the edit form">
-                      <PropertiesSelector
-                        modelId={modelId}
-                        value={editProperties}
-                        disabledNames={['created_at', 'updated_at', 'id']}
-                        disabledKinds={[
-                          'BELONGS_TO',
-                          'HAS_AND_BELONGS_TO_MANY',
-                          'HAS_MANY',
-                          'MULTI_FILE',
-                          'AUTO_INCREMENT',
-                          'COUNT',
-                          'MULTI_IMAGE',
-                          'PDF',
-                          'RICH_TEXT',
-                          'SIGNED_PDF',
-                          'SUM',
-                          'BOOLEAN_EXPRESSION',
-                          'DATE_EXPRESSION',
-                          'DATE_TIME_EXPRESSION',
-                          'DECIMAL_EXPRESSION',
-                          'INTEGER_EXPRESSION',
-                          'MINUTES_EXPRESSION',
-                          'PRICE_EXPRESSION',
-                          'STRING_EXPRESSION',
-                          'TEXT_EXPRESSION',
-                          'MINUTES',
-                          'ZIPCODE',
-                        ]}
-                        onChange={value => {
-                          setEditProperties(value);
-                        }}
-                      />
-                    </Field>
-                  )}
-                </Field>
-              </>
-            );
-            break;
-          default:
-            break;
-        }
-        return activeStep;
+              )}
+            </Field>
+          </>
+        );
       },
       onSave: () => {
         const newPrefab = { ...prefab };
-        const dataTable = reduceStructure('#dataTable', newPrefab.structure);
+        const dataTable = getDescendantByRef('#dataTable', newPrefab.structure);
         dataTable.options[0].value = modelId;
         properties.filter(property => property.kind !== 'SERIAL');
         const makeDescendantsArray = props => {
@@ -8358,6 +8350,55 @@
                           },
                         },
                         {
+                          type: 'CUSTOM',
+                          label: 'Link to',
+                          key: 'linkType',
+                          value: 'internal',
+                          configuration: {
+                            as: 'BUTTONGROUP',
+                            dataType: 'string',
+                            allowedInput: [
+                              { name: 'Internal page', value: 'internal' },
+                              { name: 'External page', value: 'external' },
+                            ],
+                            condition: {
+                              type: 'SHOW',
+                              option: 'type',
+                              comparator: 'EQ',
+                              value: 'img',
+                            },
+                          },
+                        },
+                        {
+                          value: '',
+                          label: 'Page',
+                          key: 'linkTo',
+                          type: 'ENDPOINT',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'linkType',
+                              comparator: 'EQ',
+                              value: 'internal',
+                            },
+                          },
+                        },
+                        {
+                          value: [''],
+                          label: 'URL',
+                          key: 'linkToExternal',
+                          type: 'VARIABLE',
+                          configuration: {
+                            placeholder: 'Starts with https:// or http://',
+                            condition: {
+                              type: 'SHOW',
+                              option: 'linkType',
+                              comparator: 'EQ',
+                              value: 'external',
+                            },
+                          },
+                        },
+                        {
                           value: [],
                           label: 'Source',
                           key: 'videoSource',
@@ -11389,7 +11430,7 @@
           editFormProperties,
         ).filter(item => item !== undefined);
 
-        const editForm = reduceStructure('#editForm', [editDialog]);
+        const editForm = getDescendantByRef('#editForm', [editDialog]);
         editForm.options[0].value.modelId = modelId;
         editForm.options[1].value = modelId;
         editForm.descendants = [...descendantsArray];
@@ -15070,7 +15111,9 @@
             ...dataTable.descendants,
             ...deleteDataTableColumn,
           ];
-          const deleteButton = reduceStructure('#deleteSubmit', [deleteDialog]);
+          const deleteButton = getDescendantByRef('#deleteSubmit', [
+            deleteDialog,
+          ]);
           deleteButton.options[7].value = [modelId];
         }
         save(newPrefab);
@@ -15114,16 +15157,19 @@
           </Box>
         </Box>
       ),
-      progressBar: titles => (
-        <Box
-          justify="center"
-          margin={{ bottom: '2rem', left: '2rem', top: '-1rem' }}
-        >
-          <Text size="medium" weight="bold">{`Step: ${stepNumber} / ${
-            stepper.stepAmount
-          } - ${titles[stepNumber - 1]}`}</Text>
-        </Box>
-      ),
+      progressBar: titles => {
+        const titlesArray = titles;
+        return (
+          <Box
+            justify="center"
+            margin={{ bottom: '2rem', left: '2rem', top: '-1rem' }}
+          >
+            <Text size="medium" weight="bold">{`Step: ${stepNumber} / ${
+              stepper.stepAmount
+            } - ${titlesArray[stepNumber - 1]}`}</Text>
+          </Box>
+        );
+      },
       stepAmount: 2,
     };
 

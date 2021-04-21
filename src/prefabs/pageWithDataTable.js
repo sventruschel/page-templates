@@ -1,31 +1,35 @@
 (() => ({
-  name: 'Page With Column Layout',
-  icon: 'GridIcon',
-  description:
-    'Configure the complete layout of your page by selecting the amount of rows and columns',
+  name: 'Page With Data Table',
+  description: 'This is a page which contains a datatable',
+  icon: 'DataTable',
   type: 'page',
-  category: 'LAYOUT',
+  category: 'DATA',
   beforeCreate: ({
-    close,
+    helpers: { useModelQuery },
     components: {
-      Box,
-      Content,
-      Field,
-      Footer,
       Header,
-      ButtonGroup,
-      ButtonGroupButton,
-      Button,
+      Content,
+      Footer,
+      Field,
       Text,
-      DeleteButton,
+      ModelSelector,
+      PropertiesSelector,
+      EndpointSelector,
       TextInput,
       CheckBox,
-      EndpointSelector,
+      Box,
+      Button,
     },
     prefab,
     save,
+    close,
   }) => {
-    const [rows, setRows] = React.useState([{ index: 1, columns: 2 }]);
+    const [modelId, setModelId] = React.useState('');
+    const [properties, setProperties] = React.useState([]);
+    const [modelValidation, setModelValidation] = React.useState(false);
+    const [propertiesValidation, setPropertiesValidation] = React.useState(
+      false,
+    );
     const [stepNumber, setStepNumber] = React.useState(1);
     const [appBarTitle, setAppBarTitle] = React.useState('Appbar');
     const [useLogoutButton, setUseLogoutButton] = React.useState(true);
@@ -33,26 +37,11 @@
       false,
     );
     const [redirectTo, setRedirectTo] = React.useState({});
-    const createElements = n => {
-      const elements = [];
-      for (let i = 0; i < n; i += 1) {
-        elements.push(
-          <Box
-            border={{
-              color: '#AFB5C8',
-              size: 'xsmall',
-              style: 'dashed',
-              side: 'all',
-            }}
-            margin="2px"
-            direction="column"
-            width={`${100 / n}%`}
-            background="#f0f1f5"
-          />,
-        );
-      }
-      return elements;
-    };
+
+    const { data } = useModelQuery({
+      variables: { id: modelId },
+      skip: !modelId,
+    });
 
     const getDescendantByRef = (refValue, structure) =>
       structure.reduce((acc, component) => {
@@ -77,7 +66,785 @@
       }));
     }
 
-    const maxRows = rows.length < 9;
+    const prefabStructure = [
+      {
+        name: 'AppBar',
+        ref: {
+          id: '#appBar',
+        },
+        options: [
+          {
+            label: 'Background color',
+            key: 'backgroundColor',
+            value: 'Primary',
+            type: 'COLOR',
+          },
+          {
+            label: 'Text color',
+            key: 'color',
+            value: 'White',
+            type: 'COLOR',
+          },
+          {
+            type: 'SIZE',
+            label: 'Height',
+            key: 'height',
+            value: '60px',
+            configuration: {
+              as: 'UNIT',
+            },
+          },
+          {
+            label: 'Position',
+            key: 'position',
+            value: 'static',
+            type: 'CUSTOM',
+            configuration: {
+              as: 'DROPDOWN',
+              dataType: 'string',
+              allowedInput: [
+                {
+                  name: 'Fixed',
+                  value: 'fixed',
+                },
+                {
+                  name: 'Absolute',
+                  value: 'absolute',
+                },
+                {
+                  name: 'Sticky',
+                  value: 'sticky',
+                },
+
+                {
+                  name: 'Static',
+                  value: 'static',
+                },
+                {
+                  name: 'Relative',
+                  value: 'relative',
+                },
+              ],
+            },
+          },
+          {
+            label: 'Title',
+            key: 'title',
+            value: ['Page with data table'],
+            type: 'VARIABLE',
+          },
+          {
+            label: 'Logo',
+            key: 'logoSource',
+            value: [],
+            type: 'VARIABLE',
+          },
+          {
+            type: 'SIZE',
+            label: 'Logo Width',
+            key: 'logoWidth',
+            value: '150px',
+            configuration: {
+              as: 'UNIT',
+            },
+          },
+          {
+            label: 'Align items',
+            key: 'alignItems',
+            value: 'right',
+            type: 'CUSTOM',
+            configuration: {
+              as: 'BUTTONGROUP',
+              dataType: 'string',
+              allowedInput: [
+                {
+                  name: 'Left',
+                  value: 'left',
+                },
+                {
+                  name: 'Right',
+                  value: 'right',
+                },
+              ],
+            },
+          },
+          {
+            label: 'Page',
+            key: 'endpoint',
+            value: '',
+            type: 'ENDPOINT',
+          },
+          {
+            label: 'Variant',
+            key: 'appBarVariant',
+            value: 'elevation',
+            type: 'CUSTOM',
+            configuration: {
+              as: 'BUTTONGROUP',
+              dataType: 'string',
+              allowedInput: [
+                {
+                  name: 'Flat',
+                  value: 'flat',
+                },
+                {
+                  name: 'Elevation',
+                  value: 'elevation',
+                },
+                {
+                  name: 'Outlined',
+                  value: 'outlined',
+                },
+              ],
+            },
+          },
+          {
+            label: 'Elevation',
+            key: 'elevation',
+            value: '1',
+            type: 'CUSTOM',
+            configuration: {
+              as: 'DROPDOWN',
+              dataType: 'string',
+              allowedInput: [
+                { name: '1', value: '1' },
+                { name: '2', value: '2' },
+                { name: '3', value: '3' },
+                { name: '4', value: '4' },
+                { name: '5', value: '5' },
+                { name: '6', value: '6' },
+                { name: '7', value: '7' },
+                { name: '8', value: '8' },
+                { name: '9', value: '9' },
+                { name: '10', value: '10' },
+                { name: '11', value: '11' },
+                { name: '12', value: '12' },
+                { name: '13', value: '13' },
+                { name: '14', value: '14' },
+                { name: '15', value: '15' },
+                { name: '16', value: '16' },
+                { name: '17', value: '17' },
+                { name: '18', value: '18' },
+                { name: '19', value: '19' },
+                { name: '20', value: '20' },
+                { name: '21', value: '21' },
+                { name: '22', value: '22' },
+                { name: '23', value: '23' },
+                { name: '24', value: '24' },
+              ],
+              condition: {
+                type: 'SHOW',
+                option: 'appBarVariant',
+                comparator: 'EQ',
+                value: 'elevation',
+              },
+            },
+          },
+          {
+            label: 'Square',
+            key: 'square',
+            value: true,
+            type: 'TOGGLE',
+          },
+          {
+            label: 'Size',
+            key: 'toolbarVariant',
+            value: 'regular',
+            type: 'CUSTOM',
+            configuration: {
+              as: 'DROPDOWN',
+              dataType: 'string',
+              allowedInput: [
+                {
+                  name: 'Regular',
+                  value: 'regular',
+                },
+                {
+                  name: 'Dense',
+                  value: 'dense',
+                },
+              ],
+            },
+          },
+        ],
+        descendants: [],
+      },
+      {
+        name: 'Row',
+        options: [
+          {
+            type: 'CUSTOM',
+            label: 'Width',
+            key: 'maxRowWidth',
+            value: 'XL',
+            configuration: {
+              as: 'BUTTONGROUP',
+              dataType: 'string',
+              allowedInput: [
+                { name: 'S', value: 'S' },
+                { name: 'M', value: 'M' },
+                { name: 'L', value: 'L' },
+                { name: 'XL', value: 'XL' },
+                { name: 'Full', value: 'Full' },
+              ],
+            },
+          },
+          {
+            value: '',
+            label: 'Height',
+            key: 'rowHeight',
+            type: 'TEXT',
+            configuration: {
+              as: 'UNIT',
+            },
+          },
+          {
+            value: 'transparent',
+            label: 'Background color',
+            key: 'backgroundColor',
+            type: 'COLOR',
+          },
+          {
+            value: ['0rem', '0rem', '0rem', '0rem'],
+            label: 'Outer space',
+            key: 'outerSpacing',
+            type: 'SIZES',
+          },
+        ],
+        descendants: [
+          {
+            name: 'Column',
+            options: [
+              {
+                label: 'Toggle visibility',
+                key: 'visible',
+                value: true,
+                type: 'TOGGLE',
+                configuration: {
+                  as: 'VISIBILITY',
+                },
+              },
+              {
+                value: '12',
+                label: 'Column width',
+                key: 'columnWidth',
+                type: 'CUSTOM',
+                configuration: {
+                  as: 'DROPDOWN',
+                  dataType: 'string',
+                  allowedInput: [
+                    { name: 'Fit content', value: 'fitContent' },
+                    { name: 'Flexible', value: 'flexible' },
+                    { name: 'Hidden', value: 'hidden' },
+                    { name: '1', value: '1' },
+                    { name: '2', value: '2' },
+                    { name: '3', value: '3' },
+                    { name: '4', value: '4' },
+                    { name: '5', value: '5' },
+                    { name: '6', value: '6' },
+                    { name: '7', value: '7' },
+                    { name: '8', value: '8' },
+                    { name: '9', value: '9' },
+                    { name: '10', value: '10' },
+                    { name: '11', value: '11' },
+                    { name: '12', value: '12' },
+                  ],
+                },
+              },
+              {
+                value: '12',
+                label: 'Column width (tablet landscape)',
+                key: 'columnWidthTabletLandscape',
+                type: 'CUSTOM',
+                configuration: {
+                  as: 'DROPDOWN',
+                  dataType: 'string',
+                  allowedInput: [
+                    { name: 'Fit content', value: 'fitContent' },
+                    { name: 'Flexible', value: 'flexible' },
+                    { name: 'Hidden', value: 'hidden' },
+                    { name: '1', value: '1' },
+                    { name: '2', value: '2' },
+                    { name: '3', value: '3' },
+                    { name: '4', value: '4' },
+                    { name: '5', value: '5' },
+                    { name: '6', value: '6' },
+                    { name: '7', value: '7' },
+                    { name: '8', value: '8' },
+                    { name: '9', value: '9' },
+                    { name: '10', value: '10' },
+                    { name: '11', value: '11' },
+                    { name: '12', value: '12' },
+                  ],
+                },
+              },
+              {
+                value: '12',
+                label: 'Column width (tablet portrait)',
+                key: 'columnWidthTabletPortrait',
+                type: 'CUSTOM',
+                configuration: {
+                  as: 'DROPDOWN',
+                  dataType: 'string',
+                  allowedInput: [
+                    { name: 'Fit content', value: 'fitContent' },
+                    { name: 'Flexible', value: 'flexible' },
+                    { name: 'Hidden', value: 'hidden' },
+                    { name: '1', value: '1' },
+                    { name: '2', value: '2' },
+                    { name: '3', value: '3' },
+                    { name: '4', value: '4' },
+                    { name: '5', value: '5' },
+                    { name: '6', value: '6' },
+                    { name: '7', value: '7' },
+                    { name: '8', value: '8' },
+                    { name: '9', value: '9' },
+                    { name: '10', value: '10' },
+                    { name: '11', value: '11' },
+                    { name: '12', value: '12' },
+                  ],
+                },
+              },
+              {
+                value: '12',
+                label: 'Column width (mobile)',
+                key: 'columnWidthMobile',
+                type: 'CUSTOM',
+                configuration: {
+                  as: 'DROPDOWN',
+                  dataType: 'string',
+                  allowedInput: [
+                    { name: 'Fit content', value: 'fitContent' },
+                    { name: 'Flexible', value: 'flexible' },
+                    { name: 'Hidden', value: 'hidden' },
+                    { name: '1', value: '1' },
+                    { name: '2', value: '2' },
+                    { name: '3', value: '3' },
+                    { name: '4', value: '4' },
+                    { name: '5', value: '5' },
+                    { name: '6', value: '6' },
+                    { name: '7', value: '7' },
+                    { name: '8', value: '8' },
+                    { name: '9', value: '9' },
+                    { name: '10', value: '10' },
+                    { name: '11', value: '11' },
+                    { name: '12', value: '12' },
+                  ],
+                },
+              },
+              {
+                value: '',
+                label: 'Height',
+                key: 'columnHeight',
+                type: 'TEXT',
+                configuration: {
+                  as: 'UNIT',
+                },
+              },
+              {
+                value: 'transparent',
+                label: 'Background color',
+                key: 'backgroundColor',
+                type: 'COLOR',
+              },
+              {
+                type: 'CUSTOM',
+                label: 'Horizontal Alignment',
+                key: 'horizontalAlignment',
+                value: 'inherit',
+                configuration: {
+                  as: 'BUTTONGROUP',
+                  dataType: 'string',
+                  allowedInput: [
+                    { name: 'None', value: 'inherit' },
+                    { name: 'Left', value: 'flex-start' },
+                    { name: 'Center', value: 'center' },
+                    { name: 'Right', value: 'flex-end' },
+                  ],
+                },
+              },
+              {
+                type: 'CUSTOM',
+                label: 'Vertical Alignment',
+                key: 'verticalAlignment',
+                value: 'inherit',
+                configuration: {
+                  as: 'BUTTONGROUP',
+                  dataType: 'string',
+                  allowedInput: [
+                    { name: 'None', value: 'inherit' },
+                    { name: 'Top', value: 'flex-start' },
+                    { name: 'Center', value: 'center' },
+                    { name: 'Bottom', value: 'flex-end' },
+                  ],
+                },
+              },
+              {
+                value: ['0rem', '0rem', '0rem', '0rem'],
+                label: 'Outer space',
+                key: 'outerSpacing',
+                type: 'SIZES',
+              },
+              {
+                value: ['M', 'M', 'M', 'M'],
+                label: 'Inner space',
+                key: 'innerSpacing',
+                type: 'SIZES',
+              },
+            ],
+            descendants: [
+              {
+                name: 'DataTable',
+                ref: {
+                  id: '#dataTable',
+                },
+                options: [
+                  {
+                    value: '',
+                    label: 'Model',
+                    key: 'model',
+                    type: 'MODEL',
+                  },
+                  {
+                    value: {},
+                    label: 'Filter',
+                    key: 'filter',
+                    type: 'FILTER',
+                    configuration: {
+                      dependsOn: 'model',
+                    },
+                  },
+                  {
+                    value: '',
+                    label: 'Order by',
+                    key: 'orderProperty',
+                    type: 'PROPERTY',
+                    configuration: {
+                      dependsOn: 'model',
+                    },
+                  },
+                  {
+                    value: 'asc',
+                    label: 'Sort order',
+                    key: 'sortOrder',
+                    type: 'CUSTOM',
+                    configuration: {
+                      as: 'BUTTONGROUP',
+                      dataType: 'string',
+                      allowedInput: [
+                        { name: 'Ascending', value: 'asc' },
+                        { name: 'Descending', value: 'desc' },
+                      ],
+                      condition: {
+                        type: 'HIDE',
+                        option: 'orderProperty',
+                        comparator: 'EQ',
+                        value: '',
+                      },
+                    },
+                  },
+                  {
+                    value: '',
+                    label: 'Search on property',
+                    key: 'searchProperty',
+                    type: 'PROPERTY',
+                    configuration: {
+                      dependsOn: 'model',
+                    },
+                  },
+                  {
+                    value: '',
+                    label: 'Hide built-in search field',
+                    key: 'hideSearch',
+                    type: 'TOGGLE',
+                  },
+                  {
+                    type: 'VARIABLE',
+                    label: 'Search on text',
+                    key: 'labelSearchOn',
+                    value: ['Search on'],
+                    configuration: {
+                      condition: {
+                        type: 'HIDE',
+                        option: 'hideSearch',
+                        comparator: 'EQ',
+                        value: true,
+                      },
+                    },
+                  },
+                  {
+                    value: '',
+                    label: 'Authentication Profile',
+                    key: 'authProfile',
+                    type: 'AUTHENTICATION_PROFILE',
+                  },
+                  {
+                    type: 'VARIABLE',
+                    label: 'Title',
+                    key: 'title',
+                    value: [],
+                  },
+                  {
+                    value: 'Title4',
+                    label: 'Title type',
+                    key: 'titleType',
+                    type: 'FONT',
+                  },
+                  {
+                    label: 'Pagination',
+                    key: 'pagination',
+                    value: 'always',
+                    type: 'CUSTOM',
+                    configuration: {
+                      as: 'BUTTONGROUP',
+                      dataType: 'string',
+                      allowedInput: [
+                        { name: 'Always', value: 'always' },
+                        { name: 'When needed', value: 'whenNeeded' },
+                        { name: 'Never', value: 'never' },
+                      ],
+                    },
+                  },
+                  {
+                    value: false,
+                    label: 'Auto load on scroll',
+                    key: 'autoLoadOnScroll',
+                    type: 'TOGGLE',
+                    configuration: {
+                      condition: {
+                        type: 'SHOW',
+                        option: 'pagination',
+                        comparator: 'EQ',
+                        value: 'never',
+                      },
+                    },
+                  },
+                  {
+                    value: '50',
+                    label: 'Number of records to auto load',
+                    key: 'autoLoadTakeAmount',
+                    type: 'CUSTOM',
+                    configuration: {
+                      as: 'DROPDOWN',
+                      dataType: 'string',
+                      allowedInput: [
+                        { name: '5', value: '5' },
+                        { name: '10', value: '10' },
+                        { name: '25', value: '25' },
+                        { name: '50', value: '50' },
+                        { name: '100', value: '100' },
+                      ],
+                      condition: {
+                        type: 'SHOW',
+                        option: 'autoLoadOnScroll',
+                        comparator: 'EQ',
+                        value: true,
+                      },
+                    },
+                  },
+                  {
+                    value: '5',
+                    label: 'Rows per page',
+                    key: 'take',
+                    type: 'CUSTOM',
+                    configuration: {
+                      as: 'DROPDOWN',
+                      dataType: 'string',
+                      allowedInput: [
+                        { name: '5', value: '5' },
+                        { name: '10', value: '10' },
+                        { name: '25', value: '25' },
+                        { name: '50', value: '50' },
+                        { name: '100', value: '100' },
+                      ],
+                      condition: {
+                        type: 'HIDE',
+                        option: 'autoLoadOnScroll',
+                        comparator: 'EQ',
+                        value: true,
+                      },
+                    },
+                  },
+                  {
+                    type: 'VARIABLE',
+                    label: 'Rows per page text',
+                    key: 'labelRowsPerPage',
+                    value: ['Rows per page'],
+                    configuration: {
+                      condition: {
+                        type: 'HIDE',
+                        option: 'pagination',
+                        comparator: 'EQ',
+                        value: 'never',
+                      },
+                    },
+                  },
+                  {
+                    type: 'VARIABLE',
+                    label: "Pagination label (x 'of' y)",
+                    key: 'labelNumberOfPages',
+                    value: ['of'],
+                    configuration: {
+                      condition: {
+                        type: 'HIDE',
+                        option: 'pagination',
+                        comparator: 'EQ',
+                        value: 'never',
+                      },
+                    },
+                  },
+                  {
+                    type: 'SIZE',
+                    label: 'Height',
+                    key: 'height',
+                    value: '',
+                    configuration: {
+                      as: 'UNIT',
+                    },
+                  },
+                  {
+                    type: 'TOGGLE',
+                    label: 'Sticky header',
+                    key: 'stickyHeader',
+                    value: false,
+                  },
+                  {
+                    value: 'medium',
+                    label: 'Size',
+                    key: 'size',
+                    type: 'CUSTOM',
+                    configuration: {
+                      as: 'BUTTONGROUP',
+                      dataType: 'string',
+                      allowedInput: [
+                        { name: 'Small', value: 'small' },
+                        { name: 'Medium', value: 'medium' },
+                      ],
+                    },
+                  },
+                  {
+                    type: 'COLOR',
+                    label: 'Background',
+                    key: 'background',
+                    value: 'Transparent',
+                  },
+                  {
+                    type: 'COLOR',
+                    label: 'Background header',
+                    key: 'backgroundHeader',
+                    value: 'Transparent',
+                  },
+                  {
+                    label: 'Square',
+                    key: 'square',
+                    value: false,
+                    type: 'TOGGLE',
+                  },
+                  {
+                    label: 'Variant',
+                    key: 'variant',
+                    value: 'elevation',
+                    type: 'CUSTOM',
+                    configuration: {
+                      as: 'BUTTONGROUP',
+                      dataType: 'string',
+                      allowedInput: [
+                        { name: 'Flat', value: 'flat' },
+                        { name: 'Elevation', value: 'elevation' },
+                        { name: 'Outlined', value: 'outlined' },
+                      ],
+                    },
+                  },
+                  {
+                    label: 'Elevation',
+                    key: 'elevation',
+                    value: '1',
+                    type: 'CUSTOM',
+                    configuration: {
+                      as: 'DROPDOWN',
+                      dataType: 'string',
+                      allowedInput: [
+                        { name: '1', value: '1' },
+                        { name: '2', value: '2' },
+                        { name: '3', value: '3' },
+                        { name: '4', value: '4' },
+                        { name: '5', value: '5' },
+                        { name: '6', value: '6' },
+                        { name: '7', value: '7' },
+                        { name: '8', value: '8' },
+                        { name: '9', value: '9' },
+                        { name: '10', value: '10' },
+                        { name: '11', value: '11' },
+                        { name: '12', value: '12' },
+                        { name: '13', value: '13' },
+                        { name: '14', value: '14' },
+                        { name: '15', value: '15' },
+                        { name: '16', value: '16' },
+                        { name: '17', value: '17' },
+                        { name: '18', value: '18' },
+                        { name: '19', value: '19' },
+                        { name: '20', value: '20' },
+                        { name: '21', value: '21' },
+                        { name: '22', value: '22' },
+                        { name: '23', value: '23' },
+                        { name: '24', value: '24' },
+                      ],
+                      condition: {
+                        type: 'SHOW',
+                        option: 'variant',
+                        comparator: 'EQ',
+                        value: 'elevation',
+                      },
+                    },
+                  },
+                  {
+                    value: '',
+                    label: 'Row click',
+                    key: 'linkTo',
+                    type: 'ENDPOINT',
+                  },
+                  {
+                    type: 'COLOR',
+                    label: 'Row hover color',
+                    key: 'backgroundRowHover',
+                    value: 'Transparent',
+                    configuration: {
+                      condition: {
+                        type: 'HIDE',
+                        option: 'linkTo',
+                        comparator: 'EQ',
+                        value: '',
+                      },
+                    },
+                  },
+                  {
+                    value: ['XL', '0rem', 'M', '0rem'],
+                    label: 'Outer space',
+                    key: 'outerSpacing',
+                    type: 'SIZES',
+                  },
+                  {
+                    value: 'built-in',
+                    label: 'Error message',
+                    key: 'showError',
+                    type: 'CUSTOM',
+                    configuration: {
+                      as: 'BUTTONGROUP',
+                      dataType: 'string',
+                      allowedInput: [
+                        { name: 'Built in', value: 'built-in' },
+                        { name: 'Interaction', value: 'interaction' },
+                      ],
+                    },
+                  },
+                ],
+                descendants: [],
+              },
+            ],
+          },
+        ],
+      },
+    ];
 
     const logoutButton = {
       name: 'Button',
@@ -1741,413 +2508,334 @@
         }
         return (
           <>
-            <Box direction="row">
-              <Box direction="column" basis="2/3">
-                <Field
-                  info={
-                    <>
-                      <Text size="small" color="grey700">
-                        Click the <b>+ Add row</b> button to add a new row to
-                        the page.
-                        <br />
-                        You can specify the amount of columns per row.
-                      </Text>
-                    </>
-                  }
-                >
-                  <Button
-                    label="+ Add row"
-                    disabled={!maxRows}
-                    onClick={() => {
-                      if (maxRows) {
-                        setRows([
-                          ...rows,
-                          { index: rows.length + 1, columns: 1 },
-                        ]);
-                      }
-                    }}
-                  />
-                </Field>
-                {rows.map(row => (
-                  <Field>
-                    <Box direction="row">
-                      <Box
-                        direction="column"
-                        basis="auto"
-                        alignSelf="center"
-                        pad={{ right: '15px' }}
-                      >
-                        <Text>Row {row.index}</Text>
-                      </Box>
-                      <Box direction="column" basis="auto">
-                        <ButtonGroup
-                          onChange={({ target: { value } }) => {
-                            const index = rows.findIndex(
-                              currentRow => currentRow.index === row.index,
-                            );
-                            const updatedRows = rows;
-                            updatedRows[index].columns = parseInt(value, 10);
-                            setRows([...updatedRows]);
-                          }}
-                          value={row.columns.toString()}
-                        >
-                          <ButtonGroupButton
-                            label="1"
-                            value="1"
-                            name={`options-${row.index}`}
-                          />
-                          <ButtonGroupButton
-                            label="2"
-                            value="2"
-                            name={`options-${row.index}`}
-                          />
-                          <ButtonGroupButton
-                            label="3"
-                            value="3"
-                            name={`options-${row.index}`}
-                          />
-                          <ButtonGroupButton
-                            label="4"
-                            value="4"
-                            name={`options-${row.index}`}
-                          />
-                          <ButtonGroupButton
-                            label="5"
-                            value="5"
-                            name={`options-${row.index}`}
-                          />
-                          <ButtonGroupButton
-                            label="6"
-                            value="6"
-                            name={`options-${row.index}`}
-                          />
-                        </ButtonGroup>
-                      </Box>
-                      <Box
-                        direction="column"
-                        basis="auto"
-                        pad={{ left: '5px' }}
-                      >
-                        <DeleteButton
-                          label="X"
-                          value={row.index}
-                          disabled={!(rows.length > 1)}
-                          onClick={event => {
-                            const newRows = [...rows];
-                            const index = newRows.findIndex(
-                              currentRow =>
-                                currentRow.index ===
-                                parseInt(event.target.value, 10),
-                            );
-                            if (index !== -1) {
-                              newRows.splice(index, 1);
-
-                              newRows.map((correctRow, rowIndex) => {
-                                const newRow = correctRow;
-                                newRow.index = rowIndex + 1;
-                                return { ...newRow };
-                              });
-                              setRows([...newRows]);
-                            }
-                          }}
-                        />
-                      </Box>
-                    </Box>
-                  </Field>
-                ))}
-              </Box>
-              <Box direction="column" basis="1/3" margin={{ top: '11%' }}>
-                <Text color="#666d85">Preview:</Text>
-                {rows.map(row => (
-                  <Box
-                    border={{
-                      color: '#AFB5C8',
-                      size: 'xsmall',
-                      style: 'dashed',
-                      side: 'all',
-                    }}
-                    direction="row"
-                    height="100%"
-                    background="#FFFFFF"
-                    justify="center"
-                  >
-                    {createElements(row.columns)}
-                  </Box>
-                ))}
-              </Box>
-            </Box>
-            <Box pad={{ top: '2rem' }}>
-              <Text color="#666d85" size="small">
-                Note: On smaller screens the preview may differ from what you
-                see on the canvas.
-                <br />
-                It should be the same when you build the page.
-              </Text>
-            </Box>
+            <Field
+              label="Model"
+              error={
+                modelValidation && (
+                  <Text color="#e82600">Selecting a model is required</Text>
+                )
+              }
+            >
+              <ModelSelector
+                onChange={value => {
+                  setModelValidation(false);
+                  setModelId(value);
+                }}
+                value={modelId}
+              />
+            </Field>
+            <Field
+              label="Columns in the data table"
+              error={
+                propertiesValidation && (
+                  <Text color="#e82600">Selecting a property is required</Text>
+                )
+              }
+            >
+              <PropertiesSelector
+                modelId={modelId}
+                value={properties}
+                disabledKinds={[
+                  'BELONGS_TO',
+                  'HAS_AND_BELONGS_TO_MANY',
+                  'HAS_MANY',
+                  'MULTI_FILE',
+                  'AUTO_INCREMENT',
+                  'COUNT',
+                  'MULTI_IMAGE',
+                  'PDF',
+                  'RICH_TEXT',
+                  'SIGNED_PDF',
+                  'SUM',
+                  'BOOLEAN_EXPRESSION',
+                  'DATE_EXPRESSION',
+                  'DATE_TIME_EXPRESSION',
+                  'DECIMAL_EXPRESSION',
+                  'INTEGER_EXPRESSION',
+                  'MINUTES_EXPRESSION',
+                  'PRICE_EXPRESSION',
+                  'STRING_EXPRESSION',
+                  'TEXT_EXPRESSION',
+                  'MINUTES',
+                  'ZIPCODE',
+                ]}
+                onChange={value => {
+                  setProperties(value);
+                }}
+              />
+            </Field>
           </>
         );
       },
       onSave: () => {
+        const propertiesLength = properties.length;
+        if (!modelId || propertiesLength < 1) {
+          setModelValidation(!modelId);
+          setPropertiesValidation(propertiesLength < 1);
+          return;
+        }
+
         const newPrefab = { ...prefab };
-        rows.forEach(row => {
-          const newRow = {
-            name: 'Row',
+
+        const dataTable = getDescendantByRef('#dataTable', prefabStructure);
+        dataTable.options[0].value = modelId;
+
+        dataTable.options[8].value.push(`${data.model.label}s`);
+        properties.filter(property => property.kind !== 'SERIAL');
+        properties.forEach(property => {
+          dataTable.descendants.push({
+            name: 'DataTableColumn',
             options: [
               {
+                value: true,
+                label: 'Initial visibility',
+                key: 'visible',
+                type: 'TOGGLE',
+                configuration: {
+                  as: 'VISIBILITY',
+                },
+              },
+              {
+                value: property,
+                label: 'Property',
+                key: 'property',
+                type: 'PROPERTY',
+              },
+              {
+                type: 'TOGGLE',
+                label: 'Sortable',
+                key: 'sortable',
+                value: false,
+              },
+              {
+                type: 'VARIABLE',
+                label: 'Header text',
+                key: 'headerText',
+                value: [''],
+              },
+              {
+                value: 'Body1',
+                label: 'Header Type',
+                key: 'type',
+                type: 'FONT',
+              },
+              {
+                type: 'VARIABLE',
+                label: 'Content',
+                key: 'content',
+                value: [''],
+                configuration: {
+                  as: 'MULTILINE',
+                },
+              },
+              {
+                value: 'Body1',
+                label: 'Body type',
+                key: 'bodyType',
+                type: 'FONT',
+              },
+              {
                 type: 'CUSTOM',
-                label: 'Width',
-                key: 'maxRowWidth',
-                value: 'XL',
+                label: 'Column Alignment',
+                key: 'horizontalAlignment',
+                value: 'left',
                 configuration: {
                   as: 'BUTTONGROUP',
                   dataType: 'string',
                   allowedInput: [
-                    { name: 'S', value: 'S' },
-                    { name: 'M', value: 'M' },
-                    { name: 'L', value: 'L' },
-                    { name: 'XL', value: 'XL' },
-                    { name: 'Full', value: 'Full' },
+                    { name: 'Left', value: 'left' },
+                    { name: 'Center', value: 'center' },
+                    { name: 'Right', value: 'right' },
                   ],
                 },
               },
               {
+                type: 'SIZE',
+                label: 'Width',
+                key: 'width',
                 value: '',
-                label: 'Height',
-                key: 'rowHeight',
-                type: 'TEXT',
                 configuration: {
                   as: 'UNIT',
                 },
               },
               {
-                value: 'transparent',
-                label: 'Background color',
-                key: 'backgroundColor',
                 type: 'COLOR',
+                label: 'Background',
+                key: 'background',
+                value: 'Transparent',
               },
               {
-                value: ['0rem', '0rem', '0rem', '0rem'],
-                label: 'Outer space',
-                key: 'outerSpacing',
-                type: 'SIZES',
+                type: 'COLOR',
+                label: 'Border color',
+                key: 'borderColor',
+                value: 'Light',
               },
             ],
-            descendants: [],
-          };
-
-          for (let index = 0; index < row.columns; index += 1) {
-            let widthArray = [];
-            switch (row.columns) {
-              case 2:
-                widthArray = ['6', '6', '12', '12'];
-                break;
-              case 3:
-                widthArray = ['4', '4', '12', '12'];
-                break;
-              case 4:
-                widthArray = ['3', '6', '6', '12'];
-                break;
-              case 5:
-                widthArray = ['flexible', 'flexible', '6', '12'];
-                break;
-              case 6:
-                widthArray = ['2', '2', '6', '6'];
-                break;
-              default:
-                widthArray = ['flexible', 'flexible', 'flexible', 'flexible'];
-                break;
-            }
-
-            newRow.descendants.push({
-              name: 'Column',
-              options: [
-                {
-                  label: 'Toggle visibility',
-                  key: 'visible',
-                  value: true,
-                  type: 'TOGGLE',
-                  configuration: {
-                    as: 'VISIBILITY',
-                  },
-                },
-                {
-                  value: widthArray[0],
-                  label: 'Column width',
-                  key: 'columnWidth',
-                  type: 'CUSTOM',
-                  configuration: {
-                    as: 'DROPDOWN',
-                    dataType: 'string',
-                    allowedInput: [
-                      { name: 'Fit content', value: 'fitContent' },
-                      { name: 'Flexible', value: 'flexible' },
-                      { name: 'Hidden', value: 'hidden' },
-                      { name: '1', value: '1' },
-                      { name: '2', value: '2' },
-                      { name: '3', value: '3' },
-                      { name: '4', value: '4' },
-                      { name: '5', value: '5' },
-                      { name: '6', value: '6' },
-                      { name: '7', value: '7' },
-                      { name: '8', value: '8' },
-                      { name: '9', value: '9' },
-                      { name: '10', value: '10' },
-                      { name: '11', value: '11' },
-                      { name: '12', value: '12' },
-                    ],
-                  },
-                },
-                {
-                  value: widthArray[1],
-                  label: 'Column width (tablet landscape)',
-                  key: 'columnWidthTabletLandscape',
-                  type: 'CUSTOM',
-                  configuration: {
-                    as: 'DROPDOWN',
-                    dataType: 'string',
-                    allowedInput: [
-                      { name: 'Fit content', value: 'fitContent' },
-                      { name: 'Flexible', value: 'flexible' },
-                      { name: 'Hidden', value: 'hidden' },
-                      { name: '1', value: '1' },
-                      { name: '2', value: '2' },
-                      { name: '3', value: '3' },
-                      { name: '4', value: '4' },
-                      { name: '5', value: '5' },
-                      { name: '6', value: '6' },
-                      { name: '7', value: '7' },
-                      { name: '8', value: '8' },
-                      { name: '9', value: '9' },
-                      { name: '10', value: '10' },
-                      { name: '11', value: '11' },
-                      { name: '12', value: '12' },
-                    ],
-                  },
-                },
-                {
-                  value: widthArray[2],
-                  label: 'Column width (tablet portrait)',
-                  key: 'columnWidthTabletPortrait',
-                  type: 'CUSTOM',
-                  configuration: {
-                    as: 'DROPDOWN',
-                    dataType: 'string',
-                    allowedInput: [
-                      { name: 'Fit content', value: 'fitContent' },
-                      { name: 'Flexible', value: 'flexible' },
-                      { name: 'Hidden', value: 'hidden' },
-                      { name: '1', value: '1' },
-                      { name: '2', value: '2' },
-                      { name: '3', value: '3' },
-                      { name: '4', value: '4' },
-                      { name: '5', value: '5' },
-                      { name: '6', value: '6' },
-                      { name: '7', value: '7' },
-                      { name: '8', value: '8' },
-                      { name: '9', value: '9' },
-                      { name: '10', value: '10' },
-                      { name: '11', value: '11' },
-                      { name: '12', value: '12' },
-                    ],
-                  },
-                },
-                {
-                  value: widthArray[3],
-                  label: 'Column width (mobile)',
-                  key: 'columnWidthMobile',
-                  type: 'CUSTOM',
-                  configuration: {
-                    as: 'DROPDOWN',
-                    dataType: 'string',
-                    allowedInput: [
-                      { name: 'Fit content', value: 'fitContent' },
-                      { name: 'Flexible', value: 'flexible' },
-                      { name: 'Hidden', value: 'hidden' },
-                      { name: '1', value: '1' },
-                      { name: '2', value: '2' },
-                      { name: '3', value: '3' },
-                      { name: '4', value: '4' },
-                      { name: '5', value: '5' },
-                      { name: '6', value: '6' },
-                      { name: '7', value: '7' },
-                      { name: '8', value: '8' },
-                      { name: '9', value: '9' },
-                      { name: '10', value: '10' },
-                      { name: '11', value: '11' },
-                      { name: '12', value: '12' },
-                    ],
-                  },
-                },
-                {
-                  value: '',
-                  label: 'Height',
-                  key: 'columnHeight',
-                  type: 'TEXT',
-                  configuration: {
-                    as: 'UNIT',
-                  },
-                },
-                {
-                  value: 'transparent',
-                  label: 'Background color',
-                  key: 'backgroundColor',
-                  type: 'COLOR',
-                },
-                {
-                  type: 'CUSTOM',
-                  label: 'Horizontal Alignment',
-                  key: 'horizontalAlignment',
-                  value: 'inherit',
-                  configuration: {
-                    as: 'BUTTONGROUP',
-                    dataType: 'string',
-                    allowedInput: [
-                      { name: 'None', value: 'inherit' },
-                      { name: 'Left', value: 'flex-start' },
-                      { name: 'Center', value: 'center' },
-                      { name: 'Right', value: 'flex-end' },
-                    ],
-                  },
-                },
-                {
-                  type: 'CUSTOM',
-                  label: 'Vertical Alignment',
-                  key: 'verticalAlignment',
-                  value: 'inherit',
-                  configuration: {
-                    as: 'BUTTONGROUP',
-                    dataType: 'string',
-                    allowedInput: [
-                      { name: 'None', value: 'inherit' },
-                      { name: 'Top', value: 'flex-start' },
-                      { name: 'Center', value: 'center' },
-                      { name: 'Bottom', value: 'flex-end' },
-                    ],
-                  },
-                },
-                {
-                  value: ['0rem', '0rem', '0rem', '0rem'],
-                  label: 'Outer space',
-                  key: 'outerSpacing',
-                  type: 'SIZES',
-                },
-                {
-                  value: ['M', 'M', 'M', 'M'],
-                  label: 'Inner space',
-                  key: 'innerSpacing',
-                  type: 'SIZES',
-                },
-              ],
-              descendants: [],
-            });
-          }
-          const rootColumn = getDescendantByRef(
-            '#rootColumn',
-            newPrefab.structure,
-          );
-          rootColumn.descendants.push(newRow);
+            descendants:
+              property.kind === 'IMAGE'
+                ? [
+                    {
+                      name: 'Media',
+                      options: [
+                        {
+                          label: 'Media type',
+                          key: 'type',
+                          value: 'img',
+                          type: 'CUSTOM',
+                          configuration: {
+                            as: 'BUTTONGROUP',
+                            dataType: 'string',
+                            allowedInput: [
+                              { name: 'Image', value: 'img' },
+                              { name: 'Video', value: 'video' },
+                              { name: 'I-frame', value: 'iframe' },
+                            ],
+                          },
+                        },
+                        {
+                          value: [property],
+                          label: 'Source',
+                          key: 'imageSource',
+                          type: 'VARIABLE',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'type',
+                              comparator: 'EQ',
+                              value: 'img',
+                            },
+                          },
+                        },
+                        {
+                          type: 'CUSTOM',
+                          label: 'Link to',
+                          key: 'linkType',
+                          value: 'internal',
+                          configuration: {
+                            as: 'BUTTONGROUP',
+                            dataType: 'string',
+                            allowedInput: [
+                              { name: 'Internal page', value: 'internal' },
+                              { name: 'External page', value: 'external' },
+                            ],
+                            condition: {
+                              type: 'SHOW',
+                              option: 'type',
+                              comparator: 'EQ',
+                              value: 'img',
+                            },
+                          },
+                        },
+                        {
+                          value: '',
+                          label: 'Page',
+                          key: 'linkTo',
+                          type: 'ENDPOINT',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'linkType',
+                              comparator: 'EQ',
+                              value: 'internal',
+                            },
+                          },
+                        },
+                        {
+                          value: [''],
+                          label: 'URL',
+                          key: 'linkToExternal',
+                          type: 'VARIABLE',
+                          configuration: {
+                            placeholder: 'Starts with https:// or http://',
+                            condition: {
+                              type: 'SHOW',
+                              option: 'linkType',
+                              comparator: 'EQ',
+                              value: 'external',
+                            },
+                          },
+                        },
+                        {
+                          value: [],
+                          label: 'Source',
+                          key: 'videoSource',
+                          type: 'VARIABLE',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'type',
+                              comparator: 'EQ',
+                              value: 'video',
+                            },
+                          },
+                        },
+                        {
+                          value: [],
+                          label: 'Source',
+                          key: 'iframeSource',
+                          type: 'VARIABLE',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'type',
+                              comparator: 'EQ',
+                              value: 'iframe',
+                            },
+                          },
+                        },
+                        {
+                          value: [],
+                          label: 'Image Alternative Text',
+                          key: 'imgAlt',
+                          type: 'VARIABLE',
+                          configuration: {
+                            condition: {
+                              type: 'SHOW',
+                              option: 'type',
+                              comparator: 'EQ',
+                              value: 'img',
+                            },
+                          },
+                        },
+                        {
+                          value: [],
+                          label: 'Title',
+                          key: 'title',
+                          type: 'VARIABLE',
+                        },
+                        {
+                          type: 'SIZE',
+                          label: 'Width',
+                          key: 'width',
+                          value: '100%',
+                          configuration: {
+                            as: 'UNIT',
+                          },
+                        },
+                        {
+                          type: 'SIZE',
+                          label: 'Height',
+                          key: 'height',
+                          value: '',
+                          configuration: {
+                            as: 'UNIT',
+                          },
+                        },
+                        {
+                          value: ['0rem', '0rem', 'M', '0rem'],
+                          label: 'Outer space',
+                          key: 'outerSpacing',
+                          type: 'SIZES',
+                        },
+                      ],
+                      descendants: [],
+                    },
+                  ]
+                : [],
+          });
         });
-        const appBar = getDescendantByRef('#appBar', newPrefab.structure);
+
+        const appBar = getDescendantByRef('#appBar', prefabStructure);
         if (useLogoutButton) {
           appBar.descendants.push(logoutButton);
           newPrefab.interactions.push(logoutInteraction);
@@ -2161,6 +2849,8 @@
           ];
         }
         appBar.options[4].value[0] = appBarTitle;
+        newPrefab.structure[0].descendants[0].descendants = prefabStructure;
+
         save(newPrefab);
       },
       buttons: () => (
@@ -2221,8 +2911,7 @@
 
     return (
       <>
-        <Header onClose={close} title="Configure Layout" />
-        {stepper.progressBar(['Configure Appbar', 'Configure Column Layout'])}
+        <Header title="Configure data table" onClose={close} />
         <Content>{stepper.setStep(stepNumber)}</Content>
         {stepper.buttons()}
       </>
@@ -2275,9 +2964,6 @@
       descendants: [
         {
           name: 'Column',
-          ref: {
-            id: '#rootColumn',
-          },
           options: [
             {
               label: 'Toggle visibility',
@@ -2289,7 +2975,7 @@
               },
             },
             {
-              value: 'flexible',
+              value: '12',
               label: 'Column width',
               key: 'columnWidth',
               type: 'CUSTOM',
@@ -2316,7 +3002,7 @@
               },
             },
             {
-              value: 'flexible',
+              value: '12',
               label: 'Column width (tablet landscape)',
               key: 'columnWidthTabletLandscape',
               type: 'CUSTOM',
@@ -2343,7 +3029,7 @@
               },
             },
             {
-              value: 'flexible',
+              value: '12',
               label: 'Column width (tablet portrait)',
               key: 'columnWidthTabletPortrait',
               type: 'CUSTOM',
@@ -2370,7 +3056,7 @@
               },
             },
             {
-              value: 'flexible',
+              value: '12',
               label: 'Column width (mobile)',
               key: 'columnWidthMobile',
               type: 'CUSTOM',
@@ -2456,210 +3142,7 @@
               type: 'SIZES',
             },
           ],
-          descendants: [
-            {
-              name: 'AppBar',
-              ref: {
-                id: '#appBar',
-              },
-              options: [
-                {
-                  label: 'Background color',
-                  key: 'backgroundColor',
-                  value: 'Primary',
-                  type: 'COLOR',
-                },
-                {
-                  label: 'Text color',
-                  key: 'color',
-                  value: 'White',
-                  type: 'COLOR',
-                },
-                {
-                  type: 'SIZE',
-                  label: 'Height',
-                  key: 'height',
-                  value: '60px',
-                  configuration: {
-                    as: 'UNIT',
-                  },
-                },
-                {
-                  label: 'Position',
-                  key: 'position',
-                  value: 'static',
-                  type: 'CUSTOM',
-                  configuration: {
-                    as: 'DROPDOWN',
-                    dataType: 'string',
-                    allowedInput: [
-                      {
-                        name: 'Fixed',
-                        value: 'fixed',
-                      },
-                      {
-                        name: 'Absolute',
-                        value: 'absolute',
-                      },
-                      {
-                        name: 'Sticky',
-                        value: 'sticky',
-                      },
-
-                      {
-                        name: 'Static',
-                        value: 'static',
-                      },
-                      {
-                        name: 'Relative',
-                        value: 'relative',
-                      },
-                    ],
-                  },
-                },
-                {
-                  label: 'Title',
-                  key: 'title',
-                  value: ['App Bar'],
-                  type: 'VARIABLE',
-                },
-                {
-                  label: 'Logo',
-                  key: 'logoSource',
-                  value: [],
-                  type: 'VARIABLE',
-                },
-                {
-                  type: 'SIZE',
-                  label: 'Logo Width',
-                  key: 'logoWidth',
-                  value: '150px',
-                  configuration: {
-                    as: 'UNIT',
-                  },
-                },
-                {
-                  label: 'Align items',
-                  key: 'alignItems',
-                  value: 'right',
-                  type: 'CUSTOM',
-                  configuration: {
-                    as: 'BUTTONGROUP',
-                    dataType: 'string',
-                    allowedInput: [
-                      {
-                        name: 'Left',
-                        value: 'left',
-                      },
-                      {
-                        name: 'Right',
-                        value: 'right',
-                      },
-                    ],
-                  },
-                },
-                {
-                  label: 'Page',
-                  key: 'endpoint',
-                  value: '',
-                  type: 'ENDPOINT',
-                },
-                {
-                  label: 'Variant',
-                  key: 'appBarVariant',
-                  value: 'elevation',
-                  type: 'CUSTOM',
-                  configuration: {
-                    as: 'BUTTONGROUP',
-                    dataType: 'string',
-                    allowedInput: [
-                      {
-                        name: 'Flat',
-                        value: 'flat',
-                      },
-                      {
-                        name: 'Elevation',
-                        value: 'elevation',
-                      },
-                      {
-                        name: 'Outlined',
-                        value: 'outlined',
-                      },
-                    ],
-                  },
-                },
-                {
-                  label: 'Elevation',
-                  key: 'elevation',
-                  value: '1',
-                  type: 'CUSTOM',
-                  configuration: {
-                    as: 'DROPDOWN',
-                    dataType: 'string',
-                    allowedInput: [
-                      { name: '1', value: '1' },
-                      { name: '2', value: '2' },
-                      { name: '3', value: '3' },
-                      { name: '4', value: '4' },
-                      { name: '5', value: '5' },
-                      { name: '6', value: '6' },
-                      { name: '7', value: '7' },
-                      { name: '8', value: '8' },
-                      { name: '9', value: '9' },
-                      { name: '10', value: '10' },
-                      { name: '11', value: '11' },
-                      { name: '12', value: '12' },
-                      { name: '13', value: '13' },
-                      { name: '14', value: '14' },
-                      { name: '15', value: '15' },
-                      { name: '16', value: '16' },
-                      { name: '17', value: '17' },
-                      { name: '18', value: '18' },
-                      { name: '19', value: '19' },
-                      { name: '20', value: '20' },
-                      { name: '21', value: '21' },
-                      { name: '22', value: '22' },
-                      { name: '23', value: '23' },
-                      { name: '24', value: '24' },
-                    ],
-                    condition: {
-                      type: 'SHOW',
-                      option: 'appBarVariant',
-                      comparator: 'EQ',
-                      value: 'elevation',
-                    },
-                  },
-                },
-                {
-                  label: 'Square',
-                  key: 'square',
-                  value: true,
-                  type: 'TOGGLE',
-                },
-                {
-                  label: 'Size',
-                  key: 'toolbarVariant',
-                  value: 'regular',
-                  type: 'CUSTOM',
-                  configuration: {
-                    as: 'DROPDOWN',
-                    dataType: 'string',
-                    allowedInput: [
-                      {
-                        name: 'Regular',
-                        value: 'regular',
-                      },
-                      {
-                        name: 'Dense',
-                        value: 'dense',
-                      },
-                    ],
-                  },
-                },
-              ],
-              descendants: [],
-            },
-          ],
+          descendants: [],
         },
       ],
     },
