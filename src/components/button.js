@@ -163,13 +163,13 @@
         startIcon={
           !isIcon &&
           icon !== 'None' &&
-          (iconPosition === 'left' || iconPosition === 'top') &&
+          iconPosition === 'start' &&
           React.createElement(Icons[icon])
         }
         endIcon={
           !isIcon &&
           icon !== 'None' &&
-          (iconPosition === 'right' || iconPosition === 'bottom') &&
+          iconPosition === 'end' &&
           React.createElement(Icons[icon])
         }
         onClick={event => {
@@ -234,28 +234,6 @@
         },
       },
       root: {
-        '& .MuiButton-label': {
-          display: ({ options: { iconPosition } }) =>
-            iconPosition === 'top' || iconPosition === 'bottom'
-              ? 'flex'
-              : 'inherit',
-          flexDirection: ({ options: { iconPosition } }) =>
-            iconPosition === 'top' || iconPosition === 'bottom'
-              ? 'column'
-              : 'unset',
-          '& .MuiButton-startIcon': {
-            marginLeft: ({ options: { iconPosition } }) =>
-              iconPosition === 'top' ? '0px' : '-4px',
-            marginRight: ({ options: { iconPosition } }) =>
-              iconPosition === 'top' ? '0px' : '8px',
-          },
-          '& .MuiButton-endIcon': {
-            marginLeft: ({ options: { iconPosition } }) =>
-              iconPosition === 'bottom' ? '0px' : '8px',
-            marginRight: ({ options: { iconPosition } }) =>
-              iconPosition === 'bottom' ? '0px' : '-4px',
-          },
-        },
         color: ({ options: { background, disabled, textColor, variant } }) => [
           !disabled
             ? style.getColor(variant === 'icon' ? background : textColor)
