@@ -45851,9 +45851,6 @@
     newPrefab.structure[0].descendants[0].descendants = prefabStructure;
     save(newPrefab);
   },
-  variables: [],
-  actions: [],
-  interactions: [],
   structure: [
     {
       name: 'Row',
