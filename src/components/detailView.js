@@ -44,18 +44,6 @@
     const selectedFilter = getFilter();
     const hasFilter = selectedFilter && Object.keys(selectedFilter).length > 0;
 
-    if (isDev) {
-      return <BuilderLayout />;
-    }
-
-    const CanvasLayout = () => {
-      if (!hasFilter) {
-        return <BuilderLayout />;
-      }
-
-      return <One modelId={model} />;
-    };
-
     const redirect = () => {
       const history = useHistory();
       history.push(useEndpoint(redirectWithoutResult));
