@@ -9,10 +9,11 @@
     const { env, useText, Children } = B;
     const {
       activeStep: stepIndex,
-      allImages,
+      showAllImages,
       buttonNext,
       buttonPrev,
       variant,
+      variantType,
       autoplay,
       duration,
     } = options;
@@ -71,20 +72,28 @@
 
     const maxSteps = children.length;
 
-    const overlay = (
+    const carousel = (
       <MobileStepper
         steps={maxSteps}
         position="static"
-        variant="dots"
+        variant={variant === 'text' ? variantType : variant}
         activeStep={activeStep}
-        classes={{ root: classes.overlay }}
+        classes={
+          variant === 'text'
+            ? { root: classes.mobileRoot }
+            : { root: classes.overlay }
+        }
         nextButton={
           <Button
             size="small"
             onClick={handleNext}
             disabled={activeStep === maxSteps - 1}
-            classes={{ root: classes.arrowRight }}
+            className={[
+              classes.stepButtonMobile,
+              variant === 'dots' ? classes.arrowRight : '',
+            ].join(' ')}
           >
+            {variant === 'text' && buttonNextText}
             <KeyboardArrowRight />
           </Button>
         }
@@ -93,47 +102,17 @@
             size="small"
             onClick={handleBack}
             disabled={activeStep === 0}
-            classes={{ root: classes.arrowLeft }}
+            className={[
+              classes.stepButtonMobile,
+              variant === 'dots' ? classes.arrowLeft : '',
+            ].join(' ')}
           >
             <KeyboardArrowLeft />
+            {variant === 'text' && buttonPrevText}
           </Button>
         }
       />
     );
-
-    const bottom = (
-      <MobileStepper
-        steps={maxSteps}
-        position="static"
-        variant="text"
-        activeStep={activeStep}
-        classes={{ root: classes.mobileRoot }}
-        nextButton={
-          <Button
-            size="small"
-            onClick={handleNext}
-            disabled={activeStep === maxSteps - 1}
-            classes={{ root: classes.stepButtonMobile }}
-          >
-            {buttonNextText}
-            <KeyboardArrowRight />
-          </Button>
-        }
-        backButton={
-          <Button
-            size="small"
-            onClick={handleBack}
-            disabled={activeStep === 0}
-            classes={{ root: classes.stepButtonMobile }}
-          >
-            <KeyboardArrowLeft />
-            {buttonPrevText}
-          </Button>
-        }
-      />
-    );
-
-    const carouselVariant = variant === 'mobile' ? bottom : overlay;
 
     const MobileStepperCmp = (
       <div className={classes.container}>
@@ -141,13 +120,13 @@
           <Children
             stepLabelData={stepLabelData}
             setStepLabelData={setStepLabelData}
-            active={index === activeStep || (isDev && allImages)}
+            active={index === activeStep || showAllImages}
             isFirstRender={numRendersRef.current === 1}
           >
             {React.cloneElement(child)}
           </Children>
         ))}
-        {carouselVariant}
+        {carousel}
       </div>
     );
 
@@ -190,8 +169,8 @@
           height: '12px',
         },
         '& .MuiMobileStepper-dotActive': {
-          backgroundColor: ({ options: { dotColor } }) => [
-            style.getColor(dotColor),
+          backgroundColor: ({ options: { stepProgressColor } }) => [
+            style.getColor(stepProgressColor),
             '!important',
           ],
         },
@@ -208,7 +187,15 @@
       },
       overlay: {
         justifyContent: 'center !important',
-        marginTop: '-40px',
+        position: 'absolute',
+        top: '0',
+        right: '0',
+        bottom: '0',
+        left: '0',
+        '& .MuiMobileStepper-dots': {
+          position: 'absolute',
+          bottom: '16px',
+        },
       },
       stepButtonMobile: {
         pointerEvents: isDev && 'none',
